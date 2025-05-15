@@ -13,8 +13,18 @@ __pycache__/
 # -------------------------------------------
 # IGNORAR ARCHIVOS DE CONFIGURACIÓN SENSIBLES
 # -------------------------------------------
-# .env
-# .env.*
+.env
+.env.*
+*.env
+backups/.env*
+backups/*/.env*
+# Ignorar cualquier archivo que pueda contener claves API o credenciales
+*credentials*
+*secret*
+*api_key*
+*apikey*
+*password*
+*token*
 
 # -------------------------------------------
 # IGNORAR ARCHIVOS Y CARPETAS TEMPORALES
