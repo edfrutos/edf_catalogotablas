@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Catálogo{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Catálogo/Tabla</h2>
+    <a href="{{ request.referrer or url_for('admin.dashboard_admin') }}" class="btn btn-secondary mb-3">&larr; Volver</a>
+    <form method="POST">
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ catalog.name }}" required>
+        </div>
+        <!-- Puedes añadir más campos editables aquí -->
+        <button type="submit" class="btn btn-success">Guardar Cambios</button>
+    </form>
+</div>
+{% endblock %}

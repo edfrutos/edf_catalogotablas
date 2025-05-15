@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info-box {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .warning-box {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .error-box {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .btn-success {
+            background: #2ecc71;
+        }
+        .btn-success:hover {
+            background: #27ae60;
+        }
+        .btn-warning {
+            background: #f39c12;
+        }
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        .btn-danger {
+            background: #e74c3c;
+        }
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #f2f2f2;
+            padding: 10px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+        }
+        .label {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .action-panel {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Administración</h1>
+        
+        <div class="warning-box">
+            <strong>Aviso:</strong> Esta es una página estática de emergencia. El sistema principal está experimentando problemas técnicos.
+        </div>
+        
+        <div class="info-box">
+            <strong>Estado actual:</strong> Se han identificado problemas con la configuración del servidor Apache/Gunicorn que impiden el acceso normal al sistema.
+        </div>
+        
+        <h2>Información del Servidor</h2>
+        <table>
+            <tr>
+                <td class="label">Servidor Web:</td>
+                <td>Apache 2.4.41 con proxy a Gunicorn</td>
+            </tr>
+            <tr>
+                <td class="label">Sistema:</td>
+                <td>Ubuntu 20.04 LTS</td>
+            </tr>
+            <tr>
+                <td class="label">Base de Datos:</td>
+                <td>MongoDB (app_catalogojoyero)</td>
+            </tr>
+            <tr>
+                <td class="label">Aplicación:</td>
+                <td>Flask con WSGI</td>
+            </tr>
+            <tr>
+                <td class="label">Estado:</td>
+                <td><span style="color: red;">Error - Problemas de configuración</span></td>
+            </tr>
+        </table>
+        
+        <h2>Acceso Administrador</h2>
+        <table>
+            <tr>
+                <td class="label">Email:</td>
+                <td>admin@example.com</td>
+            </tr>
+            <tr>
+                <td class="label">Contraseña:</td>
+                <td>admin123</td>
+            </tr>
+        </table>
+        
+        <div class="action-panel">
+            <h2>Acciones Disponibles</h2>
+            <p>Estas acciones pueden ayudar a restaurar el funcionamiento del sistema:</p>
+            
+            <button class="btn-warning" onclick="alert('Esta función requiere acceso al servidor. Por favor, contacta con el administrador del sistema.')">Reiniciar Servicios</button>
+            <button class="btn-danger" onclick="alert('Esta función requiere acceso al servidor. Por favor, contacta con el administrador del sistema.')">Restaurar Configuración</button>
+            <button class="btn-success" onclick="window.location.href='mailto:soporte@edefrutos.com?subject=Problema%20de%20acceso%20al%20panel&body=Estoy%20experimentando%20problemas%20para%20acceder%20al%20panel%20de%20administración.'">Contactar Soporte</button>
+        </div>
+        
+        <hr>
+        
+        <h2>Diagnósticos</h2>
+        <div id="diagnostics">
+            <p>Verificando estado del servidor...</p>
+        </div>
+        
+        <script>
+            // Script para simular diagnósticos
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    document.getElementById('diagnostics').innerHTML = `
+                        <div class="error-box">
+                            <p><strong>Problemas detectados:</strong></p>
+                            <ul>
+                                <li>Error en la configuración del proxy de Apache a Gunicorn</li>
+                                <li>Permisos incorrectos en archivos y directorios</li>
+                                <li>Posible conflicto en la configuración de WSGI</li>
+                            </ul>
+                            <p>Se recomienda revisar la configuración del servidor y restaurar los valores predeterminados.</p>
+                        </div>
+                    `;
+                }, 1500);
+            });
+        </script>
+    </div>
+</body>
+</html>

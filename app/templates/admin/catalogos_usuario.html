@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Catálogos de {{ user.nombre or user.username or user.email }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Catálogos/Tablas de {{ user.nombre or user.username or user.email }}</h1>
+        <div>
+            <a href="{{ url_for('admin.lista_usuarios') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver a la lista de usuarios
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-light">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Usuario:</strong> {{ user.nombre or user.username or 'N/A' }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Email:</strong> {{ user.email }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Total de catálogos:</strong> <span class="badge bg-info">{{ catalogs|length }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if catalogs %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle shadow-sm">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Fecha de creación</th>
+                                <th>Filas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for catalog in catalogs %}
+                            <tr>
+                                <td>{{ catalog.name }}</td>
+                                <td>{{ catalog.created_at_formatted }}</td>
+                                <td>{{ catalog.row_count }}</td>
+                                <td>
+                                    {% if session.role == 'admin' %}
+                                        <a href="{{ url_for('admin.ver_catalogo_admin_detalle', catalog_id=catalog._id_str) }}" class="btn btn-sm btn-outline-primary me-1" title="Ver"><i class="bi bi-eye"></i></a>
+                                        <a href="{{ url_for('catalogs.edit', catalog_id=catalog._id_str) }}" class="btn btn-sm btn-outline-success me-1" title="Editar"><i class="bi bi-pencil"></i></a>
+                                        <form action="{{ url_for('catalogs.delete_catalog', catalog_id=catalog._id_str) }}" method="POST" style="display:inline;">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar" onclick="return confirm('¿Seguro que deseas eliminar este catálogo?')"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    {% else %}
+                                        <span class="text-muted">Sin permisos</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    Este usuario no tiene catálogos creados.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación para eliminar catálogo -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eliminarModalLabel">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar este catálogo? Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="eliminarForm" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function eliminarCatalogo(catalogId) {
+    if (!catalogId) {
+        alert('No se puede eliminar. Identificador de catálogo no válido.');
+        return;
+    }
+    document.getElementById('eliminarForm').action = `{{ url_for('admin.eliminar_catalogo_admin', catalog_id='__catalog_id__') }}`.replace('__catalog_id__', catalogId);
+    new bootstrap.Modal(document.getElementById('eliminarModal')).show();
+}
+</script>
+{% endblock %}

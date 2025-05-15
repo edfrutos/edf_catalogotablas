@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Editar Perfil</h2>
+
+<form method="POST" action="{{ url_for('auth.edit_profile') }}">
+  <div class="mb-3">
+    <label for="username" class="form-label">Nombre de usuario</label>
+    <input type="text" class="form-control" name="username" value="{{ user.username }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="email" class="form-label">Correo electrónico</label>
+    <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="password" class="form-label">Nueva contraseña (opcional)</label>
+    <input type="password" class="form-control" name="password">
+    <div class="form-text">Déjalo en blanco si no deseas cambiarla.</div>
+  </div>
+
+  <button type="submit" class="btn btn-success">Guardar cambios</button>
+</form>
+{% endblock %}

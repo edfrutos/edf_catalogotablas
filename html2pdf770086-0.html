@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>administracion-servidor</title>
+  <style type="text/css">
+      code{white-space: pre-wrap;}
+      span.smallcaps{font-variant: small-caps;}
+      span.underline{text-decoration: underline;}
+      div.column{display: inline-block; vertical-align: top; width: 50%;}
+  </style>
+</head>
+<body>
+<h1 id="checklist-de-mantenimiento-seguridad-y-backups">Checklist de Mantenimiento, Seguridad y Backups</h1>
+<h2 id="actualización-del-sistema-y-servicios">1. Actualización del sistema y servicios</h2>
+<p>sudo apt update &amp;&amp; sudo apt upgrade -y sudo apt install –only-upgrade nginx apache2 php source /var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/bin/activate pip install –upgrade pip pip list –outdated pip install –upgrade <paquete></p>
+<h2 id="firewall">2. Firewall</h2>
+<p>sudo ufw status sudo ufw allow 22/tcp sudo ufw allow 80/tcp sudo ufw allow 443/tcp sudo ufw enable</p>
+<h2 id="servicios">3. Servicios</h2>
+<p>sudo systemctl status apache2 sudo systemctl status nginx sudo systemctl status edefrutos2025 sudo systemctl status plesk-php83-fpm sudo systemctl restart apache2 sudo systemctl restart nginx sudo systemctl restart edefrutos2025 sudo systemctl restart plesk-php83-fpm</p>
+<h2 id="backups">4. Backups</h2>
+<h1 id="backup-de-todo-el-servidor-plesk">Backup de todo el servidor (Plesk)</h1>
+<h1 id="plesk-herramientas-y-configuración-administrador-de-backups-crear-backup-completo">Plesk &gt; Herramientas y configuración &gt; Administrador de backups &gt; Crear backup completo</h1>
+<h1 id="backup-manual-de-un-dominio-wordpress">Backup manual de un dominio WordPress</h1>
+<p>sudo tar czvf /root/backup-edefrutos.me-<span class="math inline">(<em>d</em><em>a</em><em>t</em><em>e</em>+</span>(date +%F).sql # Backup manual de la app Flask sudo tar czvf /root/backup-edefrutos2025-$(date +%F).tar.gz /var/www/vhosts/edefrutos2025.xyz/httpdocs/ # MongoDB Atlas: desde el panel web o usando mongodump si tienes acceso</p>
+<h2 id="seguridad-wordpress">5. Seguridad WordPress</h2>
+<h1 id="instala-y-configura-wordfence-o-ithemes-security">Instala y configura Wordfence o iThemes Security</h1>
+<h1 id="cambia-la-url-de-login-con-wps-hide-login">Cambia la URL de login con WPS Hide Login</h1>
+<h1 id="añade-en-wp-config.php">Añade en wp-config.php:</h1>
+<p>define(‘DISALLOW_FILE_EDIT’, true); # Revisa permisos: find /var/www/vhosts/DOMINIO/ -type d -exec chmod 755 {} ; find /var/www/vhosts/DOMINIO/ -type f -exec chmod 644 {} ;</p>
+<h2 id="comprobación-de-puertos-y-procesos">6. Comprobación de puertos y procesos</h2>
+<p>sudo netstat -tulnp | grep LISTEN sudo lsof -i :80 sudo lsof -i :443 sudo lsof -i :8000</p>
+<h2 id="logs-de-errores">7. Logs de errores</h2>
+<h1 id="apache">Apache</h1>
+<p>tail -f /var/log/apache2/error.log # Nginx tail -f /var/log/nginx/error.log # Gunicorn (Flask) journalctl -u edefrutos2025 -f # Plesk tail -f /var/log/plesk/panel.log</p>
+<hr />
+<h1 id="documento-resumen-para-administrar-tu-servidor">Documento Resumen para Administrar tu Servidor</h1>
+<h2 id="actualización-y-mantenimiento">1. Actualización y Mantenimiento</h2>
+<ul>
+<li>Actualiza el sistema y los servicios web regularmente.</li>
+<li>Mantén actualizados los plugins y temas de WordPress.</li>
+<li>Actualiza dependencias Python en tu entorno virtual.</li>
+</ul>
+<h2 id="seguridad">2. Seguridad</h2>
+<ul>
+<li>Usa firewall y permite solo los puertos necesarios.</li>
+<li>Usa contraseñas fuertes y 2FA en WordPress y Plesk.</li>
+<li>Instala plugins de seguridad en WordPress.</li>
+<li>Desactiva la edición de archivos desde el panel de WordPress.</li>
+<li>Revisa y corrige los permisos de archivos y carpetas.</li>
+</ul>
+<h2 id="backups-1">3. Backups</h2>
+<ul>
+<li>Programa backups automáticos desde Plesk (servidor completo o por dominio).</li>
+<li>Haz backups manuales antes de cambios importantes.</li>
+<li>Guarda los backups en una ubicación externa si es posible.</li>
+</ul>
+<h2 id="monitorización">4. Monitorización</h2>
+<ul>
+<li>Revisa el estado de los servicios con systemctl status.</li>
+<li>Consulta los logs de errores tras cualquier problema.</li>
+<li>Usa herramientas como htop o top para monitorizar recursos.</li>
+</ul>
+<h2 id="wordpress">5. WordPress</h2>
+<ul>
+<li>Mantén todo actualizado.</li>
+<li>Elimina plugins y temas que no uses.</li>
+<li>Limita los intentos de login.</li>
+<li>Usa plugins de caché para mejorar el rendimiento.</li>
+</ul>
+<h2 id="flaskpython">6. Flask/Python</h2>
+<ul>
+<li>Usa entornos virtuales.</li>
+<li>No ejecutes la app como root.</li>
+<li>Mantén el código y dependencias actualizados.</li>
+<li>Haz backup de la base de datos y del código.</li>
+</ul>
+<h2 id="plesk">7. Plesk</h2>
+<ul>
+<li>No edites manualmente los archivos de configuración generados por Plesk.</li>
+<li>Usa el panel para cambios siempre que sea posible.</li>
+<li>Si hay problemas, reconfigura dominios con: sudo /usr/local/psa/admin/sbin/httpdmng –reconfigure-domain NOMBRE_DOMINIO</li>
+</ul>
+</body>
+</html>

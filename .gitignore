@@ -1,0 +1,60 @@
+# -------------------------------------------
+# IGNORAR ENTORNOS VIRTUALES
+# -------------------------------------------
+.venv/
+venv/
+ENV/
+env/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS DE CONFIGURACIÓN SENSIBLES
+# -------------------------------------------
+# .env
+# .env.*
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS Y CARPETAS TEMPORALES
+# -------------------------------------------
+*.sqlite3
+# *.log
+*.zip
+*.tar.gz
+*.bak
+*.tmp
+.DS_Store
+Thumbs.db
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS Y CARPETAS DE DEPLOYMENT
+# -------------------------------------------
+instance/
+uploads/
+imagenes_subidas/
+spreadsheets/
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS DE IDEs (Visual Studio Code, PyCharm, etc.)
+# -------------------------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# -------------------------------------------
+# IGNORAR TEST OUTPUTS
+# -------------------------------------------
+htmlcov/
+coverage.xml
+.tox/
+.pytest_cache/
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS DE AWS (si usas SAM o CDK)
+# -------------------------------------------
+.aws-sam/
+.cdk.staging/
+.qodo

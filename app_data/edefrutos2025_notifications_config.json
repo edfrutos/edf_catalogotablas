@@ -1,0 +1,19 @@
+{
+  "enabled": false,
+  "smtp": {
+    "server": "smtp.gmail.com",
+    "port": 587,
+    "username": "",
+    "password": "",
+    "use_tls": true
+  },
+  "recipients": [],
+  "thresholds": {
+    "cpu": 85,
+    "memory": 85,
+    "disk": 85,
+    "error_rate": 10
+  },
+  "cooldown_minutes": 60,
+  "last_alerts": {}
+}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-5">
+  <h2>Manual Interactivo de Gestión de Logs</h2>
+  <div class="mb-3">
+    <button class="btn btn-primary" onclick="verUltimos(50)">Ver últimos 50 registros</button>
+    <button class="btn btn-secondary" onclick="buscarLogs()">Buscar por palabra clave</button>
+    <button class="btn btn-success" onclick="descargarLog()">Descargar log</button>
+    <button class="btn btn-danger" onclick="limpiarLog()">Limpiar log</button>
+    <button class="btn btn-info" onclick="verTamano()">Ver tamaño y rotaciones</button>
+  </div>
+  <div class="mb-3">
+    <input type="text" id="keyword" class="form-control" placeholder="Palabra clave para buscar...">
+  </div>
+  <pre id="log-output" style="background:#222;color:#0f0;padding:1em;height:400px;overflow:auto"></pre>
+</div>
+<script>
+function verUltimos(n) {
+  fetch(`/admin/logs/tail?n=${n}`)
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('log-output').textContent = d.logs.join('');
+    });
+}
+function buscarLogs() {
+  const kw = document.getElementById('keyword').value;
+  if (!kw) return alert('Introduce una palabra clave');
+  fetch(`/admin/logs/search?kw=${encodeURIComponent(kw)}`)
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('log-output').textContent = d.logs.join('');
+    });
+}
+function descargarLog() {
+  window.location = '/admin/logs/download';
+}
+function limpiarLog() {
+  if (!confirm('¿Seguro que quieres limpiar el log?')) return;
+  fetch('/admin/logs/clear', {method:'POST'})
+    .then(r => r.json())
+    .then(d => {
+      alert(d.status);
+      verUltimos(20);
+    });
+}
+function verTamano() {
+  fetch('/admin/logs/size')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('log-output').textContent = `Tamaño: ${d.size} bytes\nRotaciones: ${d.backups}`;
+    });
+}
+</script>
+{% endblock %} 

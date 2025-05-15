@@ -1,0 +1,327 @@
+# app/routes/catalogs_routes.py
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, session
+from werkzeug.utils import secure_filename
+import csv, io
+import builtins
+import pandas as pd
+import os
+import uuid
+import datetime
+from app.extensions import mongo, is_mongo_available
+from bson.objectid import ObjectId
+from functools import wraps
+
+# Función para verificar si el usuario es administrador
+def is_admin():
+    role = session.get('role')
+    current_app.logger.info(f"Rol en sesión: {role}")
+    return role == 'admin'
+
+# Decorador para verificar permisos
+# Admin puede acceder a cualquier catálogo, usuarios solo a los suyos
+# El campo created_by se compara con el username de sesión
+
+def check_catalog_permission(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Verificar disponibilidad de MongoDB
+        if not is_mongo_available():
+            flash("Error de conexión a la base de datos.", "danger")
+            return redirect(url_for('main.dashboard_user'))
+        
+        # Obtener el ID del catálogo
+        catalog_id = kwargs.get('catalog_id')
+        if not catalog_id:
+            return f(*args, **kwargs)
+        
+        # Validar el ID del catálogo
+        try:
+            object_id = ObjectId(catalog_id)
+        except Exception as e:
+            current_app.logger.error(f"ID de catálogo inválido: {catalog_id} - {str(e)}")
+            flash("ID de catálogo inválido", "danger")
+            return redirect(url_for("catalogs.list"))
+        
+        # Buscar el catálogo en la base de datos
+        catalog = mongo.db.catalogs.find_one({"_id": object_id})
+        if not catalog:
+            flash("Catálogo no encontrado", "danger")
+            return redirect(url_for("catalogs.list"))
+        
+        # Permitir acceso a todos los catálogos sin verificar sesión
+        kwargs['catalog'] = catalog
+        return f(*args, **kwargs)
+    
+    return decorated_function
+
+catalogs_bp = Blueprint("catalogs", __name__, url_prefix="/catalogs")
+
+ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+
+def get_upload_dir():
+    # Absolute path to static/uploads irrespective of where the app package is located
+    folder = os.path.join(current_app.static_folder, 'uploads')
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+def allowed_image(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_IMAGE_EXTENSIONS
+
+@catalogs_bp.route("/")
+def list():
+    # Verificar disponibilidad de MongoDB
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for('main.dashboard_user'))
+    
+    # Obtener información del usuario (si está disponible)
+    user_email = session.get('email')
+    user_username = session.get('username')
+    user_id = user_email or user_username
+    is_user_admin = session.get('role') == 'admin'
+    
+    # Registrar información de acceso
+    current_app.logger.info(f"Acceso a catálogos: Usuario={user_id if user_id else 'Anónimo'}, Admin={is_user_admin}")
+    
+    # Mostrar todos los catálogos sin filtrar por usuario
+    catalogs_cursor = mongo.db.catalogs.find()
+    
+    # Procesar los catálogos encontrados
+    catalogs = []
+    for c in catalogs_cursor:
+        if c.get("_id"):
+            # Asegurarse de que el catálogo tenga los campos necesarios
+            if "rows" not in c:
+                c["rows"] = []
+            if "headers" not in c:
+                c["headers"] = ["Columna 1", "Columna 2", "Columna 3"]
+            
+            c["row_count"] = len(c.get("rows", []))
+            c["_id_str"] = str(c["_id"])
+            catalogs.append(c)
+            current_app.logger.info(f"Catálogo encontrado: {c.get('name')} (ID: {c['_id_str']})")
+        else:
+            current_app.logger.warning(f"Catálogo sin _id detectado: {c}")
+    
+    if not catalogs:
+        flash("No hay catálogos disponibles. Crea uno para comenzar.", "info")
+    
+    current_app.logger.info(f"Total de catálogos encontrados: {len(catalogs)}")
+    return render_template("catalogs.html", catalogs=catalogs, session=session)
+
+@catalogs_bp.route("/create", methods=["GET", "POST"])
+def create():
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.list"))
+    if request.method == "POST":
+        try:
+            name = request.form.get("name", "Nuevo Catálogo")
+            headers_str = request.form.get("headers", "")
+            if headers_str:
+                headers = [h.strip() for h in headers_str.split(",")]
+            else:
+                headers = ["Columna 1", "Columna 2", "Columna 3"]
+            catalog = {
+                "name": name, 
+                "headers": headers, 
+                "rows": [],
+                "created_by": session.get('username')
+            }
+            current_app.logger.info(f"Intentando insertar catálogo: {catalog}")
+            # Confirmar que la colección existe
+            if not hasattr(mongo.db, 'catalogs'):
+                current_app.logger.error("La colección 'catalogs' no existe en la base de datos.")
+                flash("Error interno: la colección 'catalogs' no existe.", "danger")
+                return redirect(url_for("catalogs.list"))
+            result = mongo.db.catalogs.insert_one(catalog)
+            current_app.logger.info(f"Catálogo insertado con _id: {result.inserted_id}")
+            flash("Catálogo creado con éxito", "success")
+            return redirect(url_for("catalogs.list"))
+        except Exception as e:
+            current_app.logger.error(f"Error al crear catálogo: {str(e)}", exc_info=True)
+            flash(f"Error al crear catálogo: {str(e)}", "danger")
+            return redirect(url_for("catalogs.list"))
+    return render_template("admin/crear_catalogo.html", session=session)
+
+@catalogs_bp.route("/import", methods=["GET", "POST"])
+def import_catalog():
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.list"))
+    
+    if request.method == "POST":
+        if 'file' not in request.files:
+            flash('No se seleccionó ningún archivo', 'danger')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('No se seleccionó ningún archivo', 'danger')
+            return redirect(request.url)
+        
+        if not file.filename.endswith(('.csv', '.xls', '.xlsx')):
+            flash('Formato de archivo no soportado. Use CSV o Excel.', 'danger')
+            return redirect(request.url)
+        
+        try:
+            # Procesar según el tipo de archivo
+            if file.filename.endswith('.csv'):
+                # Leer CSV
+                stream = io.StringIO(file.stream.read().decode("utf-8"), newline='')
+                csv_reader = csv.reader(stream)
+                rows = list(csv_reader)
+                
+                if not rows:
+                    flash('El archivo está vacío', 'danger')
+                    return redirect(request.url)
+                
+                headers = rows[0]  # Primera fila como encabezados
+                data_rows = []
+                
+                # Convertir filas a diccionarios
+                for row in rows[1:]:
+                    row_dict = {}
+                    for i, header in enumerate(headers):
+                        row_dict[header] = row[i] if i < len(row) else ""
+                    data_rows.append(row_dict)
+                
+            else:  # Excel
+                # Leer Excel
+                df = pd.read_excel(file)
+                headers = df.columns.tolist()
+                data_rows = df.to_dict('records')
+            
+            # Crear el catálogo
+            catalog_name = request.form.get('name', 'Catálogo Importado')
+            catalog = {
+                "name": catalog_name,
+                "headers": headers,
+                "rows": data_rows,
+                "created_by": session.get('username'),
+                "created_at": datetime.datetime.now()
+            }
+            
+            result = mongo.db.catalogs.insert_one(catalog)
+            flash(f'Catálogo importado con éxito. Se importaron {len(data_rows)} filas.', 'success')
+            return redirect(url_for('catalogs.view', catalog_id=str(result.inserted_id)))
+            
+        except Exception as e:
+            current_app.logger.error(f"Error al importar catálogo: {str(e)}", exc_info=True)
+            flash(f'Error al importar: {str(e)}', 'danger')
+            return redirect(request.url)
+    
+    return render_template('importar_catalogo.html')
+
+@catalogs_bp.route("/<catalog_id>")
+@check_catalog_permission
+def view(catalog_id, catalog):
+    current_app.logger.info(f"Visualizando catálogo {catalog_id}")
+    return render_template("ver_catalogo.html", catalog=catalog, session=session)
+
+@catalogs_bp.route("/<catalog_id>/edit")
+@check_catalog_permission
+def edit(catalog_id, catalog):
+    return render_template("editar_catalogo.html", catalog=catalog, session=session)
+
+@catalogs_bp.route("/edit-row/<catalog_id>/<int:row_index>", methods=["GET", "POST"])
+@check_catalog_permission
+def edit_row(catalog_id, row_index, catalog):
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.view", catalog_id=catalog_id))
+    # Obtener la fila correspondiente
+    row_data = catalog["rows"][row_index] if 0 <= row_index < len(catalog["rows"]) else None
+    if request.method == "POST":
+        # Actualizar los datos de la fila
+        for header in catalog["headers"]:
+            row_data[header] = request.form.get(header, "")
+        # Procesar imágenes
+        imagenes = row_data.get('imagenes', [])
+        if 'imagenes' in request.files:
+            files = request.files.getlist('imagenes')
+            upload_dir = get_upload_dir()
+            nuevas_imagenes = []
+            for file in files:
+                if file and allowed_image(file.filename):
+                    filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+                    file.save(os.path.join(upload_dir, filename))
+                    nuevas_imagenes.append(filename)
+            if nuevas_imagenes:
+                imagenes = nuevas_imagenes  # Reemplazar imágenes solo si se suben nuevas
+        row_data['imagenes'] = imagenes
+        # Guardar la fila actualizada en la base de datos
+        mongo.db.catalogs.update_one(
+            {"_id": catalog["_id"]},
+            {"$set": {f"rows.{row_index}": row_data}}
+        )
+        flash("Fila actualizada correctamente", "success")
+        return redirect(url_for("catalogs.view", catalog_id=str(catalog["_id"])) )
+    return render_template("editar_fila.html", catalog=catalog, fila=row_data, row_index=row_index, session=session, headers=catalog["headers"])
+
+@catalogs_bp.route("/add-row/<catalog_id>", methods=["GET", "POST"])
+@check_catalog_permission
+def add_row(catalog_id, catalog):
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.view", catalog_id=catalog_id))
+    if request.method == "POST":
+        # Procesar datos del formulario
+        row = {}
+        for header in catalog["headers"]:
+            row[header] = request.form.get(header, "")
+        # Procesar imágenes
+        imagenes = []
+        if 'imagenes' in request.files:
+            files = request.files.getlist('imagenes')
+            upload_dir = get_upload_dir()
+            for file in files:
+                if file and allowed_image(file.filename):
+                    filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
+                    file.save(os.path.join(upload_dir, filename))
+                    imagenes.append(filename)
+        row['imagenes'] = imagenes
+        # Agregar la fila al catálogo
+        mongo.db.catalogs.update_one(
+            {"_id": ObjectId(catalog_id)}, 
+            {"$push": {"rows": row}}
+        )
+        flash("Fila agregada correctamente", "success")
+        return redirect(url_for("catalogs.view", catalog_id=catalog_id))
+    return render_template("agregar_fila.html", catalog=catalog, session=session)
+
+# Eliminar fila de un catálogo
+@catalogs_bp.route("/delete-row/<catalog_id>/<int:row_index>", methods=["GET", "POST"])
+@check_catalog_permission
+def delete_row(catalog_id, row_index, catalog):
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.view", catalog_id=catalog_id))
+    try:
+        # Eliminar la fila del catálogo
+        mongo.db.catalogs.update_one(
+            {"_id": ObjectId(catalog_id)},
+            {"$pull": {"rows": catalog["rows"][row_index]}}
+        )
+        flash("Fila eliminada correctamente", "success")
+    except Exception as e:
+        current_app.logger.error(f"Error al eliminar fila: {str(e)}")
+        flash(f"Error al eliminar fila: {str(e)}", "danger")
+    return redirect(url_for("catalogs.view", catalog_id=catalog_id))
+
+# Eliminar catálogo
+@catalogs_bp.route("/delete/<catalog_id>")
+@check_catalog_permission
+def delete_catalog(catalog_id, catalog):
+    if not is_mongo_available():
+        flash("Error de conexión a la base de datos.", "danger")
+        return redirect(url_for("catalogs.list"))
+    try:
+        # Eliminar el catálogo
+        mongo.db.catalogs.delete_one({"_id": ObjectId(catalog_id)})
+        flash("Catálogo eliminado correctamente", "success")
+    except Exception as e:
+        current_app.logger.error(f"Error al eliminar catálogo: {str(e)}")
+        flash(f"Error al eliminar catálogo: {str(e)}", "danger")
+    return redirect(url_for("catalogs.list"))
