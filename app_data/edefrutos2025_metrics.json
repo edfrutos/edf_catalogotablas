@@ -1,9 +1,9 @@
 {
   "start_time": "2025-05-15 17:08:37",
   "database_status": {
-    "last_checked": "2025-05-15 21:23:58",
+    "last_checked": "2025-05-15 21:39:00",
     "is_available": true,
-    "response_time_ms": 53.3,
+    "response_time_ms": 148.8,
     "error": null
   },
   "cache_status": {
@@ -13,15 +13,15 @@
     "hit_rate": 0.0
   },
   "system_status": {
-    "cpu_usage": 48.5,
+    "cpu_usage": 77.0,
     "memory_usage": {
-      "percent": 97.1,
-      "used_mb": 3515.94,
+      "percent": 97.3,
+      "used_mb": 3519.8,
       "total_mb": 3919.88
     },
     "disk_usage": {
-      "percent": 72.5,
-      "used_gb": 82.26,
+      "percent": 72.4,
+      "used_gb": 82.13,
       "total_gb": 119.87
     }
   },
