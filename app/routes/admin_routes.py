@@ -36,25 +36,113 @@ def dashboard_admin():
             logger.info(f"[DEBUG] spreadsheets_collection.count_documents: {spreadsheets_collection.count_documents({})}")
         else:
             logger.warning("[DEBUG] spreadsheets_collection es None")
-        total_usuarios = users_collection.count_documents({})
+        
+        # Obtener todos los usuarios
+        usuarios = list(users_collection.find())
+        total_usuarios = len(usuarios)
         total_catalogos = spreadsheets_collection.count_documents({}) if spreadsheets_collection is not None else 0
+        
+        # Crear un diccionario para almacenar el recuento de catálogos por usuario
+        catalogos_por_usuario = {}
+        for usuario in usuarios:
+            catalogos_por_usuario[str(usuario['_id'])] = {
+                'email': usuario.get('email', 'Sin email'),
+                'nombre': usuario.get('name', usuario.get('username', 'Sin nombre')),
+                'username': usuario.get('username', 'Sin usuario'),
+                'role': usuario.get('role', 'user'),
+                'count': 0,
+                'last_update': None
+            }
+        
         tablas = []
         if spreadsheets_collection is not None:
             # Mostrar todas las tablas/catálogos, no solo los del admin
             tablas = list(spreadsheets_collection.find().sort('created_at', -1))
             logger.info(f"[ADMIN] Se encontraron {len(tablas)} catálogos totales para mostrar en el dashboard.")
+            
+            # Procesar los propietarios de los catálogos para mostrar nombres reales
+            for tabla in tablas:
+                # Si el propietario es 'usuario_predeterminado' o no existe, intentar usar otros campos
+                owner_id = None
+                if 'owner' not in tabla or tabla['owner'] == 'usuario_predeterminado':
+                    if 'owner_name' in tabla and tabla['owner_name']:
+                        tabla['owner'] = tabla['owner_name']
+                    elif 'created_by' in tabla and tabla['created_by']:
+                        tabla['owner'] = tabla['created_by']
+                    elif 'username' in tabla and tabla['username']:
+                        tabla['owner'] = tabla['username']
+                    else:
+                        tabla['owner'] = 'Usuario desconocido'
+                
+                # Buscar el ID del usuario propietario
+                if 'created_by_id' in tabla and tabla['created_by_id']:
+                    owner_id = str(tabla['created_by_id'])
+                else:
+                    # Intentar encontrar el usuario por nombre de usuario
+                    for user_id, user_info in catalogos_por_usuario.items():
+                        if user_info['username'] == tabla.get('owner') or user_info['email'] == tabla.get('owner'):
+                            owner_id = user_id
+                            break
+                
+                # Incrementar el contador de catálogos para este usuario
+                if owner_id and owner_id in catalogos_por_usuario:
+                    catalogos_por_usuario[owner_id]['count'] += 1
+                    
+                    # Actualizar la última modificación si es más reciente
+                    if 'updated_at' in tabla and tabla['updated_at']:
+                        last_update = tabla['updated_at']
+                        if isinstance(last_update, str):
+                            try:
+                                last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M:%S')
+                            except:
+                                try:
+                                    last_update = datetime.strptime(last_update, '%Y-%m-%d %H:%M')
+                                except:
+                                    last_update = None
+                        
+                        if last_update and (catalogos_por_usuario[owner_id]['last_update'] is None or 
+                                           last_update > catalogos_por_usuario[owner_id]['last_update']):
+                            catalogos_por_usuario[owner_id]['last_update'] = last_update
+                
+                logger.info(f"[ADMIN] Propietario del catálogo {tabla.get('name', 'Sin nombre')}: {tabla.get('owner', 'Sin propietario')}")
+                
+                # Asegurarse de que created_at esté en formato adecuado
+                if 'created_at' in tabla and tabla['created_at'] and not isinstance(tabla['created_at'], str):
+                    try:
+                        tabla['created_at'] = tabla['created_at'].strftime('%Y-%m-%d %H:%M')
+                    except Exception as e:
+                        logger.warning(f"[ADMIN] Error al formatear fecha: {str(e)}")
+                        tabla['created_at'] = str(tabla['created_at'])
         else:
             logger.warning("[ADMIN] La colección de hojas de cálculo es None")
+        
+        # Convertir el diccionario a una lista para la plantilla
+        usuarios_con_catalogos = []
+        for user_id, user_info in catalogos_por_usuario.items():
+            # Formatear la fecha de última actualización
+            if user_info['last_update']:
+                user_info['last_update_str'] = user_info['last_update'].strftime('%d/%m/%Y, %H:%M:%S')
+            else:
+                user_info['last_update_str'] = 'No disponible'
+            
+            user_info['id'] = user_id
+            usuarios_con_catalogos.append(user_info)
+        
+        # Ordenar por número de catálogos (de mayor a menor)
+        usuarios_con_catalogos.sort(key=lambda x: x['count'], reverse=True)
+        
         # Cálculo seguro del porcentaje
         if total_usuarios > 0:
             porcentaje = float(total_catalogos) / float(total_usuarios) * 100.0
         else:
             porcentaje = 0.0
-        logger.info(f"[ADMIN] total_usuarios={total_usuarios}, total_catalogos={total_catalogos}, porcentaje calculado: {porcentaje} (tipo: {type(porcentaje)})")
+        
+        logger.info(f"[ADMIN] total_usuarios={total_usuarios}, total_catalogos={total_catalogos}, porcentaje calculado: {porcentaje}")
         response = make_response(render_template("admin/dashboard_admin.html",
                                                 total_usuarios=total_usuarios,
                                                 total_catalogos=total_catalogos,
                                                 tablas=tablas,
+                                                usuarios=usuarios_con_catalogos,
                                                 porcentaje=porcentaje))
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
@@ -315,21 +403,33 @@ def lista_usuarios():
         users = list(get_users_collection().find())
         
         # Obtener catálogos para calcular cuántos tiene cada usuario
-        catalogs_collection = getattr(current_app, 'spreadsheets_collection', None)
-        if catalogs_collection is None:
-            from app.extensions import mongo
-            catalogs_collection = mongo.db.spreadsheets
-        
-        # Crear un diccionario con el conteo de catálogos por usuario
-        catalog_counts = {}
+        from app.extensions import mongo
+        collections_to_check = ['catalogs', 'spreadsheets']
         
         # Contar por created_by (email del usuario)
         for user in users:
             user_email = user.get("email")
             if user_email:
-                count = catalogs_collection.count_documents({"created_by": user_email})
-                user["num_catalogs"] = count
-                logger.info(f"[ADMIN] Usuario {user_email} tiene {count} catálogos")
+                # Contar catálogos en ambas colecciones
+                total_count = 0
+                for collection_name in collections_to_check:
+                    try:
+                        collection = mongo.db[collection_name]
+                        # Buscar por email en created_by, owner o email
+                        count = collection.count_documents({
+                            "$or": [
+                                {"created_by": user_email},
+                                {"owner": user_email},
+                                {"email": user_email}
+                            ]
+                        })
+                        total_count += count
+                        logger.info(f"[ADMIN] Usuario {user_email} tiene {count} catálogos en {collection_name}")
+                    except Exception as e:
+                        logger.error(f"Error al contar catálogos en {collection_name}: {str(e)}")
+                
+                user["num_catalogs"] = total_count
+                logger.info(f"[ADMIN] Usuario {user_email} tiene un total de {total_count} catálogos")
             else:
                 user["num_catalogs"] = 0
         
@@ -348,7 +448,6 @@ def lista_usuarios():
         logger.error(f"Error en lista_usuarios: {str(e)}", exc_info=True)
         flash(f"Error al cargar la lista de usuarios: {str(e)}", "error")
         return redirect(url_for('admin.dashboard_admin'))
-
 @admin_bp.route("/usuarios/<user_email>/catalogos")
 # # @admin_required
 def ver_catalogos_usuario(user_email):
@@ -359,9 +458,36 @@ def ver_catalogos_usuario(user_email):
             flash(f"Usuario con email {user_email} no encontrado", "error")
             return redirect(url_for('admin.lista_usuarios'))
         
-        # Obtener los catálogos del usuario
+        # Obtener los catálogos del usuario de ambas colecciones
         from app.extensions import mongo
-        catalogs = list(mongo.db.catalogs.find({"created_by": user_email}))
+        collections_to_check = ['catalogs', 'spreadsheets']
+        all_catalogs = []
+        
+        for collection_name in collections_to_check:
+            try:
+                collection = mongo.db[collection_name]
+                # Buscar por email en created_by, owner o email
+                catalogs_cursor = collection.find({
+                    "$or": [
+                        {"created_by": user_email},
+                        {"owner": user_email},
+                        {"email": user_email}
+                    ]
+                })
+                
+                # Convertir el cursor a lista y añadir a los resultados
+                for catalog in catalogs_cursor:
+                    # Añadir información sobre la colección de origen
+                    catalog['collection_source'] = collection_name
+                    all_catalogs.append(catalog)
+                    
+                logger.info(f"[ADMIN] Encontrados {collection.count_documents({'$or': [{'created_by': user_email}, {'owner': user_email}, {'email': user_email}]})} catálogos en {collection_name} para {user_email}")
+            except Exception as e:
+                logger.error(f"Error al buscar catálogos en {collection_name}: {str(e)}")
+        
+        # Usar la lista combinada de catálogos
+        catalogs = all_catalogs
+        logger.info(f"[ADMIN] Total de catálogos encontrados para {user_email}: {len(catalogs)}")
         
         # Añadir _id_str a cada catálogo para facilitar su uso en las plantillas
         for catalog in catalogs:
@@ -388,7 +514,14 @@ def ver_catalogos_usuario(user_email):
     except Exception as e:
         logger.error(f"Error en ver_catalogos_usuario: {str(e)}", exc_info=True)
         flash(f"Error al cargar los catálogos del usuario: {str(e)}", "error")
-        return redirect(url_for('admin.lista_usuarios'))
+        # Intentar recuperar el usuario incluso en caso de error
+        try:
+            user = get_users_collection().find_one({"email": user_email})
+            if user:
+                return render_template("admin/catalogos_usuario.html", user=user, catalogs=[])
+        except Exception as inner_e:
+            logger.error(f"Error secundario al recuperar usuario: {str(inner_e)}")
+        return redirect(url_for("admin.lista_usuarios"))
 
 @admin_bp.route("/usuarios/catalogo/<catalog_id>")
 # # @admin_required
@@ -1079,20 +1212,80 @@ def notification_settings():
 @admin_bp.route("/api/test-email", methods=["POST"])
 # # @admin_required
 def test_email():
-    """Enviar correo de prueba"""
+    """Enviar correo de prueba usando las credenciales del archivo .env"""
     email = request.form.get("email")
     if not email:
         return jsonify({"success": False, "error": "No se proporcionó dirección de correo"})
     
     try:
-        result = notifications.send_test_email(email)
-        if result:
-            audit_log("test_email_sent", details={"recipient": email})
+        # Registrar información sobre el intento de envío
+        logger.info(f"[ADMIN] Intentando enviar correo de prueba a {email}")
+        
+        # Mostrar las variables de entorno relacionadas con el correo (sin la contraseña)
+        mail_server = os.environ.get('MAIL_SERVER')
+        mail_port = os.environ.get('MAIL_PORT')
+        mail_username = os.environ.get('MAIL_USERNAME')
+        mail_use_tls = os.environ.get('MAIL_USE_TLS')
+        mail_default_sender = os.environ.get('MAIL_DEFAULT_SENDER')
+        mail_default_sender_name = os.environ.get('MAIL_DEFAULT_SENDER_NAME')
+        mail_default_sender_email = os.environ.get('MAIL_DEFAULT_SENDER_EMAIL')
+        
+        logger.info(f"[ADMIN] Configuración de correo: Servidor={mail_server}, Puerto={mail_port}, "  
+                   f"Usuario={mail_username}, TLS={mail_use_tls}")
+        logger.info(f"[ADMIN] Remitentes configurados: DEFAULT_SENDER={mail_default_sender}, "  
+                   f"SENDER_NAME={mail_default_sender_name}, SENDER_EMAIL={mail_default_sender_email}")
+        
+        # Crear un correo de prueba extremadamente simple para diagnosticar el problema
+        import smtplib
+        from email.mime.text import MIMEText
+        
+        try:
+            # Crear un mensaje simple de texto plano
+            logger.info("[ADMIN] Creando mensaje de prueba simple...")
+            msg = MIMEText("Este es un mensaje de prueba.")
+            msg['Subject'] = "Prueba de correo desde edefrutos2025"
+            msg['From'] = mail_username
+            msg['To'] = email
+            
+            # Intentar enviar directamente
+            logger.info(f"[ADMIN] Conectando a {mail_server}:{mail_port}...")
+            server = smtplib.SMTP(mail_server, int(mail_port))
+            
+            if mail_use_tls and mail_use_tls.lower() in ('true', '1', 't'):
+                logger.info("[ADMIN] Iniciando TLS...")
+                server.starttls()
+            
+            logger.info(f"[ADMIN] Iniciando sesión con {mail_username}...")
+            server.login(mail_username, os.environ.get('MAIL_PASSWORD'))
+            
+            logger.info("[ADMIN] Enviando mensaje...")
+            server.send_message(msg)
+            
+            logger.info("[ADMIN] Cerrando conexión...")
+            server.quit()
+            
+            logger.info(f"[ADMIN] Correo de prueba enviado con éxito a {email} usando método directo")
+            audit_log("test_email_sent", details={"recipient": email, "method": "direct"})
             return jsonify({"success": True})
-        else:
-            return jsonify({"success": False, "error": "Error al enviar el correo. Verifica la configuración SMTP."})
+        except Exception as direct_err:
+            logger.error(f"[ADMIN] Error en método directo: {str(direct_err)}", exc_info=True)
+            
+            # Si el método directo falla, intentar con el método normal
+            logger.info("[ADMIN] Intentando con el método normal...")
+            result = notifications.send_test_email(email)
+            
+            if result:
+                logger.info(f"[ADMIN] Correo de prueba enviado con éxito a {email} usando método normal")
+                audit_log("test_email_sent", details={"recipient": email, "method": "normal"})
+                return jsonify({"success": True})
+            else:
+                logger.error(f"[ADMIN] Error al enviar correo de prueba a {email}. Ambos métodos fallaron.")
+                return jsonify({"success": False, "error": f"Error directo: {str(direct_err)}. Error en método normal: Resultado falso sin excepción."})
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)})
+        logger.error(f"[ADMIN] Excepción al enviar correo de prueba a {email}: {str(e)}", exc_info=True)
+        return jsonify({"success": False, "error": f"Error: {str(e)}"})
+
+
 
 @admin_bp.route("/verify-users")
 # # @admin_required
@@ -1130,30 +1323,74 @@ def ver_catalogos_usuario_por_id(user_id):
             flash("Usuario no encontrado", "danger")
             return redirect(url_for("admin.lista_usuarios"))
 
-        # Obtener la colección de catálogos
-        catalogs_collection = getattr(current_app, 'spreadsheets_collection', None)
-        if catalogs_collection is None:
-            from app.extensions import mongo
-            catalogs_collection = mongo.db.spreadsheets
-
-        # Obtener todos los catálogos del usuario por su email
+        # Obtener el email del usuario para buscar sus catálogos
         user_email = usuario.get("email")
-        logger.info(f"[ADMIN] Buscando catálogos para el usuario con email: {user_email}")
-
-        catalogs = list(catalogs_collection.find({"created_by": user_email}))
-        logger.info(f"[ADMIN] Se encontraron {len(catalogs)} catálogos para el usuario {user_email}")
-
+        username = usuario.get("username")
+        
+        if not user_email:
+            flash("El usuario no tiene un email válido", "warning")
+            return redirect(url_for("admin.lista_usuarios"))
+            
+        logger.info(f"[ADMIN] Buscando catálogos para el usuario con ID: {user_id}, email: {user_email}, username: {username}")
+        
+        # Obtener los catálogos del usuario de ambas colecciones
+        from app.extensions import mongo
+        collections_to_check = ['catalogs', 'spreadsheets']
+        all_catalogs = []
+        
+        for collection_name in collections_to_check:
+            try:
+                collection = mongo.db[collection_name]
+                # Buscar por email, username, owner y owner_name
+                catalogs_cursor = collection.find({
+                    "$or": [
+                        {"created_by": user_email},
+                        {"created_by": username},
+                        {"owner": user_email},
+                        {"owner_name": username},
+                        {"email": user_email}
+                    ]
+                })
+                
+                # Convertir el cursor a lista y añadir a los resultados
+                for catalog in catalogs_cursor:
+                    # Añadir información sobre la colección de origen
+                    catalog['collection_source'] = collection_name
+                    catalog['_id_str'] = str(catalog['_id'])
+                    all_catalogs.append(catalog)
+                    
+                logger.info(f"[ADMIN] Encontrados {collection.count_documents({'$or': [{'created_by': user_email}, {'created_by': username}, {'owner': user_email}, {'owner_name': username}, {'email': user_email}]})} catálogos en {collection_name} para {user_email}")
+            except Exception as e:
+                logger.error(f"Error al buscar catálogos en {collection_name}: {str(e)}")
+        
+        # Usar la lista combinada de catálogos
+        catalogs = all_catalogs
+        logger.info(f"[ADMIN] Total de catálogos encontrados para {user_email}: {len(catalogs)}")
+        
         # Añadir información adicional a cada catálogo
-        for c in catalogs:
-            # Contar filas
-            c["row_count"] = len(c.get("data", []))
-            # Formatear la fecha de creación
-            if "created_at" in c and c["created_at"]:
-                c["created_at_formatted"] = c["created_at"].strftime("%d/%m/%Y %H:%M")
+        for catalog in catalogs:
+            # Calcular el número de filas del catálogo
+            if 'rows' in catalog and catalog['rows'] is not None:
+                catalog['row_count'] = len(catalog['rows'])
+            elif 'data' in catalog and catalog['data'] is not None:
+                catalog['row_count'] = len(catalog['data'])
             else:
-                c["created_at_formatted"] = "Fecha desconocida"
+                catalog['row_count'] = 0
+                
+            # Formatear la fecha de creación
+            if "created_at" in catalog and catalog["created_at"]:
+                try:
+                    if hasattr(catalog["created_at"], "strftime"):
+                        catalog["created_at_formatted"] = catalog["created_at"].strftime("%d/%m/%Y %H:%M")
+                    else:
+                        catalog["created_at_formatted"] = str(catalog["created_at"])
+                except Exception as e:
+                    logger.error(f"Error al formatear fecha: {str(e)}")
+                    catalog["created_at_formatted"] = str(catalog["created_at"])
+            else:
+                catalog["created_at_formatted"] = "Fecha desconocida"
 
-        return render_template("admin/catalogos_usuario.html", catalogs=catalogs, usuario=usuario)
+        return render_template("admin/catalogos_usuario.html", catalogs=catalogs, user=usuario)
     except Exception as e:
         logger.error(f"Error en ver_catalogos_usuario: {str(e)}", exc_info=True)
         flash(f"Error al cargar los catálogos del usuario: {str(e)}", "error")
@@ -1193,33 +1430,207 @@ def ver_catalogo_admin_detalle(catalog_id):
         flash(f"Error al cargar el catálogo: {str(e)}", "error")
         return redirect(url_for('admin.dashboard_admin'))
 
-@admin_bp.route("/catalogo/<catalog_id>/editar", methods=["GET", "POST"])
+@admin_bp.route("/catalogo/ver/<collection_source>/<catalog_id>")
 # # @admin_required
-def editar_catalogo_admin(catalog_id):
-    catalogs_col = get_catalogs_collection()
-    catalog = catalogs_col.find_one({"_id": ObjectId(catalog_id)})
-    if not catalog:
-        flash("Catálogo no encontrado", "danger")
-        return redirect(url_for("admin.dashboard_admin"))
-    if request.method == "POST":
-        name = request.form.get("name")
-        # Puedes añadir más campos editables aquí
-        catalogs_col.update_one({"_id": ObjectId(catalog_id)}, {"$set": {"name": name}})
-        flash("Catálogo actualizado", "success")
-        return redirect(url_for("admin.ver_catalogos_usuario_por_id", user_id=str(catalog.get('created_by_id', ''))))
-    return render_template("admin/editar_catalogo.html", catalog=catalog)
+def ver_catalogo_unificado(collection_source, catalog_id):
+    try:
+        logger.info(f"[ADMIN] Entrando en ver_catalogo_unificado con collection_source={collection_source}, catalog_id={catalog_id}")
+        
+        from app.extensions import mongo
+        
+        # Verificar que la colección solicitada existe
+        if collection_source not in ['catalogs', 'spreadsheets']:
+            flash(f"Colección {collection_source} no válida", "error")
+            return redirect(url_for('admin.dashboard_admin'))
+        
+        # Obtener el catálogo de la colección correspondiente
+        collection = mongo.db[collection_source]
+        catalog = collection.find_one({"_id": ObjectId(catalog_id)})
+        
+        if not catalog:
+            logger.warning(f"[ADMIN] Catálogo no encontrado en {collection_source} para id={catalog_id}")
+            flash("Catálogo no encontrado", "warning")
+            return render_template("admin/ver_catalogo.html", catalog=None, error="Catálogo no encontrado")
+        
+        # Añadir información sobre la colección de origen
+        catalog['collection_source'] = collection_source
+        catalog['_id_str'] = str(catalog['_id'])
+        
+        # Añadir información adicional al catálogo
+        if "created_at" in catalog and catalog["created_at"]:
+            if isinstance(catalog['created_at'], str):
+                catalog["created_at_formatted"] = catalog['created_at']
+            else:
+                catalog["created_at_formatted"] = catalog["created_at"].strftime("%d/%m/%Y %H:%M")
+        else:
+            catalog["created_at_formatted"] = "Fecha desconocida"
+        
+        # Contar filas según la estructura
+        if 'rows' in catalog and catalog['rows'] is not None:
+            catalog['row_count'] = len(catalog['rows'])
+            # Para compatibilidad con la plantilla
+            catalog['data'] = catalog['rows']
+        elif 'data' in catalog and catalog['data'] is not None:
+            catalog['row_count'] = len(catalog['data'])
+        else:
+            catalog['row_count'] = 0
+            catalog['data'] = []
+            
+        # Procesar las imágenes en cada fila
+        from app.utils.image_utils import get_image_url
+        from app.utils.s3_utils import get_s3_url
+        
+        # Verificar si hay datos en el catálogo
+        if 'data' in catalog and catalog['data']:
+            for row in catalog['data']:
+                # Procesar imágenes en el campo 'imagenes'
+                if 'imagenes' in row and row['imagenes']:
+                    # Crear un array con las URLs de las imágenes
+                    row['imagen_urls'] = []
+                    for img in row['imagenes']:
+                        if img and len(img) > 5:  # Verificar que el nombre de la imagen es válido
+                            # Intentar obtener la URL de S3 primero
+                            s3_url = get_s3_url(img)
+                            if s3_url:
+                                row['imagen_urls'].append(s3_url)
+                                logger.debug(f"[ADMIN] Imagen S3 encontrada: {img} -> {s3_url}")
+                            else:
+                                # Si no está en S3, usar la URL local
+                                local_url = url_for('static', filename=f'uploads/{img}')
+                                row['imagen_urls'].append(local_url)
+                                logger.debug(f"[ADMIN] Usando URL local para imagen: {img} -> {local_url}")
+                
+                # Procesar imágenes en el campo 'images' (compatibilidad)
+                elif 'images' in row and row['images']:
+                    # Crear un array con las URLs de las imágenes
+                    row['imagen_urls'] = []
+                    for img in row['images']:
+                        if img and len(img) > 5:  # Verificar que el nombre de la imagen es válido
+                            # Intentar obtener la URL de S3 primero
+                            s3_url = get_s3_url(img)
+                            if s3_url:
+                                row['imagen_urls'].append(s3_url)
+                                logger.debug(f"[ADMIN] Imagen S3 encontrada: {img} -> {s3_url}")
+                            else:
+                                # Si no está en S3, usar la URL local
+                                local_url = url_for('static', filename=f'uploads/{img}')
+                                row['imagen_urls'].append(local_url)
+                                logger.debug(f"[ADMIN] Usando URL local para imagen: {img} -> {local_url}")
+                    
+                    # Para compatibilidad, copiar a 'imagenes'
+                    row['imagenes'] = row['images']
+                
+            logger.info(f"[ADMIN] Procesadas {catalog['row_count']} filas con imágenes para el catálogo {catalog_id}")
+        else:
+            logger.warning(f"[ADMIN] El catálogo {catalog_id} no tiene filas o datos")
 
-@admin_bp.route("/catalogo/<catalog_id>/eliminar", methods=["POST"])
+        
+        logger.info(f"[ADMIN] Mostrando catálogo desde {collection_source}: {catalog.get('name', 'Sin nombre')}")
+        return render_template("admin/ver_catalogo.html", catalog=catalog, error=None, collection_source=collection_source)
+    except Exception as e:
+        logger.error(f"Error en ver_catalogo_unificado: {str(e)}", exc_info=True)
+        flash(f"Error al cargar el catálogo: {str(e)}", "error")
+        return redirect(url_for('admin.dashboard_admin'))
+
+@admin_bp.route("/catalogo/<collection_source>/<catalog_id>/editar", methods=["GET", "POST"])
 # # @admin_required
-def eliminar_catalogo_admin(catalog_id):
-    catalogs_col = get_catalogs_collection()
-    catalog = catalogs_col.find_one({"_id": ObjectId(catalog_id)})
-    if not catalog:
-        flash("Catálogo no encontrado", "danger")
-        return redirect(url_for("admin.dashboard_admin"))
-    catalogs_col.delete_one({"_id": ObjectId(catalog_id)})
-    flash("Catálogo eliminado", "success")
-    return redirect(request.referrer or url_for("admin.dashboard_admin"))
+def editar_catalogo_admin(collection_source, catalog_id):
+    try:
+        logger.info(f"[ADMIN] Entrando en editar_catalogo_admin con collection_source={collection_source}, catalog_id={catalog_id}")
+        
+        from app.extensions import mongo
+        
+        # Verificar que la colección solicitada existe
+        if collection_source not in ['catalogs', 'spreadsheets']:
+            flash(f"Colección {collection_source} no válida", "error")
+            return redirect(url_for('admin.dashboard_admin'))
+        
+        # Obtener el catálogo de la colección correspondiente
+        collection = mongo.db[collection_source]
+        catalog = collection.find_one({"_id": ObjectId(catalog_id)})
+        
+        if not catalog:
+            logger.warning(f"[ADMIN] Catálogo no encontrado en {collection_source} para id={catalog_id}")
+            flash("Catálogo no encontrado", "warning")
+            return redirect(url_for("admin.dashboard_admin"))
+            
+        # Añadir información sobre la colección de origen
+        catalog['collection_source'] = collection_source
+        catalog['_id_str'] = str(catalog['_id'])
+        
+        if request.method == "POST":
+            name = request.form.get("name")
+            description = request.form.get("description", "")
+            # Actualizar el catálogo en la colección correspondiente
+            collection.update_one(
+                {"_id": ObjectId(catalog_id)}, 
+                {"$set": {
+                    "name": name,
+                    "description": description,
+                    "updated_at": datetime.datetime.utcnow()
+                }}
+            )
+            flash("Catálogo actualizado correctamente", "success")
+            
+            # Intentar obtener el ID del usuario para redirigir
+            user_id = None
+            if 'created_by_id' in catalog and catalog['created_by_id']:
+                user_id = str(catalog['created_by_id'])
+            elif 'created_by' in catalog and catalog['created_by']:
+                # Buscar el usuario por email o username
+                user = mongo.db.users.find_one({"$or": [{"email": catalog['created_by']}, {"username": catalog['created_by']}]})
+                if user:
+                    user_id = str(user['_id'])
+            
+            if user_id:
+                return redirect(url_for("admin.ver_catalogos_usuario_por_id", user_id=user_id))
+            else:
+                return redirect(url_for("admin.dashboard_admin"))
+                
+        return render_template("admin/editar_catalogo.html", catalog=catalog, collection_source=collection_source)
+    except Exception as e:
+        logger.error(f"Error en editar_catalogo_admin: {str(e)}", exc_info=True)
+        flash(f"Error al editar el catálogo: {str(e)}", "error")
+        return redirect(url_for('admin.dashboard_admin'))
+
+@admin_bp.route("/catalogo/<collection_source>/<catalog_id>/eliminar", methods=["POST"])
+# # @admin_required
+def eliminar_catalogo_admin(collection_source, catalog_id):
+    try:
+        logger.info(f"[ADMIN] Entrando en eliminar_catalogo_admin con collection_source={collection_source}, catalog_id={catalog_id}")
+        
+        from app.extensions import mongo
+        
+        # Verificar que la colección solicitada existe
+        if collection_source not in ['catalogs', 'spreadsheets']:
+            flash(f"Colección {collection_source} no válida", "error")
+            return redirect(url_for('admin.dashboard_admin'))
+        
+        # Obtener el catálogo de la colección correspondiente
+        collection = mongo.db[collection_source]
+        catalog = collection.find_one({"_id": ObjectId(catalog_id)})
+        
+        if not catalog:
+            logger.warning(f"[ADMIN] Catálogo no encontrado en {collection_source} para id={catalog_id}")
+            flash("Catálogo no encontrado", "warning")
+            return redirect(url_for("admin.dashboard_admin"))
+            
+        # Eliminar el catálogo de la colección correspondiente
+        result = collection.delete_one({"_id": ObjectId(catalog_id)})
+        
+        if result.deleted_count > 0:
+            logger.info(f"[ADMIN] Catálogo eliminado correctamente: {catalog_id} de {collection_source}")
+            flash("Catálogo eliminado correctamente", "success")
+        else:
+            logger.warning(f"[ADMIN] No se pudo eliminar el catálogo: {catalog_id} de {collection_source}")
+            flash("No se pudo eliminar el catálogo", "warning")
+            
+        # Redirigir a la página anterior o al dashboard
+        return redirect(request.referrer or url_for("admin.dashboard_admin"))
+    except Exception as e:
+        logger.error(f"Error en eliminar_catalogo_admin: {str(e)}", exc_info=True)
+        flash(f"Error al eliminar el catálogo: {str(e)}", "error")
+        return redirect(url_for('admin.dashboard_admin'))
 
 admin_logs_bp = Blueprint('admin_logs', __name__)
 

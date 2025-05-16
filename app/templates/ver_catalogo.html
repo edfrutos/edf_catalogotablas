@@ -60,17 +60,29 @@
                                             {% if row.images and row.images|length > 0 %}
                                                 <div class="d-flex flex-wrap gap-2">
                                                     {% for img in row.images %}
-                                                        <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
-                                                            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
-                                                        </a>
+                                                        {% if img.startswith('http') %}
+                                                            <a href="{{ img }}" target="_blank">
+                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
+                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
+                                                            </a>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 </div>
                                             {% elif row.imagenes and row.imagenes|length > 0 %}
                                                 <div class="d-flex flex-wrap gap-2">
                                                     {% for img in row.imagenes %}
-                                                        <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
-                                                            <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
-                                                        </a>
+                                                        {% if img.startswith('http') %}
+                                                            <a href="{{ img }}" target="_blank">
+                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
+                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
+                                                            </a>
+                                                        {% endif %}
                                                     {% endfor %}
                                                 </div>
                                             {% else %}
@@ -137,8 +149,10 @@
 function eliminarFila(rowIndex) {
     const modal = new bootstrap.Modal(document.getElementById('eliminarModal'));
     const form = document.getElementById('eliminarForm');
-    const baseUrl = "{{ url_for('catalogs.delete_row', catalog_id=catalog._id|string, row_index=0) }}";
-    form.action = baseUrl.replace(/0$/, rowIndex);
+    // Crear la URL correctamente
+    const catalogId = "{{ catalog._id|string }}";
+    form.action = `/catalogs/delete-row/${catalogId}/${rowIndex}`;
+    console.log("URL de eliminación:", form.action);
     modal.show();
 }
 </script>

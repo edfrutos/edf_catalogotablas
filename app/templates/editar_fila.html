@@ -13,7 +13,7 @@
         <div class="mb-3">
             <label for="imagenes" class="form-label">Imágenes (opcional)</label>
             <input type="file" class="form-control" id="imagenes" name="imagenes" multiple accept="image/*">
-            <div class="form-text">Puede seleccionar múltiples imágenes. Si sube nuevas imágenes, reemplazarán a las existentes.</div>
+            <div class="form-text">Puede seleccionar múltiples imágenes. Las nuevas imágenes se añadirán a las existentes.</div>
         </div>
         {% if fila.imagenes and fila.imagenes|length > 0 %}
         <div class="mb-3">
@@ -21,9 +21,15 @@
             <div class="d-flex flex-wrap gap-3">
                 {% for img in fila.imagenes %}
                 <div class="position-relative">
-                    <a href="#" onclick="mostrarImagenModal('{{ url_for('static', filename='uploads/' ~ img) }}'); return false;">
-                        <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;">
+                    {% if img.startswith('http') %}
+                    <a href="#" onclick="mostrarImagenModal('{{ img }}'); return false;">
+                        <img src="{{ img }}" alt="Imagen" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
                     </a>
+                    {% else %}
+                    <a href="#" onclick="mostrarImagenModal('{{ url_for('static', filename='uploads/' ~ img) }}'); return false;">
+                        <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen" style="width: 100px; height: 100px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
+                    </a>
+                    {% endif %}
                     <div class="mt-1 text-center">
                         <button type="button" class="btn btn-sm btn-danger" onclick="confirmarEliminarImagen('{{ img }}', {{ loop.index0 }})">Eliminar</button>
                     </div>
@@ -34,7 +40,7 @@
         </div>
         {% endif %}
         <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-        <a href="{{ url_for('main.ver_tabla', table_id=tabla_id) }}" class="btn btn-secondary">Cancelar</a>
+        <a href="{{ url_for('catalogs.view', catalog_id=catalog._id|string) }}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 
@@ -97,7 +103,12 @@ function confirmarEliminarImagen(imagen, indice) {
   indiceActual = indice;
   
   // Mostrar la imagen en el modal de confirmación
-  const rutaImagen = "{{ url_for('static', filename='uploads/') }}" + imagen;
+  let rutaImagen;
+  if (imagen.startsWith('http')) {
+    rutaImagen = imagen;
+  } else {
+    rutaImagen = "{{ url_for('static', filename='uploads/') }}" + imagen;
+  }
   document.getElementById('imagenAEliminar').src = rutaImagen;
   
   // Configurar el botón de confirmación
