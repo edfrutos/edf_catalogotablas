@@ -615,9 +615,28 @@ def reset_password(token):
 
 @auth_bp.route('/logout')
 def logout():
-    logger.info("Usuario cerró sesión: %s", session.get('usuario'))
+    usuario = session.get('usuario')
+    logger.info("Usuario cerró sesión: %s", usuario)
+    
+    # Limpiar la sesión
     session.clear()
-    return redirect(url_for('auth.login'))
+    
+    # Configurar la respuesta para eliminar las cookies
+    response = redirect(url_for('auth.login'))  # Redirigir al login ya que no existe welcome.html
+    
+    # Eliminar explícitamente la cookie de sesión
+    response.delete_cookie(current_app.config.get('SESSION_COOKIE_NAME', 'session'))
+    
+    # Eliminar otras cookies que puedan estar relacionadas con la autenticación
+    response.delete_cookie('remember_token')
+    
+    # Establecer Cache-Control para evitar que el navegador almacene en caché la página
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    
+    flash('Has cerrado sesión correctamente', 'info')
+    return response
 
 @auth_bp.route('/debug_secret_key')
 def debug_secret_key():

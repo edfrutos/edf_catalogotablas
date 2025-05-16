@@ -160,6 +160,25 @@ def ver_tabla(table_id):
     try:
         table = current_app.spreadsheets_collection.find_one({'_id': ObjectId(table_id)})
         current_app.logger.info(f"[DEBUG][VISIONADO] Tabla encontrada: {table}")
+        
+        # Asegurarse de que el propietario esté disponible
+        if 'owner' not in table and 'owner_name' in table:
+            table['owner'] = table['owner_name']
+        elif 'owner' not in table and 'created_by' in table:
+            table['owner'] = table['created_by']
+        elif 'owner' not in table:
+            table['owner'] = 'Usuario desconocido'
+            
+        current_app.logger.info(f"[DEBUG][VISIONADO] Propietario de la tabla: {table.get('owner')}")
+        current_app.logger.info(f"[DEBUG][VISIONADO] Campos de la tabla: {list(table.keys())}")
+        
+        # Asegurarse de que los datos estén disponibles
+        if 'data' not in table and 'rows' in table:
+            table['data'] = table['rows']
+            current_app.logger.info(f"[DEBUG][VISIONADO] Usando 'rows' como 'data', filas: {len(table['data'])}")
+        elif 'data' not in table:
+            table['data'] = []
+            current_app.logger.info(f"[DEBUG][VISIONADO] No se encontraron datos en la tabla")
         if not table:
             flash('Tabla no encontrada.', 'error')
             return redirect(url_for('main.dashboard_user'))
@@ -168,24 +187,126 @@ def ver_tabla(table_id):
         current_app.logger.info(f"[DEBUG][VISIONADO] Sesión: {dict(session)}")
         current_app.logger.info(f"[DEBUG][VISIONADO] table.owner: {table.get('owner')}, session.username: {session.get('username')}, session.role: {session.get('role')}")
         
+        # Normalizar el campo owner si está vacío o es usuario_predeterminado
+        username = session.get('username')
+        role = session.get('role', 'user')
+        
+        if 'owner' not in table or not table['owner'] or table['owner'] == 'usuario_predeterminado':
+            # Buscar el propietario en otros campos
+            if 'created_by' in table and table['created_by']:
+                table['owner'] = table['created_by']
+                current_app.logger.info(f"[DEBUG][VISIONADO] Usando created_by como owner: {table['owner']}")
+            elif 'username' in table and table['username']:
+                table['owner'] = table['username']
+                current_app.logger.info(f"[DEBUG][VISIONADO] Usando username como owner: {table['owner']}")
+            else:
+                # Si no hay información de propietario, asignar al usuario actual
+                current_app.spreadsheets_collection.update_one(
+                    {"_id": ObjectId(table_id)},
+                    {"$set": {"owner": username}}
+                )
+                table['owner'] = username
+                current_app.logger.info(f"[DEBUG][VISIONADO] Actualizado propietario de tabla {table_id} a {username}")
+        
         # Verificar permisos: solo el propietario o admin puede ver la tabla
-        if session.get('role') != 'admin' and table.get('owner') != session.get('username'):
+        if role != 'admin' and table.get('owner') != username:
             mensaje = (
                 f"No tiene permisos para ver esta tabla. "
-                f"(owner={table.get('owner')}, username={session.get('username')}, role={session.get('role')})"
+                f"(owner={table.get('owner')}, username={username}, role={role})"
             )
-            flash(mensaje, "error")
-            return redirect(url_for('main.dashboard_user'))
+            current_app.logger.warning(f"[DEBUG][VISIONADO] {mensaje}")
+            flash(mensaje, "warning")
+            return redirect(url_for('main.tables'))
         
         # Si llegamos aquí, el usuario tiene permisos para ver la tabla
         # Obtener las URLs de las imágenes
         from app.utils.image_utils import get_image_url
+        from app.utils.s3_utils import get_s3_url
         
         # Procesar las imágenes en cada fila
-        for row in table.get('data', []):
+        for i, row in enumerate(table.get('data', [])):
+            current_app.logger.info(f"[DEBUG][VISIONADO] Procesando fila {i}: {row}")
+            
+            # Inicializar el array de imágenes si no existe
+            if 'imagenes' not in row:
+                row['imagenes'] = []
+            
+            # Asegurarse de que imagenes sea una lista
+            if row['imagenes'] and not isinstance(row['imagenes'], list):
+                row['imagenes'] = [row['imagenes']]
+                current_app.logger.info(f"[DEBUG][VISIONADO] Convertido campo 'imagenes' a lista: {row['imagenes']}")
+            
+            # Procesar imágenes en el campo 'images' (compatibilidad)
+            if 'images' in row and row['images']:
+                if not isinstance(row['images'], list):
+                    row['images'] = [row['images']]
+                    current_app.logger.info(f"[DEBUG][VISIONADO] Convertido campo 'images' a lista: {row['images']}")
+                
+                # Combinar images con imagenes si ambos existen
+                if 'imagenes' in row and row['imagenes']:
+                    row['imagenes'].extend(row['images'])
+                else:
+                    row['imagenes'] = row['images']
+                
+                current_app.logger.info(f"[DEBUG][VISIONADO] Combinadas imágenes de 'images' y 'imagenes': {row['imagenes']}")
+            
+            # Procesar imágenes en el campo 'imagen' (singular, compatibilidad)
+            if 'imagen' in row and row['imagen']:
+                if 'imagenes' not in row:
+                    row['imagenes'] = []
+                if not isinstance(row['imagen'], list):
+                    row['imagenes'].append(row['imagen'])
+                else:
+                    row['imagenes'].extend(row['imagen'])
+                current_app.logger.info(f"[DEBUG][VISIONADO] Añadida imagen del campo 'imagen': {row['imagenes']}")
+            
+            # Crear un array con las URLs de las imágenes
+            row['imagen_urls'] = []
+            
+            # Procesar todas las imágenes
             if 'imagenes' in row and row['imagenes']:
-                # Crear un diccionario con las URLs de las imágenes
-                row['imagen_urls'] = [get_image_url(img) for img in row['imagenes']]
+                # Imprimir el tipo de dato de imagenes para depuración
+                current_app.logger.info(f"[DEBUG][VISIONADO] Tipo de dato de 'imagenes': {type(row['imagenes'])}")
+                current_app.logger.info(f"[DEBUG][VISIONADO] Contenido de 'imagenes': {row['imagenes']}")
+                
+                # Si imagenes es un entero o no es iterable, convertirlo a una lista
+                if isinstance(row['imagenes'], int):
+                    current_app.logger.info(f"[DEBUG][VISIONADO] 'imagenes' es un entero: {row['imagenes']}")
+                    # Crear una lista con el número de imágenes indicado
+                    num_imagenes = row['imagenes']
+                    # Buscar imágenes en otros campos
+                    if 'imagen_data' in row:
+                        current_app.logger.info(f"[DEBUG][VISIONADO] Encontrado campo 'imagen_data': {row['imagen_data']}")
+                        if isinstance(row['imagen_data'], list):
+                            row['imagenes'] = row['imagen_data']
+                        else:
+                            # Si no hay imágenes reales, crear una lista vacía
+                            row['imagenes'] = []
+                    else:
+                        # Si no hay imágenes reales, crear una lista vacía
+                        row['imagenes'] = []
+                
+                # Procesar cada imagen
+                for img in row['imagenes']:
+                    if img and isinstance(img, str) and len(img) > 5:  # Verificar que el nombre de la imagen es válido
+                        # Intentar obtener la URL de S3 primero
+                        s3_url = get_s3_url(img)
+                        if s3_url:
+                            row['imagen_urls'].append(s3_url)
+                            current_app.logger.info(f"[DEBUG][VISIONADO] Imagen S3 encontrada: {img} -> {s3_url}")
+                        else:
+                            # Si no está en S3, usar la URL local
+                            local_url = url_for('static', filename=f'uploads/{img}')
+                            row['imagen_urls'].append(local_url)
+                            current_app.logger.info(f"[DEBUG][VISIONADO] Usando URL local para imagen: {img} -> {local_url}")
+            
+            current_app.logger.info(f"[DEBUG][VISIONADO] URLs de imágenes para fila {i}: {row.get('imagen_urls', [])}")
+            current_app.logger.info(f"[DEBUG][VISIONADO] Total de imágenes en fila {i}: {len(row.get('imagen_urls', []))}")
+            
+            # Si no hay imágenes, asegurarse de que el campo imagenes exista pero vacío
+            if not row.get('imagen_urls'):
+                row['imagenes'] = []
+                row['imagen_urls'] = []
         
         return render_template('ver_tabla.html', table=table)
     except BuildError as e:
@@ -200,16 +321,57 @@ def ver_tabla(table_id):
 
 @main_bp.route('/select_table/<table_id>')
 def select_table(table_id):
-    if not (session.get('username') or session.get('email')):
+    # Verificar que el usuario ha iniciado sesión
+    if not session.get('username'):
+        flash("Debe iniciar sesión para acceder a las tablas", "warning")
         return redirect(url_for("auth.login"))
-    table = current_app.spreadsheets_collection.find_one({"_id": ObjectId(table_id)})
-    if not table:
-        flash("Tabla no encontrada.", "error")
-        return redirect(url_for("tables"))
-    session["selected_table"] = table["filename"]
-    session["selected_table_id"] = str(table["_id"])
-    session["selected_table_name"] = table.get("name", "Sin nombre")
-    return redirect(url_for("main.ver_tabla", table_id=table_id))
+    
+    # Obtener información del usuario actual
+    username = session.get('username')
+    role = session.get('role', 'user')
+    
+    try:
+        # Obtener la tabla
+        table = current_app.spreadsheets_collection.find_one({"_id": ObjectId(table_id)})
+        if not table:
+            flash("Tabla no encontrada.", "error")
+            return redirect(url_for("main.tables"))
+        
+        # Verificar permisos: administradores pueden ver todas las tablas, usuarios solo las suyas
+        if role != "admin":
+            # Normalizar el campo owner si está vacío o es usuario_predeterminado
+            if 'owner' not in table or not table['owner'] or table['owner'] == 'usuario_predeterminado':
+                if 'created_by' in table and table['created_by']:
+                    table['owner'] = table['created_by']
+                elif 'username' in table and table['username']:
+                    table['owner'] = table['username']
+                else:
+                    # Si no hay información de propietario, asignar al usuario actual
+                    current_app.spreadsheets_collection.update_one(
+                        {"_id": ObjectId(table_id)},
+                        {"$set": {"owner": username}}
+                    )
+                    table['owner'] = username
+                    logger.info(f"Actualizado propietario de tabla {table_id} a {username}")
+            
+            # Verificar si el usuario actual es el propietario
+            if table['owner'] != username:
+                logger.warning(f"Usuario {username} intentó acceder a tabla {table_id} propiedad de {table['owner']}")
+                flash(f"No tiene permisos para ver esta tabla.", "warning")
+                return redirect(url_for("main.tables"))
+        
+        # Guardar información de la tabla en la sesión
+        session["selected_table"] = table.get("filename", "")
+        session["selected_table_id"] = str(table["_id"])
+        session["selected_table_name"] = table.get("name", "Sin nombre")
+        
+        logger.info(f"Usuario {username} seleccionó tabla {table.get('name')} (ID: {table_id})")
+        return redirect(url_for("main.ver_tabla", table_id=table_id))
+    
+    except Exception as e:
+        logger.error(f"Error al seleccionar tabla {table_id}: {str(e)}", exc_info=True)
+        flash(f"Error al acceder a la tabla: {str(e)}", "error")
+        return redirect(url_for("main.tables"))
 
 @main_bp.route('/perfil')
 def perfil():
@@ -389,8 +551,17 @@ def editar_fila(tabla_id, fila_index):
         return redirect(url_for('main.tables'))
     
     # Verificar permisos: solo el propietario o admin puede editar filas
-    if session.get('role') != 'admin' and table_info.get('owner') != session.get('username'):
-        flash('No tienes permisos para editar esta fila.', 'error')
+    username = session.get('username')
+    role = session.get('role', 'user')
+    
+    # Obtener el propietario de la tabla (puede estar en diferentes campos)
+    owner = table_info.get('owner') or table_info.get('created_by') or table_info.get('owner_name')
+    
+    current_app.logger.info(f"[DEBUG] Verificando permisos: role={role}, username={username}, owner={owner}")
+    
+    if role != 'admin' and owner != username:
+        current_app.logger.warning(f"[DEBUG] Permiso denegado: {username} intentando editar tabla de {owner}")
+        flash('No tienes permisos para editar esta fila.', 'warning')
         return redirect(url_for('main.ver_tabla', table_id=tabla_id))
     
     # Obtener la fila específica del array de datos
@@ -413,7 +584,30 @@ def editar_fila(tabla_id, fila_index):
             try:
                 import json
                 imagenes_a_eliminar = json.loads(imagenes_a_eliminar)
-                if isinstance(imagenes_a_eliminar, list) and 'imagenes' in fila:
+                logger.info(f"Imágenes a eliminar: {imagenes_a_eliminar}")
+                
+                # Asegurarse de que fila tenga el campo 'imagenes'
+                if 'imagenes' not in fila:
+                    fila['imagenes'] = []
+                    logger.info("Inicializando campo 'imagenes' en la fila")
+                
+                # Verificar si imagenes es un número entero (contador) en lugar de una lista
+                if isinstance(fila.get('imagenes'), int):
+                    logger.info(f"Campo 'imagenes' es un entero: {fila['imagenes']}")
+                    # Buscar imágenes reales en otros campos
+                    if 'imagen_data' in fila:
+                        fila['imagenes'] = fila['imagen_data']
+                        logger.info(f"Usando 'imagen_data' como fuente de imágenes: {fila['imagenes']}")
+                    else:
+                        fila['imagenes'] = []
+                        logger.info("No se encontraron imágenes reales, inicializando lista vacía")
+                
+                # Asegurarse de que imagenes sea una lista
+                if not isinstance(fila['imagenes'], list):
+                    fila['imagenes'] = [fila['imagenes']] if fila['imagenes'] else []
+                    logger.info(f"Convertido campo 'imagenes' a lista: {fila['imagenes']}")
+                
+                if isinstance(imagenes_a_eliminar, list):
                     # Eliminar las imágenes del servidor y de S3
                     ruta_uploads = os.path.join(current_app.static_folder, 'uploads')
                     use_s3 = os.environ.get('USE_S3', 'false').lower() == 'true'
@@ -437,6 +631,17 @@ def editar_fila(tabla_id, fila_index):
                     # Actualizar la lista de imágenes en la fila
                     imagenes_actualizadas = [img for img in fila.get('imagenes', []) if img not in imagenes_a_eliminar]
                     update_data[f"data.{fila_index}.imagenes"] = imagenes_actualizadas
+                    logger.info(f"Lista de imágenes actualizada: {imagenes_actualizadas}")
+                    
+                    # Actualizar también el campo imagen_data si existe
+                    if 'imagen_data' in fila:
+                        update_data[f"data.{fila_index}.imagen_data"] = imagenes_actualizadas
+                        logger.info("Campo 'imagen_data' actualizado con la misma lista de imágenes")
+                    
+                    # Si no quedan imágenes, establecer el contador a 0
+                    if not imagenes_actualizadas and isinstance(fila.get('imagenes'), int):
+                        update_data[f"data.{fila_index}.imagenes"] = 0
+                        logger.info("No quedan imágenes, contador establecido a 0")
             except Exception as e:
                 logger.error(f"Error al procesar imágenes a eliminar: {str(e)}")
         
@@ -447,6 +652,8 @@ def editar_fila(tabla_id, fila_index):
             # Limitar a máximo 3 imágenes
             archivos = archivos[:3] if len(archivos) > 3 else archivos
             
+            logger.info(f"Procesando {len(archivos)} nuevas imágenes")
+            
             for archivo in archivos:
                 if archivo and archivo.filename.strip():
                     # Generar nombre seguro y único para el archivo
@@ -456,21 +663,27 @@ def editar_fila(tabla_id, fila_index):
                     
                     # Verificar que sea una imagen válida
                     if extension.lower() not in ['.jpg', '.jpeg', '.png', '.gif']:
+                        logger.warning(f"Extensión no válida para imagen: {extension}")
                         continue
                     
                     # Guardar la imagen en la carpeta de uploads
                     ruta_uploads = os.path.join(current_app.static_folder, 'uploads')
                     if not os.path.exists(ruta_uploads):
                         os.makedirs(ruta_uploads)
+                        logger.info(f"Carpeta de uploads creada: {ruta_uploads}")
                     
                     ruta_completa = os.path.join(ruta_uploads, nombre_unico)
                     archivo.save(ruta_completa)
+                    logger.info(f"Imagen guardada localmente: {ruta_completa}")
                     
                     # Subir a S3 si está habilitado
                     use_s3 = os.environ.get('USE_S3', 'false').lower() == 'true'
+                    logger.info(f"USE_S3: {use_s3}")
                     if use_s3:
                         try:
                             from app.utils.s3_utils import upload_file_to_s3
+                            logger.info(f"Subiendo imagen a S3: {nombre_unico}")
+                            
                             result = upload_file_to_s3(ruta_completa, nombre_unico)
                             if result['success']:
                                 logger.info(f"Imagen subida a S3: {result['url']}")
@@ -484,25 +697,48 @@ def editar_fila(tabla_id, fila_index):
                     
                     nuevas_imagenes.append(nombre_unico)
         
-        # Si hay nuevas imágenes, reemplazar las existentes
+        # Si hay nuevas imágenes, actualizar la lista en la base de datos
         if nuevas_imagenes:
-            # Si ya se actualizaron las imágenes por eliminación, agregar las nuevas a las restantes
-            if f"data.{fila_index}.imagenes" in update_data:
-                update_data[f"data.{fila_index}.imagenes"] = update_data[f"data.{fila_index}.imagenes"] + nuevas_imagenes
+            logger.info(f"Nuevas imágenes a guardar: {nuevas_imagenes}")
+            
+            # Verificar si el campo imagenes es un número entero (contador)
+            if 'imagenes' in fila and isinstance(fila['imagenes'], int):
+                logger.info(f"Campo 'imagenes' es un entero: {fila['imagenes']}")
+                # Si es un contador, actualizar el campo imagen_data
+                if 'imagen_data' in fila and isinstance(fila['imagen_data'], list):
+                    # Añadir las nuevas imágenes a imagen_data
+                    update_data[f"data.{fila_index}.imagen_data"] = fila['imagen_data'] + nuevas_imagenes
+                    # Actualizar el contador
+                    update_data[f"data.{fila_index}.imagenes"] = len(fila['imagen_data']) + len(nuevas_imagenes)
+                    logger.info(f"Actualizando contador de imágenes a {update_data[f'data.{fila_index}.imagenes']}")
+                else:
+                    # Crear el campo imagen_data
+                    update_data[f"data.{fila_index}.imagen_data"] = nuevas_imagenes
+                    # Actualizar el contador
+                    update_data[f"data.{fila_index}.imagenes"] = len(nuevas_imagenes)
+                    logger.info(f"Creando campo imagen_data con {len(nuevas_imagenes)} imágenes")
             else:
-                # Reemplazar todas las imágenes con las nuevas
-                update_data[f"data.{fila_index}.imagenes"] = nuevas_imagenes
+                # Si ya se actualizaron las imágenes por eliminación, agregar las nuevas a las restantes
+                if f"data.{fila_index}.imagenes" in update_data:
+                    update_data[f"data.{fila_index}.imagenes"] = update_data[f"data.{fila_index}.imagenes"] + nuevas_imagenes
+                    logger.info(f"Añadiendo nuevas imágenes a la lista actualizada: {update_data[f'data.{fila_index}.imagenes']}")
+                else:
+                    # Si ya hay imágenes, añadir las nuevas
+                    if 'imagenes' in fila and isinstance(fila['imagenes'], list):
+                        update_data[f"data.{fila_index}.imagenes"] = fila['imagenes'] + nuevas_imagenes
+                        logger.info(f"Añadiendo nuevas imágenes a la lista existente: {fila['imagenes'] + nuevas_imagenes}")
+                    else:
+                        # Si no hay imágenes previas, crear la lista
+                        update_data[f"data.{fila_index}.imagenes"] = nuevas_imagenes
+                        logger.info(f"Creando nueva lista de imágenes: {nuevas_imagenes}")
                 
-                # Eliminar imágenes antiguas del servidor si existen
-                if 'imagenes' in fila and fila['imagenes']:
-                    ruta_uploads = os.path.join(current_app.static_folder, 'uploads')
-                    for img_antigua in fila['imagenes']:
-                        try:
-                            ruta_img = os.path.join(ruta_uploads, img_antigua)
-                            if os.path.exists(ruta_img):
-                                os.remove(ruta_img)
-                        except Exception as e:
-                            logger.error(f"Error al eliminar imagen antigua: {str(e)}")
+                # Actualizar también imagen_data si existe
+                if 'imagen_data' in fila:
+                    if isinstance(fila['imagen_data'], list):
+                        update_data[f"data.{fila_index}.imagen_data"] = fila['imagen_data'] + nuevas_imagenes
+                    else:
+                        update_data[f"data.{fila_index}.imagen_data"] = nuevas_imagenes
+                    logger.info(f"Actualizando campo imagen_data con las mismas imágenes")
         
         # Actualizar la fila en la base de datos
         current_app.spreadsheets_collection.update_one(
@@ -530,9 +766,18 @@ def agregar_fila(tabla_id):
             return redirect(url_for("main.dashboard_user"))
         
         # Verificar permisos: solo el propietario o admin puede agregar filas
-        if session.get("role") != "admin" and session.get("username") != tabla.get("owner"):
-            flash("No tiene permisos para agregar filas a esta tabla", "error")
-            return redirect(url_for("main.dashboard_user"))
+        username = session.get('username')
+        role = session.get('role', 'user')
+        
+        # Obtener el propietario de la tabla (puede estar en diferentes campos)
+        owner = tabla.get('owner') or tabla.get('created_by') or tabla.get('owner_name')
+        
+        current_app.logger.info(f"[DEBUG] Verificando permisos para agregar fila: role={role}, username={username}, owner={owner}")
+        
+        if role != 'admin' and owner != username:
+            current_app.logger.warning(f"[DEBUG] Permiso denegado para agregar fila: {username} intentando modificar tabla de {owner}")
+            flash("No tiene permisos para agregar filas a esta tabla", "warning")
+            return redirect(url_for("main.ver_tabla", table_id=tabla_id))
         
         if request.method == "POST":
             # Obtener datos del formulario
@@ -547,6 +792,8 @@ def agregar_fila(tabla_id):
                 # Limitar a máximo 3 imágenes
                 archivos = archivos[:3] if len(archivos) > 3 else archivos
                 
+                logger.info(f"Procesando {len(archivos)} imágenes para nueva fila")
+                
                 for archivo in archivos:
                     if archivo and archivo.filename.strip():
                         # Generar nombre seguro y único para el archivo
@@ -556,21 +803,26 @@ def agregar_fila(tabla_id):
                         
                         # Verificar que sea una imagen válida
                         if extension.lower() not in ['.jpg', '.jpeg', '.png', '.gif']:
+                            logger.warning(f"Extensión no válida para imagen: {extension}")
                             continue
                         
                         # Guardar la imagen en la carpeta de uploads
                         ruta_uploads = os.path.join(current_app.static_folder, 'uploads')
                         if not os.path.exists(ruta_uploads):
                             os.makedirs(ruta_uploads)
+                            logger.info(f"Carpeta de uploads creada: {ruta_uploads}")
                         
                         ruta_completa = os.path.join(ruta_uploads, nombre_unico)
                         archivo.save(ruta_completa)
+                        logger.info(f"Imagen guardada localmente: {ruta_completa}")
                         
                         # Subir a S3 si está habilitado
                         use_s3 = os.environ.get('USE_S3', 'false').lower() == 'true'
+                        logger.info(f"USE_S3: {use_s3}")
                         if use_s3:
                             try:
                                 from app.utils.s3_utils import upload_file_to_s3
+                                logger.info(f"Subiendo imagen a S3: {nombre_unico}")
                                 result = upload_file_to_s3(ruta_completa, nombre_unico)
                                 if result['success']:
                                     logger.info(f"Imagen subida a S3: {result['url']}")
@@ -583,10 +835,17 @@ def agregar_fila(tabla_id):
                                 logger.error(f"Error al procesar subida a S3: {str(e)}", exc_info=True)
                         
                         imagenes.append(nombre_unico)
+                
+                logger.info(f"Total de imágenes procesadas: {len(imagenes)}")
             
             # Agregar las imágenes a la fila
             if imagenes:
                 nueva_fila['imagenes'] = imagenes
+                # También guardar en imagen_data para compatibilidad
+                nueva_fila['imagen_data'] = imagenes
+                logger.info(f"Imágenes agregadas a la nueva fila: {imagenes}")
+                # Agregar contador de imágenes para compatibilidad con vistas antiguas
+                nueva_fila['num_imagenes'] = len(imagenes)
             
             # Agregar la fila a la tabla
             current_app.spreadsheets_collection.update_one(
@@ -607,12 +866,18 @@ def agregar_fila(tabla_id):
 @main_bp.route("/tables", methods=["GET", "POST"])
 # # @login_required
 def tables():
-    # Eliminar verificación de sesión para permitir acceso sin restricciones
-    # if "username" not in session:
-    #     flash("Debe iniciar sesión para acceder a las tablas", "warning")
-    #     return redirect(url_for("auth.login"))
+    # Verificar si el usuario ha iniciado sesión
+    if "username" not in session:
+        flash("Debe iniciar sesión para acceder a las tablas", "warning")
+        return redirect(url_for("auth.login"))
         
-    owner = "usuario_predeterminado"
+    # Obtener el nombre de usuario de la sesión actual
+    owner = session.get("username")
+    logger.info(f"Usuario actual: {owner}")
+    
+    if not owner:
+        flash("Error de sesión. Por favor, inicie sesión nuevamente.", "warning")
+        return redirect(url_for("auth.login"))
     
     # Verificar que la colección de spreadsheets esté disponible
     if not hasattr(current_app, 'spreadsheets_collection'):
@@ -629,10 +894,39 @@ def tables():
                 todas_las_tablas = list(current_app.spreadsheets_collection.find())
                 logger.info(f"[ADMIN] Mostrando todas las tablas para el administrador {owner}")
             else:
-                todas_las_tablas = list(current_app.spreadsheets_collection.find({"owner": owner}))
-                logger.info(f"[USER] Mostrando solo las tablas del usuario {owner}")
+                # Buscar tablas donde el usuario actual es el propietario (varios campos posibles)
+                query = {
+                    "$or": [
+                        {"owner": owner},
+                        {"created_by": owner},
+                        {"username": owner}
+                    ]
+                }
+                todas_las_tablas = list(current_app.spreadsheets_collection.find(query))
+                logger.info(f"[USER] Mostrando solo las tablas del usuario {owner}. Encontradas: {len(todas_las_tablas)}")
             
-            current_app.logger.info(f"[VISIONADO] Tablas encontradas para {owner}: {todas_las_tablas}")
+            # Añadir información adicional a cada tabla para facilitar su visualización
+            for tabla in todas_las_tablas:
+                # Asegurarse de que tiene un campo owner definido
+                if 'owner' not in tabla or not tabla['owner'] or tabla['owner'] == 'usuario_predeterminado':
+                    if 'created_by' in tabla and tabla['created_by']:
+                        tabla['owner'] = tabla['created_by']
+                    elif 'username' in tabla and tabla['username']:
+                        tabla['owner'] = tabla['username']
+                    else:
+                        tabla['owner'] = owner
+                
+                # Contar filas si existe el campo data
+                if 'data' in tabla and isinstance(tabla['data'], list):
+                    tabla['row_count'] = len(tabla['data'])
+                else:
+                    tabla['row_count'] = 0
+            
+            current_app.logger.info(f"[VISIONADO] Tablas encontradas para {owner}: {len(todas_las_tablas)}")
+            
+            # Filtrar para mostrar solo las tablas que realmente pertenecen al usuario
+            if role != "admin":
+                todas_las_tablas = [t for t in todas_las_tablas if t.get('owner') == owner]
             return render_template("tables.html", tables=todas_las_tablas)
         except Exception as e:
             logger.error(f"Error al listar tablas: {str(e)}", exc_info=True)
@@ -848,15 +1142,53 @@ def editar_tabla(id):
                     new_data.append(new_row)
                 
                 update_data['data'] = new_data
-            
-            # Actualizar la tabla
-            current_app.spreadsheets_collection.update_one(
-                {'_id': ObjectId(id)},
-                {'$set': update_data}
-            )
-            
-            flash('Tabla actualizada correctamente.', 'success')
-            return redirect(url_for('main.ver_tabla', table_id=id))
+                
+                # Manejar actualización de imágenes
+                nuevas_imagenes = request.files.getlist("imagenes")
+                if nuevas_imagenes:
+                    logger.info(f"Nuevas imágenes a guardar: {nuevas_imagenes}")
+                    
+                    # Verificar si el campo imagenes es un número entero (contador)
+                    if 'imagenes' in row and isinstance(row['imagenes'], int):
+                        # Si es un contador, actualizar el campo imagen_data
+                        if 'imagen_data' in row and isinstance(row['imagen_data'], list):
+                            # Añadir las nuevas imágenes a imagen_data
+                            update_data['imagen_data'] = row['imagen_data'] + [img.filename for img in nuevas_imagenes]
+                            # Actualizar el contador
+                            update_data['imagenes'] = len(row['imagen_data']) + len(nuevas_imagenes)
+                            logger.info(f"Actualizando contador de imágenes a {update_data['imagenes']}")
+                        else:
+                            # Crear el campo imagen_data
+                            update_data['imagen_data'] = [img.filename for img in nuevas_imagenes]
+                            # Actualizar el contador
+                            update_data['imagenes'] = len(nuevas_imagenes)
+                            logger.info(f"Creando campo imagen_data con {len(nuevas_imagenes)} imágenes")
+                    else:
+                        # Si ya hay imágenes, añadir las nuevas
+                        if 'imagenes' in row and isinstance(row['imagenes'], list):
+                            update_data['imagenes'] = row['imagenes'] + [img.filename for img in nuevas_imagenes]
+                            logger.info(f"Añadiendo nuevas imágenes a la lista existente: {update_data['imagenes']}")
+                        else:
+                            # Si no hay imágenes previas, crear la lista
+                            update_data['imagenes'] = [img.filename for img in nuevas_imagenes]
+                            logger.info(f"Creando nueva lista de imágenes: {nuevas_imagenes}")
+                        
+                        # Actualizar también imagen_data si existe
+                        if 'imagen_data' in row:
+                            if isinstance(row['imagen_data'], list):
+                                update_data['imagen_data'] = row['imagen_data'] + [img.filename for img in nuevas_imagenes]
+                            else:
+                                update_data['imagen_data'] = [img.filename for img in nuevas_imagenes]
+                            logger.info(f"Actualizando campo imagen_data con las mismas imágenes")
+                
+                # Actualizar la tabla
+                current_app.spreadsheets_collection.update_one(
+                    {'_id': ObjectId(id)},
+                    {'$set': update_data}
+                )
+                
+                flash('Tabla actualizada correctamente.', 'success')
+                return redirect(url_for('main.ver_tabla', table_id=id))
         
         # GET: Mostrar formulario de edición
         return render_template('editar_tabla.html', table=table)
@@ -874,12 +1206,26 @@ def delete_table(table_id):
         return redirect(url_for("auth.login"))
 
     # Verificar permisos: solo el propietario o admin puede eliminar la tabla
-    if session.get("role") == "admin":
-        # Los administradores pueden eliminar cualquier tabla
-        table = current_app.spreadsheets_collection.find_one({"_id": ObjectId(table_id)})
-    else:
-        # Los usuarios normales solo pueden eliminar sus propias tablas
-        table = current_app.spreadsheets_collection.find_one({"_id": ObjectId(table_id), "owner": session["username"]})
+    username = session.get('username')
+    role = session.get('role', 'user')
+    
+    # Primero, obtener la tabla
+    table = current_app.spreadsheets_collection.find_one({"_id": ObjectId(table_id)})
+    
+    if not table:
+        flash("Tabla no encontrada.", "warning")
+        return redirect(url_for("main.tables"))
+    
+    # Obtener el propietario de la tabla (puede estar en diferentes campos)
+    owner = table.get('owner') or table.get('created_by') or table.get('owner_name')
+    
+    current_app.logger.info(f"[DEBUG] Verificando permisos para eliminar tabla: role={role}, username={username}, owner={owner}")
+    
+    # Verificar permisos
+    if role != 'admin' and owner != username:
+        current_app.logger.warning(f"[DEBUG] Permiso denegado para eliminar tabla: {username} intentando eliminar tabla de {owner}")
+        flash("No tiene permisos para eliminar esta tabla.", "warning")
+        return redirect(url_for("main.tables"))
 
     if not table:
         flash("Tabla no encontrada o no tiene permisos para eliminarla.", "error")

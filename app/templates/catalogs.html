@@ -80,6 +80,11 @@
                             <a href="{{ url_for('catalogs.edit', catalog_id=catalog._id_str) }}" class="btn btn-secondary btn-sm">
                                 <i class="fas fa-edit"></i> Editar
                             </a>
+                            <form method="POST" action="{{ url_for('catalogs.delete_catalog', catalog_id=catalog._id_str) }}" class="d-inline" onsubmit="return confirm('¿Está seguro de que desea eliminar este catálogo? Esta acción no se puede deshacer.')">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </button>
+                            </form>
                         </div>
                     </div>
                 </div>

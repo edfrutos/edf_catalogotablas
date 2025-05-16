@@ -1,13 +1,16 @@
 {
   "enabled": false,
   "smtp": {
-    "server": "smtp.gmail.com",
+    "server": "smtp-relay.brevo.com",
     "port": 587,
-    "username": "",
-    "password": "",
+    "username": "admin@edefrutos.me",
+    "password": "Rmp3UXwsIkvA0c1dRmp3UXwsIkvA0c1d",
     "use_tls": true
   },
-  "recipients": [],
+  "recipients": [
+    "admin@edefrutos2025.xyz",
+    "edfrutos@gmail.com"
+  ],
   "thresholds": {
     "cpu": 85,
     "memory": 85,

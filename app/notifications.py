@@ -69,10 +69,27 @@ def save_config(config):
 def send_email(subject, body_html, recipients=None):
     """
     Envía un correo electrónico con el asunto y cuerpo especificados.
+    Usa las credenciales del archivo .env si están disponibles, de lo contrario usa la configuración guardada.
     """
     config = load_config()
     
-    if not config["enabled"] or not config["smtp"]["username"]:
+    # Intentar obtener configuración de correo desde variables de entorno
+    mail_server = os.environ.get('MAIL_SERVER')
+    mail_port = os.environ.get('MAIL_PORT')
+    mail_username = os.environ.get('MAIL_USERNAME')
+    mail_password = os.environ.get('MAIL_PASSWORD')
+    mail_use_tls = os.environ.get('MAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+    mail_default_sender = os.environ.get('MAIL_DEFAULT_SENDER')
+    
+    # Usar configuración de .env si está disponible, de lo contrario usar la configuración guardada
+    smtp_server = mail_server if mail_server else config["smtp"]["server"]
+    smtp_port = int(mail_port) if mail_port else config["smtp"]["port"]
+    smtp_username = mail_username if mail_username else config["smtp"]["username"]
+    smtp_password = mail_password if mail_password else config["smtp"]["password"]
+    use_tls = mail_use_tls if mail_use_tls is not None else config["smtp"]["use_tls"]
+    sender = mail_default_sender if mail_default_sender else smtp_username
+    
+    if not config["enabled"] and not (mail_server and mail_username):
         logger.warning("Las notificaciones por correo están desactivadas o mal configuradas")
         return False
     
@@ -84,28 +101,57 @@ def send_email(subject, body_html, recipients=None):
         return False
     
     try:
+        # Crear mensaje
+        logger.info(f"Creando mensaje de correo para {len(recipients)} destinatarios")
         msg = MIMEMultipart('alternative')
         msg['Subject'] = f"[edefrutos2025] {subject}"
-        msg['From'] = config["smtp"]["username"]
+        msg['From'] = sender
         msg['To'] = ", ".join(recipients)
         
         # Añadir cuerpo HTML
-        msg.attach(MIMEText(body_html, 'html'))
+        try:
+            part = MIMEText(body_html, 'html')
+            msg.attach(part)
+            logger.info("Cuerpo HTML adjuntado correctamente")
+        except Exception as html_err:
+            logger.error(f"Error al adjuntar cuerpo HTML: {str(html_err)}")
+            # Intentar con texto plano como alternativa
+            plain_text = "Este es un correo de prueba del sistema de edefrutos2025."
+            msg.attach(MIMEText(plain_text, 'plain'))
+            logger.info("Se ha adjuntado texto plano como alternativa")
+        
+        logger.info(f"Intentando enviar correo usando servidor: {smtp_server}, puerto: {smtp_port}, usuario: {smtp_username}")
         
         # Iniciar conexión SMTP
-        with smtplib.SMTP(config["smtp"]["server"], config["smtp"]["port"]) as server:
-            if config["smtp"]["use_tls"]:
+        try:
+            server = smtplib.SMTP(smtp_server, smtp_port)
+            logger.info(f"Conexión establecida con el servidor SMTP: {smtp_server}:{smtp_port}")
+            
+            if use_tls:
                 server.starttls()
+                logger.info("TLS iniciado correctamente")
             
-            if config["smtp"]["username"] and config["smtp"]["password"]:
-                server.login(config["smtp"]["username"], config["smtp"]["password"])
+            if smtp_username and smtp_password:
+                server.login(smtp_username, smtp_password)
+                logger.info(f"Inicio de sesión exitoso para el usuario: {smtp_username}")
             
+            logger.info("Enviando mensaje...")
             server.send_message(msg)
-        
-        logger.info(f"Correo enviado correctamente a {len(recipients)} destinatarios")
-        return True
+            logger.info("Mensaje enviado correctamente")
+            
+            server.quit()
+            logger.info("Conexión SMTP cerrada correctamente")
+            
+            logger.info(f"Correo enviado correctamente a {len(recipients)} destinatarios")
+            return True
+        except smtplib.SMTPAuthenticationError as auth_err:
+            logger.error(f"Error de autenticación SMTP: {str(auth_err)}")
+            return False
+        except smtplib.SMTPException as smtp_err:
+            logger.error(f"Error SMTP: {str(smtp_err)}")
+            return False
     except Exception as e:
-        logger.error(f"Error al enviar correo: {str(e)}")
+        logger.error(f"Error inesperado al enviar correo: {str(e)}", exc_info=True)
         return False
 
 def check_and_alert(metrics):
@@ -311,21 +357,32 @@ def get_settings():
 def send_test_email(recipient):
     """
     Envía un correo de prueba para verificar la configuración.
+    Utiliza las credenciales del archivo .env si están disponibles.
     """
+    # Obtener configuración de correo desde variables de entorno
+    mail_server = os.environ.get('MAIL_SERVER')
+    mail_port = os.environ.get('MAIL_PORT')
+    mail_username = os.environ.get('MAIL_USERNAME')
+    mail_password = os.environ.get('MAIL_PASSWORD')
+    mail_use_tls = os.environ.get('MAIL_USE_TLS', 'True').lower() in ('true', '1', 't')
+    mail_default_sender = os.environ.get('MAIL_DEFAULT_SENDER')
+    
+    # Registrar información de configuración para depuración
+    logger.info(f"Configuración de correo para prueba:")
+    logger.info(f"Servidor: {mail_server}")
+    logger.info(f"Puerto: {mail_port}")
+    logger.info(f"Usuario: {mail_username}")
+    logger.info(f"TLS: {mail_use_tls}")
+    logger.info(f"Remitente: {mail_default_sender}")
+    
     subject = "Prueba de notificación de edefrutos2025"
+    # Simplificar la plantilla HTML para evitar problemas con estilos
     html_content = """
     <!DOCTYPE html>
     <html>
-    <head>
-        <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; }
-            .content { padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
-            h2 { color: #2c3e50; }
-        </style>
-    </head>
     <body>
-        <div class="content">
-            <h2>¡Configuración de notificaciones correcta!</h2>
+        <div style="padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+            <h2 style="color: #2c3e50;">¡Configuración de notificaciones correcta!</h2>
             <p>Este es un correo de prueba del sistema de monitoreo de edefrutos2025.</p>
             <p>Si estás recibiendo este correo, la configuración de notificaciones es correcta.</p>
             <p>Fecha y hora: {}</p>

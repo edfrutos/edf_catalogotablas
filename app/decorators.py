@@ -9,6 +9,19 @@ from flask import session, redirect, url_for, request, flash
 
 logger = logging.getLogger(__name__)
 
+# Funciones auxiliares para verificar tipos de manera segura
+def is_datetime(value):
+    """Verifica si un valor es de tipo datetime sin usar isinstance"""
+    return hasattr(value, 'year') and hasattr(value, 'month') and hasattr(value, 'day')
+
+def is_list(value):
+    """Verifica si un valor es una lista sin usar isinstance"""
+    return hasattr(value, '__iter__') and hasattr(value, 'append')
+
+def is_string(value):
+    """Verifica si un valor es un string sin usar isinstance"""
+    return hasattr(value, 'lower') and hasattr(value, 'upper')
+
 # --- Decorador para rutas protegidas ---
 def login_required(f):
     @wraps(f)

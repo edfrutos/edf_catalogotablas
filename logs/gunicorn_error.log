@@ -1,685 +1,1761 @@
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7f4fb2e254c0>
+  on_reload: <function on_reload at 0x7f4fb2e25550>
+  when_ready: <function when_ready at 0x7f4fb2e255e0>
+  pre_fork: <function pre_fork at 0x7f4fb34ced30>
+  post_fork: <function post_fork at 0x7f4fb34ceca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f4fb2d7da60>
+  worker_int: <function WorkerInt.worker_int at 0x7f4fb2d7db80>
+  worker_abort: <function worker_abort at 0x7f4fb34d1040>
+  pre_exec: <function pre_exec at 0x7f4fb34cedc0>
+  pre_request: <function pre_request at 0x7f4fb34cee50>
+  post_request: <function post_request at 0x7f4fb34ceee0>
+  child_exit: <function child_exit at 0x7f4fb34d10d0>
+  worker_exit: <function worker_exit at 0x7f4fb34cef70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f4fb2d96310>
+  on_exit: <function OnExit.on_exit at 0x7f4fb2d96430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7f4fb2d96550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 19:33:03 +0200] [1546501] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 19:33:03 +0200] [1546501] [DEBUG] Arbiter booted
+[2025-05-16 19:33:03 +0200] [1546501] [INFO] Listening at: http://127.0.0.1:8002 (1546501)
+[2025-05-16 19:33:03 +0200] [1546501] [INFO] Using worker: sync
+[2025-05-16 19:33:03 +0200] [1546507] [INFO] Booting worker with pid: 1546507
+[2025-05-16 19:33:03 +0200] [1546501] [DEBUG] 1 workers
+[2025-05-16 19:33:41 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 19:33:42 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:33:42 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 19:33:42 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:33:46 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:33:46 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:33:46 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:33:46 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:33:46 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:33:52 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:33:52 +0200] [1546507] [DEBUG] GET /static/uploads/dc70acc8327f4fdd885cfb238bf9cb81_20250216_154911150_iOS.jpg
+[2025-05-16 19:34:04 +0200] [1546507] [DEBUG] GET /ver_tabla/
+[2025-05-16 19:34:18 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:34:18 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 19:34:18 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:34:24 +0200] [1546507] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 19:34:24 +0200] [1546507] [DEBUG] GET /admin/usuarios
+[2025-05-16 19:34:31 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:34:34 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 19:34:37 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:34:38 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:34:38 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:34:38 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:34:38 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:34:44 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:34:44 +0200] [1546507] [DEBUG] GET /static/uploads/dc70acc8327f4fdd885cfb238bf9cb81_20250216_154911150_iOS.jpg
+[2025-05-16 19:35:02 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:35:02 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:35:02 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:35:02 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:35:02 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:35:06 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 19:35:36 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:35:36 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:35:36 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:35:36 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:35:36 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:36:04 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:36:04 +0200] [1546507] [DEBUG] GET /static/uploads/dc70acc8327f4fdd885cfb238bf9cb81_20250216_154911150_iOS.jpg
+[2025-05-16 19:36:30 +0200] [1546507] [DEBUG] GET /ver_tabla/
+[2025-05-16 19:36:36 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 19:36:36 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 19:36:47 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:36:47 +0200] [1546507] [DEBUG] GET /static/uploads/dc70acc8327f4fdd885cfb238bf9cb81_20250216_154911150_iOS.jpg
+[2025-05-16 19:37:38 +0200] [1546507] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 19:37:39 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:37:49 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/2
+[2025-05-16 19:37:49 +0200] [1546507] [DEBUG] GET /static/uploads/0f66cc4d32164250af3b3ff2cd69c9ff_IMG_7571.jpg
+[2025-05-16 19:37:55 +0200] [1546507] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/2
+[2025-05-16 19:37:56 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:37:56 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:37:56 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:37:56 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:37:56 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:38:00 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:38:00 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 19:38:02 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/2
+[2025-05-16 19:38:02 +0200] [1546507] [DEBUG] GET /static/uploads/0f66cc4d32164250af3b3ff2cd69c9ff_IMG_7571.jpg
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/2
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
+[2025-05-16 19:38:08 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:38:49 +0200] [1546507] [DEBUG] POST /catalogs/delete-row/680a1922b6570e9943828f62/2
+[2025-05-16 19:38:49 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:38:49 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:38:49 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:38:49 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
+[2025-05-16 19:39:01 +0200] [1546507] [DEBUG] POST /catalogs/delete-row/680a1922b6570e9943828f62/1
+[2025-05-16 19:39:01 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:39:01 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
+[2025-05-16 19:39:01 +0200] [1546507] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
+[2025-05-16 19:39:06 +0200] [1546507] [DEBUG] POST /catalogs/delete-row/680a1922b6570e9943828f62/0
+[2025-05-16 19:39:06 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:39:09 +0200] [1546507] [DEBUG] GET /catalogs/add-row/680a1922b6570e9943828f62
+[2025-05-16 19:41:39 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 19:41:39 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 19:43:00 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:43:00 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 19:43:07 +0200] [1546507] [DEBUG] POST /catalogs/add-row/680a1922b6570e9943828f62
+[2025-05-16 19:43:08 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:43:08 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:43:08 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 19:43:08 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:46:44 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 19:46:44 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 19:48:01 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:48:01 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 19:51:33 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:51:33 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:51:33 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 19:51:33 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 19:51:38 +0200] [1546507] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb0297
+[2025-05-16 19:51:38 +0200] [1546507] [DEBUG] GET /admin/usuarios
+[2025-05-16 19:51:48 +0200] [1546507] [DEBUG] GET /admin/usuarios/admin@example.com/catalogos
+[2025-05-16 19:51:48 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 19:51:48 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 19:51:53 +0200] [1546507] [DEBUG] GET /admin/catalogo/ver/catalogs/680a1922b6570e9943828f62
+[2025-05-16 19:51:53 +0200] [1546507] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 19:51:58 +0200] [1546507] [DEBUG] GET /admin/usuarios/admin@example.com/catalogos
+[2025-05-16 19:52:03 +0200] [1546507] [DEBUG] GET /admin/catalogo/ver/catalogs/6823a685c1719acfea2ce211
+[2025-05-16 19:52:04 +0200] [1546507] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 19:52:07 +0200] [1546507] [DEBUG] GET /admin/usuarios/admin@example.com/catalogos
+[2025-05-16 19:52:09 +0200] [1546507] [DEBUG] GET /admin/usuarios
+[2025-05-16 19:52:18 +0200] [1546507] [DEBUG] GET /admin/usuarios/edfrutos@gmail.com/catalogos
+[2025-05-16 19:52:22 +0200] [1546507] [DEBUG] GET /admin/catalogo/ver/catalogs/68274d08cc0326f99017cd2d
+[2025-05-16 19:52:22 +0200] [1546507] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 19:52:27 +0200] [1546507] [DEBUG] GET /admin/usuarios/edfrutos@gmail.com/catalogos
+[2025-05-16 19:52:28 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_ea366e3e.jpg
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 19:52:32 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 19:52:36 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 19:52:44 +0200] [1546507] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_ea366e3e.jpg
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 19:52:45 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 19:52:51 +0200] [1546507] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 19:52:51 +0200] [1546507] [DEBUG] GET /static/uploads/b561ac73f20641128ec916a9ff417ab7_IMG_7579.jpg
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_ea366e3e.jpg
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 19:53:00 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 19:53:01 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:53:01 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 19:53:02 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 19:53:57 +0200] [1380995] [INFO] Handling signal: term
+[2025-05-16 19:53:57 +0200] [1400241] [INFO] Worker exiting (pid: 1400241)
+[2025-05-16 19:53:57 +0200] [1400243] [INFO] Worker exiting (pid: 1400243)
+[2025-05-16 19:53:57 +0200] [1400237] [INFO] Worker exiting (pid: 1400237)
+[2025-05-16 19:53:57 +0200] [1400238] [INFO] Worker exiting (pid: 1400238)
+[2025-05-16 19:54:01 +0200] [1380995] [INFO] Shutting down: Master
+[2025-05-16 19:54:01 +0200] [1556253] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 19:54:01 +0200] [1556253] [INFO] Listening at: http://127.0.0.1:8001 (1556253)
+[2025-05-16 19:54:01 +0200] [1556253] [INFO] Using worker: sync
+[2025-05-16 19:54:01 +0200] [1556269] [INFO] Booting worker with pid: 1556269
+[2025-05-16 19:54:01 +0200] [1556270] [INFO] Booting worker with pid: 1556270
+[2025-05-16 19:54:01 +0200] [1556271] [INFO] Booting worker with pid: 1556271
+[2025-05-16 19:54:01 +0200] [1556272] [INFO] Booting worker with pid: 1556272
+[2025-05-16 19:56:52 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 19:56:53 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 19:58:01 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 19:58:02 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:00:26 +0200] [1556253] [INFO] Handling signal: term
+[2025-05-16 20:00:26 +0200] [1556272] [INFO] Worker exiting (pid: 1556272)
+[2025-05-16 20:00:26 +0200] [1556270] [INFO] Worker exiting (pid: 1556270)
+[2025-05-16 20:00:26 +0200] [1556271] [INFO] Worker exiting (pid: 1556271)
+[2025-05-16 20:00:26 +0200] [1556269] [INFO] Worker exiting (pid: 1556269)
+[2025-05-16 20:00:28 +0200] [1556253] [INFO] Shutting down: Master
+[2025-05-16 20:00:29 +0200] [1559730] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:00:29 +0200] [1559730] [INFO] Listening at: http://127.0.0.1:8001 (1559730)
+[2025-05-16 20:00:29 +0200] [1559730] [INFO] Using worker: sync
+[2025-05-16 20:00:29 +0200] [1559755] [INFO] Booting worker with pid: 1559755
+[2025-05-16 20:00:29 +0200] [1559756] [INFO] Booting worker with pid: 1559756
+[2025-05-16 20:00:29 +0200] [1559757] [INFO] Booting worker with pid: 1559757
+[2025-05-16 20:00:29 +0200] [1559761] [INFO] Booting worker with pid: 1559761
+[2025-05-16 20:01:57 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:01:58 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:03:41 +0200] [1559730] [INFO] Handling signal: term
+[2025-05-16 20:03:41 +0200] [1559756] [INFO] Worker exiting (pid: 1559756)
+[2025-05-16 20:03:41 +0200] [1559757] [INFO] Worker exiting (pid: 1559757)
+[2025-05-16 20:03:41 +0200] [1559755] [INFO] Worker exiting (pid: 1559755)
+[2025-05-16 20:03:41 +0200] [1559761] [INFO] Worker exiting (pid: 1559761)
+[2025-05-16 20:03:44 +0200] [1559730] [INFO] Shutting down: Master
+[2025-05-16 20:03:44 +0200] [1561390] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:03:44 +0200] [1561390] [INFO] Listening at: http://127.0.0.1:8001 (1561390)
+[2025-05-16 20:03:44 +0200] [1561390] [INFO] Using worker: sync
+[2025-05-16 20:03:44 +0200] [1561401] [INFO] Booting worker with pid: 1561401
+[2025-05-16 20:03:44 +0200] [1561402] [INFO] Booting worker with pid: 1561402
+[2025-05-16 20:03:44 +0200] [1561403] [INFO] Booting worker with pid: 1561403
+[2025-05-16 20:03:45 +0200] [1561404] [INFO] Booting worker with pid: 1561404
+[2025-05-16 20:03:46 +0200] [1561403] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+    worker.init_process()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 135, in init_process
+    self.load_wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/base.py", line 66, in wsgi
+    self.callable = self.load()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+    return self.load_wsgiapp()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/util.py", line 370, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 975, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 671, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/wsgi.py", line 41, in <module>
+    from app import create_app
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/__init__.py", line 32, in <module>
+    from app.routes.auth_routes import auth_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/__init__.py", line 7, in <module>
+    from app.routes.admin_routes import admin_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 1574
+    return jsonify({'size': size, 'backups': backups})        return redirect(url_for("admin.lista_usuarios"))
+                                                              ^
+SyntaxError: invalid syntax
+[2025-05-16 20:03:46 +0200] [1561403] [INFO] Worker exiting (pid: 1561403)
+[2025-05-16 20:03:46 +0200] [1561402] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+    worker.init_process()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 135, in init_process
+    self.load_wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/base.py", line 66, in wsgi
+    self.callable = self.load()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+    return self.load_wsgiapp()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/util.py", line 370, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 975, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 671, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/wsgi.py", line 41, in <module>
+    from app import create_app
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/__init__.py", line 32, in <module>
+    from app.routes.auth_routes import auth_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/__init__.py", line 7, in <module>
+    from app.routes.admin_routes import admin_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 1574
+    return jsonify({'size': size, 'backups': backups})        return redirect(url_for("admin.lista_usuarios"))
+                                                              ^
+SyntaxError: invalid syntax
+[2025-05-16 20:03:46 +0200] [1561402] [INFO] Worker exiting (pid: 1561402)
+[2025-05-16 20:03:46 +0200] [1561404] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+    worker.init_process()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 135, in init_process
+    self.load_wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/base.py", line 66, in wsgi
+    self.callable = self.load()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+    return self.load_wsgiapp()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/util.py", line 370, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 975, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 671, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/wsgi.py", line 41, in <module>
+    from app import create_app
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/__init__.py", line 32, in <module>
+    from app.routes.auth_routes import auth_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/__init__.py", line 7, in <module>
+    from app.routes.admin_routes import admin_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 1574
+    return jsonify({'size': size, 'backups': backups})        return redirect(url_for("admin.lista_usuarios"))
+                                                              ^
+SyntaxError: invalid syntax
+[2025-05-16 20:03:46 +0200] [1561404] [INFO] Worker exiting (pid: 1561404)
+[2025-05-16 20:03:46 +0200] [1561401] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+    worker.init_process()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 135, in init_process
+    self.load_wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+    self.wsgi = self.app.wsgi()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/base.py", line 66, in wsgi
+    self.callable = self.load()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+    return self.load_wsgiapp()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+    return util.import_app(self.app_uri)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/util.py", line 370, in import_app
+    mod = importlib.import_module(module)
+  File "/usr/lib/python3.8/importlib/__init__.py", line 127, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 991, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 975, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 671, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 848, in exec_module
+  File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/wsgi.py", line 41, in <module>
+    from app import create_app
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/__init__.py", line 32, in <module>
+    from app.routes.auth_routes import auth_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/__init__.py", line 7, in <module>
+    from app.routes.admin_routes import admin_bp
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 1574
+    return jsonify({'size': size, 'backups': backups})        return redirect(url_for("admin.lista_usuarios"))
+                                                              ^
+SyntaxError: invalid syntax
+[2025-05-16 20:03:46 +0200] [1561401] [INFO] Worker exiting (pid: 1561401)
+[2025-05-16 20:03:47 +0200] [1561390] [ERROR] Worker (pid:1561402) exited with code 3
+[2025-05-16 20:04:17 +0200] [1561390] [ERROR] Shutting down: Master
+[2025-05-16 20:04:17 +0200] [1561390] [ERROR] Reason: Worker failed to boot.
+[2025-05-16 20:05:09 +0200] [1562140] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:05:09 +0200] [1562140] [INFO] Listening at: http://127.0.0.1:8001 (1562140)
+[2025-05-16 20:05:09 +0200] [1562140] [INFO] Using worker: sync
+[2025-05-16 20:05:09 +0200] [1562150] [INFO] Booting worker with pid: 1562150
+[2025-05-16 20:05:09 +0200] [1562153] [INFO] Booting worker with pid: 1562153
+[2025-05-16 20:05:09 +0200] [1562158] [INFO] Booting worker with pid: 1562158
+[2025-05-16 20:05:09 +0200] [1562159] [INFO] Booting worker with pid: 1562159
+[2025-05-16 20:07:01 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:07:01 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:07:44 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:07:44 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:10:01 +0200] [1562140] [INFO] Handling signal: term
+[2025-05-16 20:10:01 +0200] [1562158] [INFO] Worker exiting (pid: 1562158)
+[2025-05-16 20:10:01 +0200] [1562150] [INFO] Worker exiting (pid: 1562150)
+[2025-05-16 20:10:01 +0200] [1562159] [INFO] Worker exiting (pid: 1562159)
+[2025-05-16 20:10:01 +0200] [1562153] [INFO] Worker exiting (pid: 1562153)
+[2025-05-16 20:10:05 +0200] [1562140] [INFO] Shutting down: Master
+[2025-05-16 20:10:05 +0200] [1564550] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:10:05 +0200] [1564550] [INFO] Listening at: http://127.0.0.1:8001 (1564550)
+[2025-05-16 20:10:05 +0200] [1564550] [INFO] Using worker: sync
+[2025-05-16 20:10:05 +0200] [1564556] [INFO] Booting worker with pid: 1564556
+[2025-05-16 20:10:05 +0200] [1564557] [INFO] Booting worker with pid: 1564557
+[2025-05-16 20:10:05 +0200] [1564558] [INFO] Booting worker with pid: 1564558
+[2025-05-16 20:10:05 +0200] [1564559] [INFO] Booting worker with pid: 1564559
+[2025-05-16 20:11:27 +0200] [1564550] [INFO] Handling signal: term
+[2025-05-16 20:11:27 +0200] [1564557] [INFO] Worker exiting (pid: 1564557)
+[2025-05-16 20:11:27 +0200] [1564559] [INFO] Worker exiting (pid: 1564559)
+[2025-05-16 20:11:27 +0200] [1564558] [INFO] Worker exiting (pid: 1564558)
+[2025-05-16 20:11:27 +0200] [1564556] [INFO] Worker exiting (pid: 1564556)
+[2025-05-16 20:11:29 +0200] [1564550] [INFO] Shutting down: Master
+[2025-05-16 20:11:30 +0200] [1565351] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:11:30 +0200] [1565351] [INFO] Listening at: http://127.0.0.1:8001 (1565351)
+[2025-05-16 20:11:30 +0200] [1565351] [INFO] Using worker: sync
+[2025-05-16 20:11:30 +0200] [1565359] [INFO] Booting worker with pid: 1565359
+[2025-05-16 20:11:30 +0200] [1565360] [INFO] Booting worker with pid: 1565360
+[2025-05-16 20:11:30 +0200] [1565361] [INFO] Booting worker with pid: 1565361
+[2025-05-16 20:11:30 +0200] [1565362] [INFO] Booting worker with pid: 1565362
+[2025-05-16 20:12:05 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:12:05 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:12:44 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:12:44 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:13:17 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 20:13:17 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:13:17 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:13:17 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:13:22 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 20:13:26 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 20:13:27 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:13:30 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 20:13:35 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:13:39 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62/edit
+[2025-05-16 20:13:42 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:13:45 +0200] [1546507] [DEBUG] GET /tables
+[2025-05-16 20:13:48 +0200] [1546507] [DEBUG] GET /select_table/67f5a0bef67bc06b78b50bc0
+[2025-05-16 20:13:49 +0200] [1546507] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 20:13:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:13:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:13:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:13:52 +0200] [1546507] [DEBUG] GET /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:13:52 +0200] [1546507] [DEBUG] GET /static/uploads/96f3c1df1bd044b29dc27a3c8f943e39.jpg
+[2025-05-16 20:13:52 +0200] [1546507] [DEBUG] GET /static/uploads/065da41d5cc14524a431fe3ec5a58abe.jpg
+[2025-05-16 20:13:52 +0200] [1546507] [DEBUG] GET /static/uploads/f3318f55d30244c5b17f2e99275d0e3d.jpg
+[2025-05-16 20:13:55 +0200] [1546507] [DEBUG] GET /static/uploads/96f3c1df1bd044b29dc27a3c8f943e39.jpg
+[2025-05-16 20:13:58 +0200] [1546507] [DEBUG] GET /static/uploads/065da41d5cc14524a431fe3ec5a58abe.jpg
+[2025-05-16 20:14:01 +0200] [1546507] [DEBUG] GET /static/uploads/f3318f55d30244c5b17f2e99275d0e3d.jpg
+[2025-05-16 20:14:05 +0200] [1546507] [DEBUG] POST /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:14:06 +0200] [1546507] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 20:14:06 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:14:06 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:14:11 +0200] [1546507] [DEBUG] GET /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:14:23 +0200] [1546507] [DEBUG] POST /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:14:23 +0200] [1546507] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 20:14:23 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:14:23 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:14:29 +0200] [1546507] [DEBUG] GET /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:14:29 +0200] [1546507] [DEBUG] GET /static/uploads/f5603ae9b9fa40f48a0b28fbbd8862f5.jpg
+[2025-05-16 20:14:37 +0200] [1546507] [DEBUG] POST /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 20:14:38 +0200] [1546507] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 20:14:38 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:14:38 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:17:09 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:17:09 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:17:45 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:17:45 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:17:45 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:17:46 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:17:46 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:17:46 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:17:49 +0200] [1546507] [DEBUG] GET /ver_tabla/682752572ce29cdcef8f4dfb
+[2025-05-16 20:17:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:17:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:17:49 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:17:56 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:17:59 +0200] [1546507] [DEBUG] GET /ver_tabla/68274fb82ce29cdcef8f4dfa
+[2025-05-16 20:17:59 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:17:59 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:18:06 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:18:11 +0200] [1546507] [DEBUG] GET /ver_tabla/682726bee88075ac494aad53
+[2025-05-16 20:18:11 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:18:11 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:18:15 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:18:18 +0200] [1546507] [DEBUG] GET /ver_tabla/6826ff3be88075ac494aad50
+[2025-05-16 20:18:18 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:18:18 +0200] [1546507] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 20:18:25 +0200] [1546507] [DEBUG] GET /dashboard_user
+[2025-05-16 20:18:29 +0200] [1546507] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:18:33 +0200] [1546507] [DEBUG] GET /catalogs/
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 20:18:37 +0200] [1546507] [DEBUG] GET /static/uploads/tabla.csv_0_ea366e3e.jpg
+[2025-05-16 20:20:20 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:20:21 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:20:21 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:20:21 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:20:23 +0200] [1546507] [DEBUG] GET /admin/maintenance
+[2025-05-16 20:20:28 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:20:45 +0200] [1546507] [DEBUG] POST /admin/api/truncate-logs
+[2025-05-16 20:20:47 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:20:48 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:21:48 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:21:49 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:21:50 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:21:50 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:21:50 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:22:13 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:22:13 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:22:45 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:22:45 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:22:50 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:22:51 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:23:51 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:23:52 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:24:52 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:24:53 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:24:53 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:24:53 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:24:53 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:25:54 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:25:54 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:25:54 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:25:54 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:25:54 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:26:54 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:26:55 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:27:17 +0200] [1546507] [DEBUG] HEAD /
+[2025-05-16 20:27:17 +0200] [1546507] [DEBUG] HEAD /welcome
+[2025-05-16 20:27:45 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:27:46 +0200] [1546507] [DEBUG] GET /welcome
+[2025-05-16 20:27:55 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:27:56 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:27:56 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:27:57 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:27:57 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:28:58 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:28:59 +0200] [1546507] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:28:59 +0200] [1546507] [DEBUG] GET /
+[2025-05-16 20:28:59 +0200] [1546507] [DEBUG] GET /dashboard
+[2025-05-16 20:28:59 +0200] [1546507] [DEBUG] GET /admin/
+[2025-05-16 20:30:03 +0200] [1546507] [DEBUG] GET /admin/system-status
+[2025-05-16 20:30:44 +0200] [1546501] [CRITICAL] WORKER TIMEOUT (pid:1546507)
+[2025-05-16 20:30:45 +0200] [1546507] [ERROR] Error handling request /admin/system-status
+Traceback (most recent call last):
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/sync.py", line 134, in handle
+    self.handle_request(listener, req, client, addr)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/sync.py", line 177, in handle_request
+    respiter = self.wsgi(environ, resp.start_response)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/flask/app.py", line 1488, in __call__
+    return self.wsgi_app(environ, start_response)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/flask/app.py", line 1463, in wsgi_app
     response = self.full_dispatch_request()
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/flask/app.py", line 872, in full_dispatch_request
-    rv = self.handle_user_exception(e)
   File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/flask/app.py", line 870, in full_dispatch_request
     rv = self.dispatch_request()
   File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/flask/app.py", line 855, in dispatch_request
     return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 394, in editar_usuario
-    # Actualizar la contraseña
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/collection.py", line 1312, in update_one
-    self._update_retryable(
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/collection.py", line 1107, in _update_retryable
-    return self._database.client._retryable_write(
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1898, in _retryable_write
-    return self._retry_with_session(retryable, func, s, bulk, operation, operation_id)
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1784, in _retry_with_session
-    return self._retry_internal(
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 189, in system_status
+    data = get_system_status_data()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/routes/admin_routes.py", line 213, in get_system_status_data
+    if is_mongo_available():
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/extensions.py", line 35, in is_mongo_available
+    mongo.cx.admin.command('ping')
   File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/_csot.py", line 119, in csot_wrapper
     return func(self, *args, **kwargs)
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 1819, in _retry_internal
-    return _ClientConnectionRetryable(
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 2554, in run
-    return self._read() if self._is_read else self._write()
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 2676, in _write
-    return self._func(self._session, conn, self._retryable)  # type: ignore
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/collection.py", line 1088, in _update
-    return self._update(
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/collection.py", line 1050, in _update
-    _check_write_command_response(result)
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/helpers_shared.py", line 285, in _check_write_command_response
-    _raise_last_write_error(write_errors)
-  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/helpers_shared.py", line 255, in _raise_last_write_error
-    raise DuplicateKeyError(error.get("errmsg"), 11000, error)
-pymongo.errors.DuplicateKeyError: E11000 duplicate key error collection: app_catalogojoyero.users index: email_idx dup key: { email: "amadeo@gmail.com" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: app_catalogojoyero.users index: email_idx dup key: { email: "amadeo@gmail.com" }', 'keyPattern': {'email': 1}, 'keyValue': {'email': 'amadeo@gmail.com'}}
-[2025-05-15 20:07:27 +0200] [776075] [DEBUG] GET /admin/usuarios/edit/681e29888bb6d00307eb0294
-[2025-05-15 20:07:31 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:07:34 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0/edit
-[2025-05-15 20:07:46 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:07:51 +0200] [776075] [DEBUG] GET /catalogs/add-row/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:08:38 +0200] [776075] [DEBUG] POST /catalogs/add-row/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:08:39 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:08:39 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:08:39 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:08:39 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:08:50 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:08:54 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:08:57 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:08:59 +0200] [776075] [DEBUG] GET /catalogs/67f63aaa7192e41468359b1c
-[2025-05-15 20:09:02 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:09:04 +0200] [776075] [DEBUG] GET /catalogs/67f63da27192e41468359beb
-[2025-05-15 20:09:06 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:09:08 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:09:12 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:09:15 +0200] [776075] [DEBUG] GET /editar_fila/68262902e88075ac494aad4e/0
-[2025-05-15 20:09:24 +0200] [776075] [DEBUG] POST /editar_fila/68262902e88075ac494aad4e/0
-[2025-05-15 20:09:25 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:10:52 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:10:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:11:02 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:11:02 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:11:21 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:11:21 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:13:54 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:13:55 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:13:55 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:13:55 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:13:56 +0200] [776075] [DEBUG] GET /admin/maintenance
-[2025-05-15 20:13:58 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:15:02 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:15:23 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:15:23 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:15:23 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:15:24 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:15:33 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:15:38 +0200] [776075] [DEBUG] GET /tables
-[2025-05-15 20:15:55 +0200] [776075] [DEBUG] GET /select_table/67f63da27192e41468359beb
-[2025-05-15 20:15:55 +0200] [776075] [DEBUG] GET /ver_tabla/67f63da27192e41468359beb
-[2025-05-15 20:16:03 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:16:03 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:16:04 +0200] [776075] [DEBUG] GET /agregar_fila/67f63da27192e41468359beb
-[2025-05-15 20:16:06 +0200] [776075] [DEBUG] GET /ver_tabla/67f63da27192e41468359beb
-[2025-05-15 20:16:09 +0200] [776075] [DEBUG] GET /agregar_fila/67f63da27192e41468359beb
-[2025-05-15 20:16:21 +0200] [776075] [DEBUG] GET /ver_tabla/67f63da27192e41468359beb
-[2025-05-15 20:16:26 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:16:26 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:16:27 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:16:31 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:16:39 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:16:51 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:18:25 +0200] [776075] [DEBUG] GET /ver_catalogo
-[2025-05-15 20:18:26 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:18:26 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:18:26 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:18:29 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:18:29 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:18:29 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:18:32 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:18:37 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:18:41 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:18:42 +0200] [776075] [DEBUG] GET /catalogs/67f63aaa7192e41468359b1c
-[2025-05-15 20:18:49 +0200] [776075] [DEBUG] GET /catalogs/add-row/67f63aaa7192e41468359b1c
-[2025-05-15 20:18:59 +0200] [776075] [DEBUG] POST /catalogs/add-row/67f63aaa7192e41468359b1c
-[2025-05-15 20:18:59 +0200] [776075] [DEBUG] GET /catalogs/67f63aaa7192e41468359b1c
-[2025-05-15 20:19:03 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:19:05 +0200] [776075] [DEBUG] GET /catalogs/67f63aaa7192e41468359b1c
-[2025-05-15 20:21:03 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:21:03 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:21:29 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:21:29 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:26:03 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:26:03 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:26:33 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:26:33 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:28:56 +0200] [861485] [INFO] Handling signal: term
-[2025-05-15 20:28:56 +0200] [861492] [INFO] Worker exiting (pid: 861492)
-[2025-05-15 20:28:56 +0200] [861493] [INFO] Worker exiting (pid: 861493)
-[2025-05-15 20:28:56 +0200] [861491] [INFO] Worker exiting (pid: 861491)
-[2025-05-15 20:28:56 +0200] [861494] [INFO] Worker exiting (pid: 861494)
-[2025-05-15 20:28:59 +0200] [861485] [INFO] Shutting down: Master
-[2025-05-15 20:29:00 +0200] [872225] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 20:29:00 +0200] [872225] [INFO] Listening at: http://127.0.0.1:8001 (872225)
-[2025-05-15 20:29:00 +0200] [872225] [INFO] Using worker: sync
-[2025-05-15 20:29:00 +0200] [872231] [INFO] Booting worker with pid: 872231
-[2025-05-15 20:29:00 +0200] [872232] [INFO] Booting worker with pid: 872232
-[2025-05-15 20:29:00 +0200] [872233] [INFO] Booting worker with pid: 872233
-[2025-05-15 20:29:00 +0200] [872234] [INFO] Booting worker with pid: 872234
-[2025-05-15 20:30:10 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:30:11 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:30:11 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:30:11 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:30:15 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:30:19 +0200] [776075] [DEBUG] GET /catalogs/add-row/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:30:54 +0200] [776075] [DEBUG] POST /catalogs/add-row/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:30:54 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:30:55 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:30:55 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:30:55 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:31:03 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:31:04 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0/edit
-[2025-05-15 20:31:04 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:31:07 +0200] [776075] [DEBUG] POST /catalogs/67f5a0bef67bc06b78b50bc0/edit
-[2025-05-15 20:31:07 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:31:10 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:31:14 +0200] [776075] [DEBUG] GET /catalogs/67f5a0bef67bc06b78b50bc0
-[2025-05-15 20:31:16 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:31:18 +0200] [776075] [DEBUG] GET /catalogs/67f63aaa7192e41468359b1c
-[2025-05-15 20:31:19 +0200] [776075] [DEBUG] GET /catalogs/
-[2025-05-15 20:31:22 +0200] [776075] [DEBUG] GET /catalogs/create
-[2025-05-15 20:31:29 +0200] [776075] [DEBUG] GET /catalogs/import
-[2025-05-15 20:31:36 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:31:36 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:31:46 +0200] [776075] [DEBUG] POST /catalogs/import
-[2025-05-15 20:31:47 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:32:00 +0200] [776075] [DEBUG] GET /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:11 +0200] [776075] [DEBUG] POST /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:11 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:32:11 +0200] [776075] [DEBUG] GET /static/uploads/f3822c45ad3d45b1a9b9806375cf2416_20250216_151630506_iOS.jpg
-[2025-05-15 20:32:14 +0200] [776075] [DEBUG] GET /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:14 +0200] [776075] [DEBUG] GET /static/uploads/f3822c45ad3d45b1a9b9806375cf2416_20250216_151630506_iOS.jpg
-[2025-05-15 20:32:22 +0200] [776075] [DEBUG] POST /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:22 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:32:22 +0200] [776075] [DEBUG] GET /static/uploads/0b53cad025de47998894e421bfe3c99c_20250216_151655238_iOS.jpg
-[2025-05-15 20:32:28 +0200] [776075] [DEBUG] GET /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:29 +0200] [776075] [DEBUG] GET /static/uploads/0b53cad025de47998894e421bfe3c99c_20250216_151655238_iOS.jpg
-[2025-05-15 20:32:39 +0200] [776075] [DEBUG] POST /catalogs/edit-row/68263313e88075ac494aad4f/0
-[2025-05-15 20:32:39 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:32:39 +0200] [776075] [DEBUG] GET /static/uploads/403d1e719f0147c992eeef2e093e811c_20250216_151630506_iOS.jpg
-[2025-05-15 20:33:01 +0200] [776075] [DEBUG] GET /catalogs/edit-row/68263313e88075ac494aad4f/1
-[2025-05-15 20:33:13 +0200] [776075] [DEBUG] POST /catalogs/edit-row/68263313e88075ac494aad4f/1
-[2025-05-15 20:33:13 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:33:13 +0200] [776075] [DEBUG] GET /static/uploads/403d1e719f0147c992eeef2e093e811c_20250216_151630506_iOS.jpg
-[2025-05-15 20:33:13 +0200] [776075] [DEBUG] GET /static/uploads/c483efc5895846bb9fa79799c9ca89ab_20250216_152438604_iOS.jpg
-[2025-05-15 20:33:16 +0200] [776075] [DEBUG] GET /catalogs/edit-row/68263313e88075ac494aad4f/1
-[2025-05-15 20:33:16 +0200] [776075] [DEBUG] GET /static/uploads/c483efc5895846bb9fa79799c9ca89ab_20250216_152438604_iOS.jpg
-[2025-05-15 20:33:29 +0200] [776075] [DEBUG] POST /catalogs/edit-row/68263313e88075ac494aad4f/1
-[2025-05-15 20:33:29 +0200] [776075] [DEBUG] GET /catalogs/68263313e88075ac494aad4f
-[2025-05-15 20:33:30 +0200] [776075] [DEBUG] GET /static/uploads/403d1e719f0147c992eeef2e093e811c_20250216_151630506_iOS.jpg
-[2025-05-15 20:33:30 +0200] [776075] [DEBUG] GET /static/uploads/07f5f373cb074f5e8fedfd1178969a23_20250216_152445428_iOS.jpg
-[2025-05-15 20:33:52 +0200] [776075] [DEBUG] GET /logout
-[2025-05-15 20:33:52 +0200] [776075] [DEBUG] GET /login
-[2025-05-15 20:34:05 +0200] [776075] [DEBUG] POST /login
-[2025-05-15 20:34:05 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:34:11 +0200] [776075] [DEBUG] GET /ver_tabla/68262902e88075ac494aad4e
-[2025-05-15 20:34:22 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:34:29 +0200] [776075] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
-[2025-05-15 20:34:29 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
-[2025-05-15 20:34:29 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
-[2025-05-15 20:34:29 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
-[2025-05-15 20:34:29 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
-[2025-05-15 20:34:35 +0200] [776075] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
-[2025-05-15 20:34:35 +0200] [776075] [DEBUG] GET /static/uploads/ed1cb531cca344a9977d3abc55ad3c41_IMG_7589.jpg
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/0
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
-[2025-05-15 20:34:44 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
-[2025-05-15 20:34:49 +0200] [776075] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/1
-[2025-05-15 20:34:49 +0200] [776075] [DEBUG] GET /static/uploads/07e00e2cb7134147965e01933acba0b7_Lector_tarjetas.jpg
-[2025-05-15 20:34:57 +0200] [776075] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/1
-[2025-05-15 20:34:57 +0200] [776075] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
-[2025-05-15 20:34:58 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_f0f300c0.jpg
-[2025-05-15 20:34:58 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_0_41083234.jpg
-[2025-05-15 20:34:58 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_1_57d75fc2.jpg
-[2025-05-15 20:34:58 +0200] [776075] [DEBUG] GET /static/uploads/Conectores_2_d37c0482.jpg
-[2025-05-15 20:35:04 +0200] [776075] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/2
-[2025-05-15 20:35:07 +0200] [776075] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/2
-[2025-05-15 20:35:14 +0200] [776075] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/1
-[2025-05-15 20:35:55 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:35:55 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:35:55 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:35:56 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:35:56 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:35:56 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:36:01 +0200] [776075] [DEBUG] GET /perfil
-[2025-05-15 20:36:01 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/43947824311b4c3dad9fcb652d8f7362_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:03 +0200] [776075] [DEBUG] GET /editar_perfil
-[2025-05-15 20:36:03 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/43947824311b4c3dad9fcb652d8f7362_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:36:04 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:36:19 +0200] [776075] [DEBUG] POST /editar_perfil
-[2025-05-15 20:36:20 +0200] [776075] [DEBUG] GET /perfil
-[2025-05-15 20:36:20 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/b2003440d5f14f41abc5699f6362ac16_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:24 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:36:24 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:36:29 +0200] [776075] [DEBUG] GET /perfil
-[2025-05-15 20:36:29 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/b2003440d5f14f41abc5699f6362ac16_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:38 +0200] [776075] [DEBUG] GET /editar_perfil
-[2025-05-15 20:36:38 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/b2003440d5f14f41abc5699f6362ac16_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:42 +0200] [776075] [DEBUG] GET /perfil
-[2025-05-15 20:36:42 +0200] [776075] [DEBUG] GET /static/imagenes_subidas/b2003440d5f14f41abc5699f6362ac16_viaje_de_los_Reyes_Magos_de_Oriente_y_su_sequito.png
-[2025-05-15 20:36:42 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:36:42 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:36:44 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:36:44 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:36:46 +0200] [776075] [DEBUG] GET /admin/maintenance
-[2025-05-15 20:36:48 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:37:03 +0200] [776075] [DEBUG] POST /admin/api/truncate-logs
-[2025-05-15 20:37:06 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:37:07 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:38:07 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:38:08 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:38:08 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:38:08 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:38:08 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:38:53 +0200] [776075] [DEBUG] GET /logout
-[2025-05-15 20:38:53 +0200] [776075] [DEBUG] GET /login
-[2025-05-15 20:38:54 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:38:54 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:38:59 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:38:59 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:39:02 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:39:14 +0200] [776075] [DEBUG] GET /tables
-[2025-05-15 20:39:33 +0200] [776075] [DEBUG] POST /tables
-[2025-05-15 20:39:33 +0200] [776075] [DEBUG] GET /tables
-[2025-05-15 20:39:53 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:39:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:40:03 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:40:03 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:40:05 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:40:05 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:40:07 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:40:12 +0200] [776075] [DEBUG] GET /tables
-[2025-05-15 20:40:19 +0200] [776075] [DEBUG] GET /select_table/6824b4565dd463dce4bdd96b
-[2025-05-15 20:40:19 +0200] [776075] [DEBUG] GET /login
-[2025-05-15 20:40:22 +0200] [776075] [DEBUG] POST /login
-[2025-05-15 20:40:22 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:40:27 +0200] [776075] [DEBUG] GET /ver_tabla/6824c375bb75a4af64112411
-[2025-05-15 20:40:31 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:40:36 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:40:39 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:40:41 +0200] [776075] [DEBUG] GET /admin/usuarios
-[2025-05-15 20:40:45 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:40:46 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:40:50 +0200] [776075] [DEBUG] GET /dashboard_user
-[2025-05-15 20:40:52 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:41:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:41:04 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:41:48 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:41:48 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:46:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:46:04 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:46:52 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:46:52 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:47:51 +0200] [872225] [INFO] Handling signal: term
-[2025-05-15 20:47:51 +0200] [872231] [INFO] Worker exiting (pid: 872231)
-[2025-05-15 20:47:51 +0200] [872234] [INFO] Worker exiting (pid: 872234)
-[2025-05-15 20:47:51 +0200] [872233] [INFO] Worker exiting (pid: 872233)
-[2025-05-15 20:47:51 +0200] [872232] [INFO] Worker exiting (pid: 872232)
-[2025-05-15 20:47:54 +0200] [872225] [INFO] Shutting down: Master
-[2025-05-15 20:47:54 +0200] [881612] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 20:47:54 +0200] [881612] [INFO] Listening at: http://127.0.0.1:8001 (881612)
-[2025-05-15 20:47:54 +0200] [881612] [INFO] Using worker: sync
-[2025-05-15 20:47:54 +0200] [881615] [INFO] Booting worker with pid: 881615
-[2025-05-15 20:47:54 +0200] [881616] [INFO] Booting worker with pid: 881616
-[2025-05-15 20:47:54 +0200] [881617] [INFO] Booting worker with pid: 881617
-[2025-05-15 20:47:54 +0200] [881622] [INFO] Booting worker with pid: 881622
-[2025-05-15 20:48:15 +0200] [776075] [DEBUG] GET /admin/maintenance
-[2025-05-15 20:48:17 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:48:17 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:48:17 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:48:18 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:49:19 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:49:20 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:49:21 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:49:21 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:49:21 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:50:20 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:50:22 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:50:22 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:50:22 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:50:22 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:51:05 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:51:05 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:51:22 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:51:23 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:51:24 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:51:24 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:51:24 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:51:31 +0200] [881612] [INFO] Handling signal: term
-[2025-05-15 20:51:31 +0200] [881622] [INFO] Worker exiting (pid: 881622)
-[2025-05-15 20:51:31 +0200] [881615] [INFO] Worker exiting (pid: 881615)
-[2025-05-15 20:51:31 +0200] [881617] [INFO] Worker exiting (pid: 881617)
-[2025-05-15 20:51:31 +0200] [881616] [INFO] Worker exiting (pid: 881616)
-[2025-05-15 20:51:35 +0200] [881612] [INFO] Shutting down: Master
-[2025-05-15 20:51:35 +0200] [883754] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 20:51:35 +0200] [883754] [INFO] Listening at: http://127.0.0.1:8001 (883754)
-[2025-05-15 20:51:35 +0200] [883754] [INFO] Using worker: sync
-[2025-05-15 20:51:35 +0200] [883758] [INFO] Booting worker with pid: 883758
-[2025-05-15 20:51:35 +0200] [883760] [INFO] Booting worker with pid: 883760
-[2025-05-15 20:51:35 +0200] [883762] [INFO] Booting worker with pid: 883762
-[2025-05-15 20:51:35 +0200] [883763] [INFO] Booting worker with pid: 883763
-[2025-05-15 20:51:56 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:51:56 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:52:24 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:52:25 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:52:26 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:52:26 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:52:26 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:53:07 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:53:08 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:53:09 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:53:09 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:53:09 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:54:08 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:54:09 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:54:09 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:54:09 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:54:09 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:55:09 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:55:10 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:55:10 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:55:10 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:55:10 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:56:05 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:56:05 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 20:56:10 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:56:11 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:56:11 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:56:11 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:56:11 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:57:00 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 20:57:01 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 20:57:11 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:57:12 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:57:12 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:57:13 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:57:13 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:58:12 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:58:13 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:58:14 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:58:14 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:58:14 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 20:59:13 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 20:59:14 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 20:59:15 +0200] [776075] [DEBUG] GET /
-[2025-05-15 20:59:15 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 20:59:15 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:00:14 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:00:15 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:00:16 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:00:16 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:00:16 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:00:43 +0200] [883754] [INFO] Handling signal: term
-[2025-05-15 21:00:43 +0200] [883762] [INFO] Worker exiting (pid: 883762)
-[2025-05-15 21:00:43 +0200] [883760] [INFO] Worker exiting (pid: 883760)
-[2025-05-15 21:00:43 +0200] [883758] [INFO] Worker exiting (pid: 883758)
-[2025-05-15 21:00:43 +0200] [883763] [INFO] Worker exiting (pid: 883763)
-[2025-05-15 21:00:47 +0200] [883754] [INFO] Shutting down: Master
-[2025-05-15 21:00:47 +0200] [888691] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 21:00:47 +0200] [888691] [INFO] Listening at: http://127.0.0.1:8001 (888691)
-[2025-05-15 21:00:47 +0200] [888691] [INFO] Using worker: sync
-[2025-05-15 21:00:47 +0200] [888697] [INFO] Booting worker with pid: 888697
-[2025-05-15 21:00:47 +0200] [888698] [INFO] Booting worker with pid: 888698
-[2025-05-15 21:00:47 +0200] [888699] [INFO] Booting worker with pid: 888699
-[2025-05-15 21:00:47 +0200] [888700] [INFO] Booting worker with pid: 888700
-[2025-05-15 21:01:02 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:01:03 +0200] [776075] [DEBUG] GET /robots.txt
-[2025-05-15 21:01:03 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:01:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:01:04 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:01:04 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:01:05 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:01:05 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:02:04 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:02:04 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:02:04 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:02:05 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:02:05 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:02:06 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:02:06 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:03:05 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:03:06 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:03:07 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:03:07 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:03:07 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:04:06 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:04:07 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:04:07 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:04:07 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:04:07 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:05:07 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:05:08 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:05:09 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:05:10 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:05:10 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:06:08 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:06:09 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:06:10 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:06:10 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:06:10 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:07:08 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:07:08 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:07:10 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:07:11 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:07:11 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:07:11 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:07:11 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:07:52 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:07:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:08:11 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:08:12 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:08:12 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:08:13 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:08:13 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:09:12 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:09:13 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:09:13 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:09:14 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:09:14 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:10:13 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:10:14 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:10:15 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:10:15 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:10:15 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:11:10 +0200] [888691] [INFO] Handling signal: term
-[2025-05-15 21:11:10 +0200] [888698] [INFO] Worker exiting (pid: 888698)
-[2025-05-15 21:11:10 +0200] [888700] [INFO] Worker exiting (pid: 888700)
-[2025-05-15 21:11:10 +0200] [888699] [INFO] Worker exiting (pid: 888699)
-[2025-05-15 21:11:10 +0200] [888697] [INFO] Worker exiting (pid: 888697)
-[2025-05-15 21:11:14 +0200] [888691] [INFO] Shutting down: Master
-[2025-05-15 21:11:14 +0200] [894027] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 21:11:14 +0200] [894027] [INFO] Listening at: http://127.0.0.1:8001 (894027)
-[2025-05-15 21:11:14 +0200] [894027] [INFO] Using worker: sync
-[2025-05-15 21:11:14 +0200] [894030] [INFO] Booting worker with pid: 894030
-[2025-05-15 21:11:14 +0200] [894031] [INFO] Booting worker with pid: 894031
-[2025-05-15 21:11:14 +0200] [894032] [INFO] Booting worker with pid: 894032
-[2025-05-15 21:11:14 +0200] [894033] [INFO] Booting worker with pid: 894033
-[2025-05-15 21:11:15 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:11:17 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:11:17 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:11:17 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:11:17 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:11:26 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:11:27 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:12:12 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:12:12 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:12:27 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:12:28 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:12:28 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:12:29 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:12:29 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:12:53 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:12:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:13:28 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:13:29 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:13:29 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:13:29 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:13:29 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:14:29 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:14:30 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:14:31 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:14:31 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:14:31 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:15:30 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:15:31 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:15:32 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:15:32 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:15:32 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:15:46 +0200] [776075] [DEBUG] POST /admin/api/truncate-logs
-[2025-05-15 21:15:49 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:15:50 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:16:09 +0200] [776075] [DEBUG] GET /admin/logs/download/flask_debug.log
-[2025-05-15 21:16:49 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:16:50 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:16:51 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:16:51 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:16:51 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:17:16 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:17:17 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:17:50 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:17:51 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:17:52 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:17:52 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:17:52 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:17:53 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:17:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:18:37 +0200] [894027] [INFO] Handling signal: term
-[2025-05-15 21:18:37 +0200] [894030] [INFO] Worker exiting (pid: 894030)
-[2025-05-15 21:18:37 +0200] [894033] [INFO] Worker exiting (pid: 894033)
-[2025-05-15 21:18:37 +0200] [894032] [INFO] Worker exiting (pid: 894032)
-[2025-05-15 21:18:37 +0200] [894031] [INFO] Worker exiting (pid: 894031)
-[2025-05-15 21:18:41 +0200] [894027] [INFO] Shutting down: Master
-[2025-05-15 21:18:42 +0200] [897822] [INFO] Starting gunicorn 23.0.0
-[2025-05-15 21:18:42 +0200] [897822] [INFO] Listening at: http://127.0.0.1:8001 (897822)
-[2025-05-15 21:18:42 +0200] [897822] [INFO] Using worker: sync
-[2025-05-15 21:18:42 +0200] [897829] [INFO] Booting worker with pid: 897829
-[2025-05-15 21:18:42 +0200] [897830] [INFO] Booting worker with pid: 897830
-[2025-05-15 21:18:42 +0200] [897831] [INFO] Booting worker with pid: 897831
-[2025-05-15 21:18:42 +0200] [897832] [INFO] Booting worker with pid: 897832
-[2025-05-15 21:18:51 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:18:53 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:18:53 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:18:53 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:18:53 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:19:53 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:19:54 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:19:55 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:19:55 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:19:55 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:20:56 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:20:57 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:20:57 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:20:57 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:20:57 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:21:57 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:21:58 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:21:58 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:21:58 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:21:58 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:22:20 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:22:20 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:22:53 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:22:53 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:22:58 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:22:59 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:22:59 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:22:59 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:22:59 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:23:59 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:24:00 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:24:01 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:24:01 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:24:01 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:25:00 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:25:01 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:25:01 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:25:02 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:25:02 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:26:02 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:26:03 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:26:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:26:04 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:26:04 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:27:03 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:27:04 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:27:04 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:27:04 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:27:04 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:27:24 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:27:24 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:27:54 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:27:54 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:28:04 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:28:05 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:28:06 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:28:06 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:28:06 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:29:05 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:29:06 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:29:06 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:29:06 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:29:06 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:30:06 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:30:07 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:30:07 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:30:07 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:30:07 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:31:07 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:31:08 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:31:09 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:31:09 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:31:09 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:32:08 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:32:09 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:32:09 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:32:09 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:32:09 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:32:29 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:32:29 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:32:54 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:32:54 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:33:09 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:33:10 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:33:11 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:33:11 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:33:11 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:34:10 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:34:11 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:34:11 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:34:11 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:34:12 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:35:11 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:35:12 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:35:13 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:35:13 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:35:13 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:36:13 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:36:14 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:36:15 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:36:15 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:36:15 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:37:15 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:37:16 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:37:17 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:37:17 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:37:17 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:37:33 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:37:33 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:37:54 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:37:54 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:38:16 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:38:17 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:38:17 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:38:18 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:38:18 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:39:17 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:39:18 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:39:19 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:39:19 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:39:19 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:40:18 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:40:19 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:40:20 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:40:20 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:40:20 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:41:20 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:41:21 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:41:22 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:41:22 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:41:22 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:42:22 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:42:24 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:42:24 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:42:24 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:42:24 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:42:37 +0200] [776075] [DEBUG] HEAD /
-[2025-05-15 21:42:37 +0200] [776075] [DEBUG] HEAD /welcome
-[2025-05-15 21:42:54 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:42:55 +0200] [776075] [DEBUG] GET /welcome
-[2025-05-15 21:43:23 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:43:24 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:43:25 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:43:25 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:43:25 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:44:24 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:44:25 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:44:26 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:44:26 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:44:26 +0200] [776075] [DEBUG] GET /admin/
-[2025-05-15 21:45:25 +0200] [776075] [DEBUG] GET /admin/system-status
-[2025-05-15 21:45:26 +0200] [776075] [DEBUG] GET /static/favicon.ico
-[2025-05-15 21:45:27 +0200] [776075] [DEBUG] GET /
-[2025-05-15 21:45:27 +0200] [776075] [DEBUG] GET /dashboard
-[2025-05-15 21:45:27 +0200] [776075] [DEBUG] GET /admin/
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/database.py", line 930, in command
+    return self._command(
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/database.py", line 770, in _command
+    return conn.command(
+  File "/usr/lib/python3.8/contextlib.py", line 120, in __exit__
+    next(self.gen)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/mongo_client.py", line 2105, in _tmp_session
+    s.end_session()
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/client_session.py", line 520, in end_session
+    self._end_session(lock=True)
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/pymongo/synchronous/client_session.py", line 523, in _end_session
+    if self._server_session is not None:
+  File "/var/www/vhosts/edefrutos2025.xyz/httpdocs/.venv/lib/python3.8/site-packages/gunicorn/workers/base.py", line 204, in handle_abort
+    sys.exit(1)
+SystemExit: 1
+[2025-05-16 20:30:46 +0200] [1546501] [ERROR] Worker (pid:1546507) was sent SIGKILL! Perhaps out of memory?
+[2025-05-16 20:30:46 +0200] [1574132] [INFO] Booting worker with pid: 1574132
+[2025-05-16 20:30:55 +0200] [1574132] [DEBUG] GET /error_docs/internal_server_error.html
+[2025-05-16 20:30:56 +0200] [1574132] [DEBUG] GET /static/favicon.ico
+[2025-05-16 20:32:21 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:32:22 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:32:46 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:32:46 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /dashboard
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /admin/
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /dashboard
+[2025-05-16 20:34:51 +0200] [1574132] [DEBUG] GET /admin/
+[2025-05-16 20:37:25 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:37:26 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:37:47 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:37:47 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:39:46 +0200] [1574132] [DEBUG] GET /admin/maintenance
+[2025-05-16 20:39:47 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:39:47 +0200] [1574132] [DEBUG] GET /dashboard
+[2025-05-16 20:39:47 +0200] [1574132] [DEBUG] GET /admin/
+[2025-05-16 20:39:49 +0200] [1574132] [DEBUG] GET /admin/notification-settings
+[2025-05-16 20:40:00 +0200] [1574132] [DEBUG] GET /catalogs/
+[2025-05-16 20:40:02 +0200] [1574132] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:40:05 +0200] [1574132] [DEBUG] GET /catalogs/
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_0_ea366e3e.jpg
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 20:40:08 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_0_4500a746.jpg
+[2025-05-16 20:40:18 +0200] [1574132] [DEBUG] POST /catalogs/delete-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:19 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:19 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_d855a49a.jpg
+[2025-05-16 20:40:19 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_63100850.jpg
+[2025-05-16 20:40:19 +0200] [1574132] [DEBUG] GET /static/uploads/tabla.csv_1_c4384f19.jpg
+[2025-05-16 20:40:25 +0200] [1574132] [DEBUG] POST /catalogs/delete-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:25 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:28 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:36 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:36 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:36 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:39 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:39 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:45 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:45 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:45 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:40:45 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:48 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:48 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:40:48 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:54 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:55 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:40:55 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:55 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:40:55 +0200] [1574132] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 20:40:58 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:40:58 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:40:58 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:40:58 +0200] [1574132] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 20:41:04 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:41:05 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:41:05 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:41:05 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:41:05 +0200] [1574132] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 20:41:05 +0200] [1574132] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 20:41:08 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:41:08 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:41:08 +0200] [1574132] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 20:41:08 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:41:08 +0200] [1574132] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 20:41:15 +0200] [1574132] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 20:41:23 +0200] [1574132] [DEBUG] GET /catalogs/
+[2025-05-16 20:41:28 +0200] [1574132] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:41:30 +0200] [1574132] [DEBUG] GET /catalogs/add-row/680a1922b6570e9943828f62
+[2025-05-16 20:42:30 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:42:30 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:42:47 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:42:47 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:42:55 +0200] [1574132] [DEBUG] POST /catalogs/add-row/680a1922b6570e9943828f62
+[2025-05-16 20:42:56 +0200] [1574132] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:42:56 +0200] [1574132] [DEBUG] GET /static/uploads/3402a15da324451492d0e7456c85ae9f_Lector_tarjetas.jpg
+[2025-05-16 20:42:56 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:42:56 +0200] [1574132] [DEBUG] GET /dashboard
+[2025-05-16 20:42:56 +0200] [1574132] [DEBUG] GET /admin/
+[2025-05-16 20:43:00 +0200] [1574132] [DEBUG] GET /catalogs/
+[2025-05-16 20:43:07 +0200] [1574132] [DEBUG] GET /catalogs/680a1922b6570e9943828f62/edit
+[2025-05-16 20:43:16 +0200] [1574132] [DEBUG] POST /catalogs/680a1922b6570e9943828f62/edit
+[2025-05-16 20:43:16 +0200] [1574132] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 20:43:16 +0200] [1574132] [DEBUG] GET /static/uploads/3402a15da324451492d0e7456c85ae9f_Lector_tarjetas.jpg
+[2025-05-16 20:43:24 +0200] [1574132] [DEBUG] GET /catalogs/
+[2025-05-16 20:43:32 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:43:33 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:43:33 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:43:33 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:43:41 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63/edit
+[2025-05-16 20:43:58 +0200] [1574132] [DEBUG] POST /catalogs/680a1950b6570e9943828f63/edit
+[2025-05-16 20:43:58 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:43:58 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:43:58 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:43:58 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:47:34 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:47:34 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:47:47 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:47:48 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:49:04 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:49:36 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:49:36 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:49:36 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:49:36 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:49:37 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:49:43 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:49:43 +0200] [1574132] [DEBUG] GET /static/uploads/8f625dce8919428485a1dd86b4ea88d9_Samsung970.jpg
+[2025-05-16 20:49:46 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:49:46 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:49:46 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:49:46 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:49:46 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:49:48 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:49:59 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:51:05 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:51:18 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:51:22 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:51:22 +0200] [1574132] [DEBUG] GET /static/uploads/8f625dce8919428485a1dd86b4ea88d9_Samsung970.jpg
+[2025-05-16 20:51:27 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:51:27 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:51:28 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:51:28 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:51:28 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:51:28 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:51:30 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:51:30 +0200] [1574132] [DEBUG] GET /static/uploads/8f625dce8919428485a1dd86b4ea88d9_Samsung970.jpg
+[2025-05-16 20:51:36 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:51:36 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:51:37 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:51:37 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:51:37 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:51:37 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:52:37 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:52:37 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:52:48 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:52:48 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:53:16 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:16 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:16 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:53:16 +0200] [1574132] [DEBUG] GET /dashboard
+[2025-05-16 20:53:16 +0200] [1574132] [DEBUG] GET /admin/
+[2025-05-16 20:53:21 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:22 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:53:22 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:53:22 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:53:22 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:22 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:53:26 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:26 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:35 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:53:40 +0200] [1574132] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:40 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:40 +0200] [1574132] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:53:48 +0200] [1574132] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:57:26 +0200] [1574132] [DEBUG] GET /robots.txt
+[2025-05-16 20:57:40 +0200] [1574132] [DEBUG] HEAD /
+[2025-05-16 20:57:40 +0200] [1574132] [DEBUG] HEAD /welcome
+[2025-05-16 20:57:48 +0200] [1574132] [DEBUG] GET /
+[2025-05-16 20:57:48 +0200] [1574132] [DEBUG] GET /welcome
+[2025-05-16 20:57:56 +0200] [1574132] [INFO] Worker exiting (pid: 1574132)
+[2025-05-16 20:57:56 +0200] [1546501] [INFO] Handling signal: term
+[2025-05-16 20:57:58 +0200] [1546501] [INFO] Shutting down: Master
+[2025-05-16 20:57:59 +0200] [1587225] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7fbd11dea4c0>
+  on_reload: <function on_reload at 0x7fbd11dea550>
+  when_ready: <function when_ready at 0x7fbd11dea5e0>
+  pre_fork: <function pre_fork at 0x7fbd12492d30>
+  post_fork: <function post_fork at 0x7fbd12492ca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fbd11d41a60>
+  worker_int: <function WorkerInt.worker_int at 0x7fbd11d41b80>
+  worker_abort: <function worker_abort at 0x7fbd12495040>
+  pre_exec: <function pre_exec at 0x7fbd12492dc0>
+  pre_request: <function pre_request at 0x7fbd12492e50>
+  post_request: <function post_request at 0x7fbd12492ee0>
+  child_exit: <function child_exit at 0x7fbd124950d0>
+  worker_exit: <function worker_exit at 0x7fbd12492f70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fbd11d5a310>
+  on_exit: <function OnExit.on_exit at 0x7fbd11d5a430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7fbd11d5a550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 20:57:59 +0200] [1587225] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 20:57:59 +0200] [1587225] [DEBUG] Arbiter booted
+[2025-05-16 20:57:59 +0200] [1587225] [INFO] Listening at: http://127.0.0.1:8002 (1587225)
+[2025-05-16 20:57:59 +0200] [1587225] [INFO] Using worker: sync
+[2025-05-16 20:57:59 +0200] [1587228] [INFO] Booting worker with pid: 1587228
+[2025-05-16 20:57:59 +0200] [1587225] [DEBUG] 1 workers
+[2025-05-16 20:58:13 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:58:13 +0200] [1587228] [DEBUG] GET /static/uploads/8f625dce8919428485a1dd86b4ea88d9_Samsung970.jpg
+[2025-05-16 20:58:14 +0200] [1587228] [DEBUG] GET /
+[2025-05-16 20:58:14 +0200] [1587228] [DEBUG] GET /dashboard
+[2025-05-16 20:58:14 +0200] [1587228] [DEBUG] GET /admin/
+[2025-05-16 20:58:16 +0200] [1587228] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:58:17 +0200] [1587228] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 20:58:19 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:58:19 +0200] [1587228] [DEBUG] GET /static/uploads/8f625dce8919428485a1dd86b4ea88d9_Samsung970.jpg
+[2025-05-16 20:58:25 +0200] [1587228] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:58:25 +0200] [1587228] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 20:58:26 +0200] [1587228] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 20:58:26 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 20:58:26 +0200] [1587228] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 20:58:26 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 20:58:26 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 20:59:22 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 20:59:22 +0200] [1587228] [DEBUG] GET /
+[2025-05-16 20:59:22 +0200] [1587228] [DEBUG] GET /dashboard
+[2025-05-16 20:59:22 +0200] [1587228] [DEBUG] GET /admin/
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:00:11 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:01:43 +0200] [1587228] [DEBUG] GET /catalogs/
+[2025-05-16 21:01:43 +0200] [1587228] [DEBUG] GET /
+[2025-05-16 21:01:44 +0200] [1587228] [DEBUG] GET /dashboard
+[2025-05-16 21:01:44 +0200] [1587228] [DEBUG] GET /admin/
+[2025-05-16 21:01:47 +0200] [1587228] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 21:01:47 +0200] [1587228] [DEBUG] GET /static/uploads/3402a15da324451492d0e7456c85ae9f_Lector_tarjetas.jpg
+[2025-05-16 21:01:49 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 21:01:49 +0200] [1587228] [DEBUG] GET /static/uploads/3402a15da324451492d0e7456c85ae9f_Lector_tarjetas.jpg
+[2025-05-16 21:01:55 +0200] [1587228] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 21:01:55 +0200] [1587228] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 21:02:00 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 21:02:23 +0200] [1587228] [DEBUG] POST /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 21:02:23 +0200] [1587228] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 21:02:24 +0200] [1587228] [DEBUG] GET /static/uploads/5ab253620be9436eaa7e5a32d0f3754d_Lector_tarjetas.jpg
+[2025-05-16 21:02:29 +0200] [1587228] [DEBUG] GET /catalogs/
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:02:34 +0200] [1587228] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:02:37 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:02:39 +0200] [1587228] [DEBUG] GET /ver_tabla/
+[2025-05-16 21:02:43 +0200] [1587228] [DEBUG] HEAD /
+[2025-05-16 21:02:43 +0200] [1587228] [DEBUG] HEAD /welcome
+[2025-05-16 21:02:48 +0200] [1587228] [DEBUG] GET /
+[2025-05-16 21:02:48 +0200] [1587228] [DEBUG] GET /welcome
+[2025-05-16 21:02:53 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:02:55 +0200] [1587228] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:02:59 +0200] [1587228] [DEBUG] GET /catalogs/
+[2025-05-16 21:03:02 +0200] [1587228] [DEBUG] GET /catalogs/680a1922b6570e9943828f62
+[2025-05-16 21:03:03 +0200] [1587228] [DEBUG] GET /static/uploads/5ab253620be9436eaa7e5a32d0f3754d_Lector_tarjetas.jpg
+[2025-05-16 21:03:05 +0200] [1587228] [DEBUG] GET /catalogs/edit-row/680a1922b6570e9943828f62/0
+[2025-05-16 21:03:05 +0200] [1587228] [DEBUG] GET /static/uploads/5ab253620be9436eaa7e5a32d0f3754d_Lector_tarjetas.jpg
+[2025-05-16 21:03:10 +0200] [1587228] [DEBUG] GET /ver_tabla/
+[2025-05-16 21:03:22 +0200] [1587228] [INFO] Worker exiting (pid: 1587228)
+[2025-05-16 21:03:22 +0200] [1587225] [INFO] Handling signal: term
+[2025-05-16 21:03:23 +0200] [1587225] [INFO] Shutting down: Master
+[2025-05-16 21:03:23 +0200] [1590206] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7fa4d21f34c0>
+  on_reload: <function on_reload at 0x7fa4d21f3550>
+  when_ready: <function when_ready at 0x7fa4d21f35e0>
+  pre_fork: <function pre_fork at 0x7fa4d289bd30>
+  post_fork: <function post_fork at 0x7fa4d289bca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fa4d214aa60>
+  worker_int: <function WorkerInt.worker_int at 0x7fa4d214ab80>
+  worker_abort: <function worker_abort at 0x7fa4d289e040>
+  pre_exec: <function pre_exec at 0x7fa4d289bdc0>
+  pre_request: <function pre_request at 0x7fa4d289be50>
+  post_request: <function post_request at 0x7fa4d289bee0>
+  child_exit: <function child_exit at 0x7fa4d289e0d0>
+  worker_exit: <function worker_exit at 0x7fa4d289bf70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fa4d2163310>
+  on_exit: <function OnExit.on_exit at 0x7fa4d2163430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7fa4d2163550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 21:03:23 +0200] [1590206] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 21:03:23 +0200] [1590206] [DEBUG] Arbiter booted
+[2025-05-16 21:03:23 +0200] [1590206] [INFO] Listening at: http://127.0.0.1:8002 (1590206)
+[2025-05-16 21:03:23 +0200] [1590206] [INFO] Using worker: sync
+[2025-05-16 21:03:23 +0200] [1590218] [INFO] Booting worker with pid: 1590218
+[2025-05-16 21:03:23 +0200] [1590206] [DEBUG] 1 workers
+[2025-05-16 21:03:47 +0200] [1590218] [DEBUG] GET /ver_tabla/
+[2025-05-16 21:03:48 +0200] [1590218] [DEBUG] GET /static/favicon.ico
+[2025-05-16 21:03:55 +0200] [1590218] [DEBUG] GET /ver_tabla/
+[2025-05-16 21:03:58 +0200] [1590218] [DEBUG] GET /
+[2025-05-16 21:03:58 +0200] [1590218] [DEBUG] GET /dashboard
+[2025-05-16 21:03:58 +0200] [1590218] [DEBUG] GET /admin/
+[2025-05-16 21:04:02 +0200] [1590218] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:04:08 +0200] [1590218] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:04:18 +0200] [1590218] [DEBUG] GET /tables
+[2025-05-16 21:04:20 +0200] [1590218] [DEBUG] GET /catalogs/
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:04:24 +0200] [1590218] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:04:26 +0200] [1590218] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:04:30 +0200] [1590218] [DEBUG] GET /ver_tabla/
+[2025-05-16 21:06:01 +0200] [1590218] [DEBUG] GET /
+[2025-05-16 21:06:01 +0200] [1590218] [DEBUG] GET /welcome
+[2025-05-16 21:07:48 +0200] [1590218] [DEBUG] HEAD /
+[2025-05-16 21:07:48 +0200] [1590218] [DEBUG] HEAD /welcome
+[2025-05-16 21:08:16 +0200] [1590206] [INFO] Handling signal: term
+[2025-05-16 21:08:15 +0200] [1590218] [INFO] Worker exiting (pid: 1590218)
+[2025-05-16 21:08:18 +0200] [1590206] [INFO] Shutting down: Master
+[2025-05-16 21:08:19 +0200] [1592648] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7f9fd6f804c0>
+  on_reload: <function on_reload at 0x7f9fd6f80550>
+  when_ready: <function when_ready at 0x7f9fd6f805e0>
+  pre_fork: <function pre_fork at 0x7f9fd7628d30>
+  post_fork: <function post_fork at 0x7f9fd7628ca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f9fd6ed7a60>
+  worker_int: <function WorkerInt.worker_int at 0x7f9fd6ed7b80>
+  worker_abort: <function worker_abort at 0x7f9fd762b040>
+  pre_exec: <function pre_exec at 0x7f9fd7628dc0>
+  pre_request: <function pre_request at 0x7f9fd7628e50>
+  post_request: <function post_request at 0x7f9fd7628ee0>
+  child_exit: <function child_exit at 0x7f9fd762b0d0>
+  worker_exit: <function worker_exit at 0x7f9fd7628f70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f9fd6ef0310>
+  on_exit: <function OnExit.on_exit at 0x7f9fd6ef0430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7f9fd6ef0550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 21:08:19 +0200] [1592648] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 21:08:19 +0200] [1592648] [DEBUG] Arbiter booted
+[2025-05-16 21:08:19 +0200] [1592648] [INFO] Listening at: http://127.0.0.1:8002 (1592648)
+[2025-05-16 21:08:19 +0200] [1592648] [INFO] Using worker: sync
+[2025-05-16 21:08:19 +0200] [1592648] [DEBUG] 1 workers
+[2025-05-16 21:08:19 +0200] [1592656] [INFO] Booting worker with pid: 1592656
+[2025-05-16 21:08:55 +0200] [1592656] [DEBUG] GET /catalogs/
+[2025-05-16 21:08:56 +0200] [1592656] [DEBUG] GET /
+[2025-05-16 21:08:57 +0200] [1592656] [DEBUG] GET /dashboard
+[2025-05-16 21:08:57 +0200] [1592656] [DEBUG] GET /admin/
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:01 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:09:03 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:03 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:09:09 +0200] [1592656] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:09:12 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:20 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:09:20 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:20 +0200] [1592656] [DEBUG] GET /static/uploads/26164113dffc44108566593a4496b378_IMG_7602.jpg
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:09:26 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:28 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:29 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:34 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:09:37 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:09:37 +0200] [1592656] [DEBUG] GET /static/uploads/aa1ae129667d47b786b904ae9ef7a6f2_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:09:42 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:09:42 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:42 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:42 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:09:42 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:45 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:46 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:52 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:09:52 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:09:52 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:09:52 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_0_003a33bb.jpg
+[2025-05-16 21:09:52 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:10:06 +0200] [1592656] [DEBUG] POST /catalogs/delete-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:10:06 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:10:06 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:10:06 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:10:13 +0200] [1592656] [DEBUG] GET /catalogs/add-row/680a1950b6570e9943828f63
+[2025-05-16 21:11:01 +0200] [1592656] [DEBUG] GET /
+[2025-05-16 21:11:01 +0200] [1592656] [DEBUG] GET /welcome
+[2025-05-16 21:11:26 +0200] [1592656] [DEBUG] POST /catalogs/add-row/680a1950b6570e9943828f63
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /static/uploads/dc97fc098bfb440f91940579c462c527_Samsung970.jpg
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /dashboard
+[2025-05-16 21:11:27 +0200] [1592656] [DEBUG] GET /admin/
+[2025-05-16 21:11:38 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/5
+[2025-05-16 21:11:38 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:11:45 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/5
+[2025-05-16 21:11:45 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:11:45 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:11:45 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:11:45 +0200] [1592656] [DEBUG] GET /static/uploads/dc97fc098bfb440f91940579c462c527_Samsung970.jpg
+[2025-05-16 21:11:47 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:12:07 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/0
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] GET /static/uploads/68fc06d9a42843c6a7e426bf1fa89408_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] GET /static/uploads/dc97fc098bfb440f91940579c462c527_Samsung970.jpg
+[2025-05-16 21:12:20 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:12:52 +0200] [1592656] [DEBUG] HEAD /
+[2025-05-16 21:12:52 +0200] [1592656] [DEBUG] HEAD /welcome
+[2025-05-16 21:13:16 +0200] [1592656] [DEBUG] GET /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] POST /catalogs/edit-row/680a1950b6570e9943828f63/1
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /catalogs/680a1950b6570e9943828f63
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /static/uploads/dc97fc098bfb440f91940579c462c527_Samsung970.jpg
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /static/uploads/e2f15a29ca2c4079a8c4fd453aca2703_sandisk-ultra-64gb-usb-30-sdcz48-064g-u46r-red.jpg
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_6_895fc11c.jpg
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /static/uploads/68fc06d9a42843c6a7e426bf1fa89408_498620815.seagate-barracuda-3-5-2tb-7200rpm-256mb-sata3-st2000dm008.jpg
+[2025-05-16 21:13:25 +0200] [1592656] [DEBUG] GET /static/uploads/storage_units.xlsx_20_299f706a.jpg
+[2025-05-16 21:13:41 +0200] [1592656] [DEBUG] GET /catalogs/
+[2025-05-16 21:13:47 +0200] [1592656] [DEBUG] GET /dashboard_user
+[2025-05-16 21:13:51 +0200] [1592656] [DEBUG] GET /admin/
+[2025-05-16 21:13:55 +0200] [1592656] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:14:08 +0200] [1592656] [DEBUG] GET /admin/
+[2025-05-16 21:15:58 +0200] [1592656] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:16:01 +0200] [1592656] [DEBUG] GET /
+[2025-05-16 21:16:01 +0200] [1592656] [DEBUG] GET /welcome
+[2025-05-16 21:16:30 +0200] [1592656] [DEBUG] GET /tables
+[2025-05-16 21:16:33 +0200] [1592656] [DEBUG] GET /select_table/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:16:33 +0200] [1592656] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:16:33 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:16:33 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:16:35 +0200] [1592656] [DEBUG] GET /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 21:16:35 +0200] [1592656] [DEBUG] GET /static/uploads/f5603ae9b9fa40f48a0b28fbbd8862f5.jpg
+[2025-05-16 21:16:35 +0200] [1592656] [DEBUG] GET /static/uploads/a39bdcc37c494d17b60ce3d5a1a4b30f.jpg
+[2025-05-16 21:16:35 +0200] [1592656] [DEBUG] GET /static/img/image-placeholder.png
+[2025-05-16 21:16:37 +0200] [1592656] [DEBUG] GET /static/uploads/f5603ae9b9fa40f48a0b28fbbd8862f5.jpg
+[2025-05-16 21:16:40 +0200] [1592656] [DEBUG] GET /static/uploads/a39bdcc37c494d17b60ce3d5a1a4b30f.jpg
+[2025-05-16 21:16:43 +0200] [1592656] [DEBUG] POST /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 21:16:44 +0200] [1592656] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:16:44 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:16:44 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:16:47 +0200] [1592656] [DEBUG] GET /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 21:16:58 +0200] [1592656] [DEBUG] POST /editar_fila/67f5a0bef67bc06b78b50bc0/0
+[2025-05-16 21:16:59 +0200] [1592656] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:16:59 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:16:59 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:17:00 +0200] [1592656] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:17:34 +0200] [1592656] [INFO] Worker exiting (pid: 1592656)
+[2025-05-16 21:17:34 +0200] [1592648] [INFO] Handling signal: term
+[2025-05-16 21:17:37 +0200] [1592648] [INFO] Shutting down: Master
+[2025-05-16 21:17:37 +0200] [1596929] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7f2bc2a5d4c0>
+  on_reload: <function on_reload at 0x7f2bc2a5d550>
+  when_ready: <function when_ready at 0x7f2bc2a5d5e0>
+  pre_fork: <function pre_fork at 0x7f2bc3105d30>
+  post_fork: <function post_fork at 0x7f2bc3105ca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f2bc29b4a60>
+  worker_int: <function WorkerInt.worker_int at 0x7f2bc29b4b80>
+  worker_abort: <function worker_abort at 0x7f2bc3108040>
+  pre_exec: <function pre_exec at 0x7f2bc3105dc0>
+  pre_request: <function pre_request at 0x7f2bc3105e50>
+  post_request: <function post_request at 0x7f2bc3105ee0>
+  child_exit: <function child_exit at 0x7f2bc31080d0>
+  worker_exit: <function worker_exit at 0x7f2bc3105f70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f2bc29cd310>
+  on_exit: <function OnExit.on_exit at 0x7f2bc29cd430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7f2bc29cd550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 21:17:37 +0200] [1596929] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 21:17:37 +0200] [1596929] [DEBUG] Arbiter booted
+[2025-05-16 21:17:37 +0200] [1596929] [INFO] Listening at: http://127.0.0.1:8002 (1596929)
+[2025-05-16 21:17:37 +0200] [1596929] [INFO] Using worker: sync
+[2025-05-16 21:17:37 +0200] [1596932] [INFO] Booting worker with pid: 1596932
+[2025-05-16 21:17:37 +0200] [1596929] [DEBUG] 1 workers
+[2025-05-16 21:17:51 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:17:56 +0200] [1596932] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:17:56 +0200] [1596932] [DEBUG] HEAD /
+[2025-05-16 21:17:56 +0200] [1596932] [DEBUG] HEAD /welcome
+[2025-05-16 21:18:00 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:18:10 +0200] [1596932] [DEBUG] GET /admin/usuarios/edfrutos@gmail.com/catalogos
+[2025-05-16 21:18:13 +0200] [1596932] [DEBUG] GET /admin/catalogo/ver/catalogs/68274d08cc0326f99017cd2d
+[2025-05-16 21:18:14 +0200] [1596932] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:18:17 +0200] [1596932] [DEBUG] GET /admin/usuarios/edfrutos@gmail.com/catalogos
+[2025-05-16 21:18:38 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:18:43 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:18:46 +0200] [1596932] [DEBUG] GET /catalogs/
+[2025-05-16 21:18:50 +0200] [1596932] [DEBUG] GET /catalogs/
+[2025-05-16 21:18:52 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:18:55 +0200] [1596932] [DEBUG] GET /tables
+[2025-05-16 21:19:00 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:19:02 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:19:09 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:19:13 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:19:20 +0200] [1596932] [DEBUG] GET /catalogs/
+[2025-05-16 21:19:22 +0200] [1596932] [DEBUG] GET /tables
+[2025-05-16 21:19:25 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:19:27 +0200] [1596932] [DEBUG] GET /catalogs/
+[2025-05-16 21:19:35 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:19:38 +0200] [1596932] [DEBUG] GET /tables
+[2025-05-16 21:19:45 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:20:06 +0200] [1596932] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb0294
+[2025-05-16 21:20:09 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:21:01 +0200] [1596932] [DEBUG] GET /
+[2025-05-16 21:21:02 +0200] [1596932] [DEBUG] GET /welcome
+[2025-05-16 21:22:00 +0200] [1596932] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028d
+[2025-05-16 21:22:01 +0200] [1596932] [DEBUG] GET /
+[2025-05-16 21:22:01 +0200] [1596932] [DEBUG] GET /dashboard
+[2025-05-16 21:22:01 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:22:09 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:22:18 +0200] [1596932] [DEBUG] GET /admin/usuarios/j.g.1991@hotmail.es/catalogos
+[2025-05-16 21:22:21 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:22:24 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:22:28 +0200] [1596932] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028c
+[2025-05-16 21:22:33 +0200] [1596932] [DEBUG] GET /tables
+[2025-05-16 21:22:39 +0200] [1596932] [DEBUG] GET /select_table/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:22:39 +0200] [1596932] [DEBUG] GET /ver_tabla/67f5a0bef67bc06b78b50bc0
+[2025-05-16 21:22:39 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:39 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:42 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:22:45 +0200] [1596932] [DEBUG] GET /ver_tabla/68272e581710109e024f7d4a
+[2025-05-16 21:22:45 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:45 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:45 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:47 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:22:49 +0200] [1596932] [DEBUG] GET /ver_tabla/6826ff3be88075ac494aad50
+[2025-05-16 21:22:49 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:49 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:49 +0200] [1596932] [DEBUG] GET /static/img/image-error.svg
+[2025-05-16 21:22:56 +0200] [1596932] [DEBUG] GET /dashboard_user
+[2025-05-16 21:22:58 +0200] [1596932] [DEBUG] GET /perfil
+[2025-05-16 21:22:58 +0200] [1596932] [DEBUG] GET /static/imagenes_subidas/7903341a544d40218c77ad020c21b4bc_Miguel_Angel_y_yo_de_ninos.jpg
+[2025-05-16 21:23:00 +0200] [1596932] [DEBUG] GET /dashboard
+[2025-05-16 21:23:00 +0200] [1596932] [DEBUG] GET /admin/
+[2025-05-16 21:23:00 +0200] [1596932] [DEBUG] HEAD /
+[2025-05-16 21:23:00 +0200] [1596932] [DEBUG] HEAD /welcome
+[2025-05-16 21:23:03 +0200] [1596932] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:23:12 +0200] [1596932] [DEBUG] GET /admin/usuarios/edit/681e29888bb6d00307eb0294
+[2025-05-16 21:25:39 +0200] [1596929] [INFO] Handling signal: term
+[2025-05-16 21:25:39 +0200] [1596932] [INFO] Worker exiting (pid: 1596932)
+[2025-05-16 21:25:41 +0200] [1596929] [INFO] Shutting down: Master
+[2025-05-16 21:25:41 +0200] [1600485] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7f5dec3d54c0>
+  on_reload: <function on_reload at 0x7f5dec3d5550>
+  when_ready: <function when_ready at 0x7f5dec3d55e0>
+  pre_fork: <function pre_fork at 0x7f5deca7ed30>
+  post_fork: <function post_fork at 0x7f5deca7eca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7f5dec32ca60>
+  worker_int: <function WorkerInt.worker_int at 0x7f5dec32cb80>
+  worker_abort: <function worker_abort at 0x7f5deca81040>
+  pre_exec: <function pre_exec at 0x7f5deca7edc0>
+  pre_request: <function pre_request at 0x7f5deca7ee50>
+  post_request: <function post_request at 0x7f5deca7eee0>
+  child_exit: <function child_exit at 0x7f5deca810d0>
+  worker_exit: <function worker_exit at 0x7f5deca7ef70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7f5dec346310>
+  on_exit: <function OnExit.on_exit at 0x7f5dec346430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7f5dec346550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 21:25:41 +0200] [1600485] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 21:25:41 +0200] [1600485] [DEBUG] Arbiter booted
+[2025-05-16 21:25:41 +0200] [1600485] [INFO] Listening at: http://127.0.0.1:8002 (1600485)
+[2025-05-16 21:25:41 +0200] [1600485] [INFO] Using worker: sync
+[2025-05-16 21:25:41 +0200] [1600505] [INFO] Booting worker with pid: 1600505
+[2025-05-16 21:25:41 +0200] [1600485] [DEBUG] 1 workers
+[2025-05-16 21:26:02 +0200] [1600505] [DEBUG] GET /
+[2025-05-16 21:26:03 +0200] [1600505] [DEBUG] GET /welcome
+[2025-05-16 21:26:11 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:26:11 +0200] [1600505] [DEBUG] GET /
+[2025-05-16 21:26:11 +0200] [1600505] [DEBUG] GET /dashboard
+[2025-05-16 21:26:11 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:26:13 +0200] [1600505] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:26:18 +0200] [1600505] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:26:24 +0200] [1600505] [DEBUG] GET /admin/usuarios/armando@gmail.com/catalogos
+[2025-05-16 21:26:27 +0200] [1600505] [DEBUG] GET /admin/catalogo/ver/catalogs/682759b5da07e805c039b25c
+[2025-05-16 21:26:28 +0200] [1600505] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:26:34 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:26:52 +0200] [1600505] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:27:40 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:27:44 +0200] [1600505] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:28:04 +0200] [1600505] [DEBUG] HEAD /
+[2025-05-16 21:28:04 +0200] [1600505] [DEBUG] HEAD /welcome
+[2025-05-16 21:28:12 +0200] [1600505] [DEBUG] GET /catalogs/
+[2025-05-16 21:28:17 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:28:20 +0200] [1600505] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:30:23 +0200] [1600505] [DEBUG] GET /admin/usuarios/armando@gmail.com/catalogos
+[2025-05-16 21:30:23 +0200] [1600505] [DEBUG] GET /
+[2025-05-16 21:30:23 +0200] [1600505] [DEBUG] GET /dashboard
+[2025-05-16 21:30:23 +0200] [1600505] [DEBUG] GET /admin/
+[2025-05-16 21:30:34 +0200] [1600505] [DEBUG] GET /admin/catalogo/ver/catalogs/682759b5da07e805c039b25c
+[2025-05-16 21:30:34 +0200] [1600505] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:30:37 +0200] [1600505] [DEBUG] GET /admin/usuarios/armando@gmail.com/catalogos
+[2025-05-16 21:30:40 +0200] [1600505] [DEBUG] GET /admin/catalogo/catalogs/682759b5da07e805c039b25c/editar
+[2025-05-16 21:30:42 +0200] [1600505] [DEBUG] GET /admin/usuarios/armando@gmail.com/catalogos
+[2025-05-16 21:31:03 +0200] [1600505] [DEBUG] GET /
+[2025-05-16 21:31:03 +0200] [1600505] [DEBUG] GET /welcome
+[2025-05-16 21:33:08 +0200] [1600505] [DEBUG] HEAD /
+[2025-05-16 21:33:08 +0200] [1600505] [DEBUG] HEAD /welcome
+[2025-05-16 21:36:02 +0200] [1600485] [INFO] Handling signal: term
+[2025-05-16 21:36:02 +0200] [1600505] [INFO] Worker exiting (pid: 1600505)
+[2025-05-16 21:36:05 +0200] [1600485] [INFO] Shutting down: Master
+[2025-05-16 21:36:05 +0200] [1605358] [DEBUG] Current configuration:
+  config: gunicorn_config.py
+  wsgi_app: None
+  bind: ['127.0.0.1:8002']
+  backlog: 2048
+  workers: 1
+  worker_class: sync
+  threads: 1
+  worker_connections: 1000
+  max_requests: 0
+  max_requests_jitter: 0
+  timeout: 30
+  graceful_timeout: 30
+  keepalive: 2
+  limit_request_line: 4094
+  limit_request_fields: 100
+  limit_request_field_size: 8190
+  reload: False
+  reload_engine: auto
+  reload_extra_files: []
+  spew: False
+  check_config: False
+  print_config: False
+  preload_app: False
+  sendfile: None
+  reuse_port: False
+  chdir: /var/www/vhosts/edefrutos2025.xyz/httpdocs
+  daemon: False
+  raw_env: []
+  pidfile: None
+  worker_tmp_dir: None
+  user: 33
+  group: 33
+  umask: 0
+  initgroups: False
+  tmp_upload_dir: None
+  secure_scheme_headers: {'X-FORWARDED-PROTOCOL': 'ssl', 'X-FORWARDED-PROTO': 'https', 'X-FORWARDED-SSL': 'on'}
+  forwarded_allow_ips: ['127.0.0.1', '::1']
+  accesslog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_access.log
+  disable_redirect_access_to_syslog: False
+  access_log_format: %({X-Forwarded-For}i)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"
+  errorlog: /var/www/vhosts/edefrutos2025.xyz/httpdocs/logs/gunicorn_error.log
+  loglevel: debug
+  capture_output: False
+  logger_class: gunicorn.glogging.Logger
+  logconfig: None
+  logconfig_dict: {}
+  logconfig_json: None
+  syslog_addr: udp://localhost:514
+  syslog: False
+  syslog_prefix: None
+  syslog_facility: user
+  enable_stdio_inheritance: False
+  statsd_host: None
+  dogstatsd_tags: 
+  statsd_prefix: 
+  proc_name: None
+  default_proc_name: wsgi:app
+  pythonpath: None
+  paste: None
+  on_starting: <function on_starting at 0x7fc9d42104c0>
+  on_reload: <function on_reload at 0x7fc9d4210550>
+  when_ready: <function when_ready at 0x7fc9d42105e0>
+  pre_fork: <function pre_fork at 0x7fc9d48b8d30>
+  post_fork: <function post_fork at 0x7fc9d48b8ca0>
+  post_worker_init: <function PostWorkerInit.post_worker_init at 0x7fc9d4167a60>
+  worker_int: <function WorkerInt.worker_int at 0x7fc9d4167b80>
+  worker_abort: <function worker_abort at 0x7fc9d48bb040>
+  pre_exec: <function pre_exec at 0x7fc9d48b8dc0>
+  pre_request: <function pre_request at 0x7fc9d48b8e50>
+  post_request: <function post_request at 0x7fc9d48b8ee0>
+  child_exit: <function child_exit at 0x7fc9d48bb0d0>
+  worker_exit: <function worker_exit at 0x7fc9d48b8f70>
+  nworkers_changed: <function NumWorkersChanged.nworkers_changed at 0x7fc9d4180310>
+  on_exit: <function OnExit.on_exit at 0x7fc9d4180430>
+  ssl_context: <function NewSSLContext.ssl_context at 0x7fc9d4180550>
+  proxy_protocol: False
+  proxy_allow_ips: ['127.0.0.1', '::1']
+  keyfile: None
+  certfile: None
+  ssl_version: 2
+  cert_reqs: 0
+  ca_certs: None
+  suppress_ragged_eofs: True
+  do_handshake_on_connect: False
+  ciphers: None
+  raw_paste_global_conf: []
+  permit_obsolete_folding: False
+  strip_header_spaces: False
+  permit_unconventional_http_method: False
+  permit_unconventional_http_version: False
+  casefold_http_method: False
+  forwarder_headers: ['SCRIPT_NAME', 'PATH_INFO']
+  header_map: drop
+[2025-05-16 21:36:05 +0200] [1605358] [INFO] Starting gunicorn 23.0.0
+[2025-05-16 21:36:05 +0200] [1605358] [DEBUG] Arbiter booted
+[2025-05-16 21:36:05 +0200] [1605358] [INFO] Listening at: http://127.0.0.1:8002 (1605358)
+[2025-05-16 21:36:05 +0200] [1605358] [INFO] Using worker: sync
+[2025-05-16 21:36:05 +0200] [1605363] [INFO] Booting worker with pid: 1605363
+[2025-05-16 21:36:05 +0200] [1605358] [DEBUG] 1 workers
+[2025-05-16 21:36:35 +0200] [1605363] [DEBUG] GET /admin/
+[2025-05-16 21:36:35 +0200] [1605363] [DEBUG] GET /
+[2025-05-16 21:36:35 +0200] [1605363] [DEBUG] GET /dashboard
+[2025-05-16 21:36:36 +0200] [1605363] [DEBUG] GET /admin/
+[2025-05-16 21:36:39 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:36:47 +0200] [1605363] [DEBUG] GET /admin/catalogo/ver/catalogs/680a4ded896fd940ce1731cf
+[2025-05-16 21:36:48 +0200] [1605363] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:36:54 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:36:58 +0200] [1605363] [DEBUG] GET /admin/catalogo/catalogs/680a4ded896fd940ce1731cf/editar
+[2025-05-16 21:37:02 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:37:13 +0200] [1605363] [DEBUG] GET /dashboard_user
+[2025-05-16 21:37:17 +0200] [1605363] [DEBUG] GET /admin/
+[2025-05-16 21:37:19 +0200] [1605363] [DEBUG] GET /admin/usuarios
+[2025-05-16 21:37:27 +0200] [1605363] [DEBUG] GET /admin/usuarios/edfrutos@gmail.com/catalogos
+[2025-05-16 21:37:30 +0200] [1605363] [DEBUG] GET /admin/catalogo/ver/catalogs/68274d08cc0326f99017cd2d
+[2025-05-16 21:37:30 +0200] [1605363] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:37:34 +0200] [1605363] [DEBUG] GET /catalogs/
+[2025-05-16 21:37:38 +0200] [1605363] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 21:37:38 +0200] [1605363] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 21:37:38 +0200] [1605363] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 21:37:38 +0200] [1605363] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 21:37:38 +0200] [1605363] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 21:37:40 +0200] [1605363] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 21:37:40 +0200] [1605363] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 21:37:40 +0200] [1605363] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 21:37:40 +0200] [1605363] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 21:37:40 +0200] [1605363] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 21:37:43 +0200] [1605363] [DEBUG] GET /static/uploads/ee2143714fec49bd8bcc0ee01e4eb6a5_IMG_7594.jpg
+[2025-05-16 21:37:46 +0200] [1605363] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 21:37:46 +0200] [1605363] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 21:37:46 +0200] [1605363] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 21:37:46 +0200] [1605363] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 21:37:46 +0200] [1605363] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 21:37:52 +0200] [1605363] [DEBUG] GET /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 21:37:52 +0200] [1605363] [DEBUG] GET /static/uploads/f2f83765e1c348c6a9e2a07dddf1ac3b_IMG_7595.jpg
+[2025-05-16 21:37:52 +0200] [1605363] [DEBUG] GET /static/uploads/8e46ab9e12274366be732350ff6e717d_IMG_7593.jpg
+[2025-05-16 21:37:52 +0200] [1605363] [DEBUG] GET /static/uploads/653d9d95bb0e4654b550254bce80a40b_IMG_7578.jpg
+[2025-05-16 21:38:02 +0200] [1605363] [DEBUG] POST /catalogs/edit-row/680a19386d69c6d43251bba2/0
+[2025-05-16 21:38:03 +0200] [1605363] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 21:38:11 +0200] [1605363] [DEBUG] HEAD /
+[2025-05-16 21:38:11 +0200] [1605363] [DEBUG] HEAD /welcome
+[2025-05-16 21:41:25 +0200] [1605363] [DEBUG] GET /
+[2025-05-16 21:41:25 +0200] [1605363] [DEBUG] GET /welcome
+[2025-05-16 21:43:15 +0200] [1605363] [DEBUG] HEAD /
+[2025-05-16 21:43:15 +0200] [1605363] [DEBUG] HEAD /welcome
+[2025-05-16 21:46:25 +0200] [1605363] [DEBUG] GET /
+[2025-05-16 21:46:25 +0200] [1605363] [DEBUG] GET /welcome
+[2025-05-16 21:48:19 +0200] [1605363] [DEBUG] HEAD /
+[2025-05-16 21:48:19 +0200] [1605363] [DEBUG] HEAD /welcome
+[2025-05-16 21:49:46 +0200] [1605363] [DEBUG] GET /catalogs/680a19386d69c6d43251bba2
+[2025-05-16 21:49:47 +0200] [1605363] [DEBUG] GET /static/favicon.ico
+[2025-05-16 21:49:47 +0200] [1605363] [DEBUG] GET /
+[2025-05-16 21:49:47 +0200] [1605363] [DEBUG] GET /dashboard
+[2025-05-16 21:49:47 +0200] [1605363] [DEBUG] GET /admin/
+[2025-05-16 21:49:50 +0200] [1605363] [DEBUG] GET /logout
+[2025-05-16 21:49:50 +0200] [1605363] [DEBUG] GET /login
+[2025-05-16 21:49:52 +0200] [1605363] [DEBUG] POST /login
+[2025-05-16 21:49:52 +0200] [1605363] [DEBUG] GET /admin/
+[2025-05-16 21:49:56 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:50:03 +0200] [1605363] [DEBUG] POST /admin/catalogo/spreadsheets/68262902e88075ac494aad4e/eliminar
+[2025-05-16 21:50:03 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:50:13 +0200] [1605363] [DEBUG] POST /admin/catalogo/spreadsheets/68232489844715fbbed26f57/eliminar
+[2025-05-16 21:50:13 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:50:16 +0200] [1605363] [DEBUG] POST /admin/catalogo/spreadsheets/68231b8e580991777dd26f57/eliminar
+[2025-05-16 21:50:16 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:50:24 +0200] [1605363] [DEBUG] GET /admin/catalogo/ver/spreadsheets/681f2189f3e71c71760bf457
+[2025-05-16 21:50:24 +0200] [1605363] [DEBUG] GET /static/img/image-error.png
+[2025-05-16 21:50:29 +0200] [1605363] [DEBUG] GET /admin/catalogos-usuario/681e29888bb6d00307eb028a
+[2025-05-16 21:51:25 +0200] [1605363] [DEBUG] GET /
+[2025-05-16 21:51:26 +0200] [1605363] [DEBUG] GET /welcome

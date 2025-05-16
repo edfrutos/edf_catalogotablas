@@ -55,6 +55,45 @@
       </a>
     </div>
   </div>
+  <h4 class="mt-4 mb-3"><i class="bi bi-people"></i> Catálogos por Usuario</h4>
+  <div class="table-responsive mb-4">
+    <table class="table table-hover align-middle shadow-sm">
+      <thead class="table-light">
+        <tr>
+          <th>Usuario</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Nº Catálogos</th>
+          <th>Última Actualización</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+          <td><i class="bi bi-person"></i> {{ usuario.nombre }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>
+            <span class="badge {% if usuario.role == 'admin' %}bg-danger{% else %}bg-primary{% endif %}">
+              {{ usuario.role }}
+            </span>
+          </td>
+          <td class="text-center">
+            <span class="badge bg-success">{{ usuario.count }}</span>
+          </td>
+          <td>{{ usuario.last_update_str }}</td>
+          <td>
+            <a href="{{ url_for('admin.ver_catalogos_usuario_por_id', user_id=usuario.id) }}" class="btn btn-sm btn-outline-primary" title="Ver catálogos"><i class="bi bi-eye"></i> Ver</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if not usuarios %}
+      <div class="alert alert-info mt-3">No hay usuarios registrados.</div>
+    {% endif %}
+  </div>
+
   <h4 class="mt-4 mb-3"><i class="bi bi-clock-history"></i> Últimos Catálogos/Tablas Creados</h4>
   <div class="table-responsive">
     <table class="table table-hover align-middle shadow-sm">

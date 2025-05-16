@@ -60,9 +60,15 @@
                                     <td>{{ user.email }}</td>
                                     <td>{{ user.nombre }}</td>
                                     <td>{{ user.role or 'Sin rol' }}</td>
-                                    <td>
-                                        <a href="{{ url_for('admin.ver_catalogos_usuario', user_email=user.email) }}" class="btn btn-info btn-sm">
-                                            {{ user.num_catalogs|default(0) }}
+                                    <td class="text-center">
+                                        <a href="{{ url_for('admin.ver_catalogos_usuario', user_email=user.email) }}" 
+                                           class="btn btn-primary btn-sm position-relative" 
+                                           style="min-width: 110px; font-weight: bold;">
+                                            <i class="bi bi-table me-1"></i> Catálogos
+                                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                                {{ user.num_catalogs|default(0) }}
+                                                <span class="visually-hidden">catálogos</span>
+                                            </span>
                                         </a>
                                     </td>
                                     <td>
@@ -127,11 +133,14 @@
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Formatear fechas
-    document.querySelectorAll('td:nth-child(4)').forEach(function(cell) {
-        const date = new Date(cell.textContent);
-        if (!isNaN(date)) {
-            cell.textContent = date.toLocaleString('es-ES');
+    // Formatear fechas en la columna de última actualización (5ta columna)
+    document.querySelectorAll('td:nth-child(5)').forEach(function(cell) {
+        const text = cell.textContent.trim();
+        if (text !== 'No disponible') {
+            const date = new Date(text);
+            if (!isNaN(date)) {
+                cell.textContent = date.toLocaleString('es-ES');
+            }
         }
     });
 });

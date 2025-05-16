@@ -1,8 +1,12 @@
 import os
-from flask import Blueprint, request, redirect, url_for, flash, current_app, render_template
+from flask import Blueprint, request, redirect, url_for, flash, current_app, render_template, session
 from werkzeug.utils import secure_filename
 from app.extensions import mongo, is_mongo_available
 from bson import ObjectId
+from datetime import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 image_bp = Blueprint('images', __name__)
 
@@ -38,8 +42,9 @@ def upload_images(catalog_id):
             flash("No se han seleccionado imágenes.", "warning")
             return redirect(url_for('catalogs.view', catalog_id=catalog_id))
             
-        if len(files) > 3:
-            flash("Sólo puedes subir hasta 3 imágenes.", "warning")
+        # Eliminar la restricción de 3 imágenes
+        if len(files) > 10:  # Aumentar el límite a 10 imágenes por carga
+            flash("Sólo puedes subir hasta 10 imágenes a la vez.", "warning")
             return redirect(url_for('catalogs.view', catalog_id=catalog_id))
 
         # Crear directorio de uploads si no existe
@@ -71,11 +76,22 @@ def upload_images(catalog_id):
                 
                 current_app.logger.info(f"Imagen guardada: {save_path}")
 
-        # Actualizar el catálogo con las nuevas imágenes
-        current_collection.update_one(
-            {'_id': ObjectId(catalog_id)},
-            {'$set': {'images': image_names}}
-        )
+        # Actualizar el catálogo con las nuevas imágenes en ambos campos para mantener compatibilidad
+        try:
+            # Actualizar tanto el campo 'images' como 'imagenes' para mantener compatibilidad
+            current_collection.update_one(
+                {'_id': ObjectId(catalog_id)},
+                {'$set': {
+                    'images': image_names,
+                    'imagenes': image_names,
+                    'updated_at': datetime.now()
+                }}
+            )
+            
+            logger.info(f"Catálogo {catalog_id} actualizado con {len(image_names)} imágenes")
+        except Exception as e:
+            logger.error(f"Error al actualizar imágenes en el catálogo: {str(e)}")
+            raise e
         
         current_app.logger.info(f"Catálogo actualizado con imágenes: {image_names}")
         flash("Imágenes subidas correctamente.", "success")
