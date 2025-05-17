@@ -28,6 +28,11 @@
                         <i class="fas fa-user-shield"></i> Admin
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if '/tools' in request.path %}active{% endif %}" href="/tools">
+                        <i class="fas fa-tools"></i> Scripts
+                    </a>
+                </li>
                 {% endif %}
             </ul>
             <div class="d-flex">

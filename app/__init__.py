@@ -37,6 +37,7 @@ from app.routes.usuarios_routes import usuarios_bp
 from app.routes.admin_routes import admin_bp, admin_logs_bp
 from app.error_handlers import errors_bp
 from app.routes.emergency_access import emergency_bp
+from app.routes.scripts_routes import scripts_bp
 
 # Definir instancias de MongoDB para uso posterior
 client = None
@@ -113,6 +114,7 @@ def create_app():
     app.register_blueprint(errors_bp)
     app.register_blueprint(emergency_bp)
     app.register_blueprint(admin_logs_bp)
+    app.register_blueprint(scripts_bp)
     
     # Inicializar sistema de monitoreo
     try:

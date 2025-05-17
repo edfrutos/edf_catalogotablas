@@ -13,7 +13,18 @@ def init_extensions(app):
     global s3_client
     global catalog_collection
 
-    mongo.init_app(app)
+    # Hacer que la conexión a MongoDB sea opcional
+    if app.config.get('MONGO_URI'):
+        try:
+            mongo.init_app(app)
+            catalog_collection = mongo.db.catalogo_tablas
+            app.logger.info("MongoDB inicializado correctamente")
+        except Exception as e:
+            app.logger.error(f"Error al inicializar MongoDB: {e}")
+            app.logger.warning("Continuando sin MongoDB - algunas funcionalidades estarán limitadas")
+    else:
+        app.logger.warning("MONGO_URI no configurado - continuando sin MongoDB")
+    
     mail.init_app(app)
 
     if app.config.get("USE_S3"):
@@ -24,7 +35,7 @@ def init_extensions(app):
             region_name=app.config['AWS_REGION']
         )
 
-    catalog_collection = mongo.db.catalogo_tablas
+    # La asignación de catalog_collection se hace en el bloque try arriba
 
 def is_mongo_available():
     try:
