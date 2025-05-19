@@ -2,14 +2,16 @@
 # app/routes/scripts_routes.py
 
 import os
+import sys
 import glob
 import subprocess
 import json
 from datetime import datetime
 from functools import wraps
-from flask import Blueprint, render_template, jsonify, request, abort, session, redirect, url_for, flash
+from flask import Blueprint, render_template, jsonify, request, abort, session, redirect, url_for, flash, current_app, send_file
+from functools import wraps
 
-# Definir el decorador admin_required localmente para evitar dependencias
+# Definición local del decorador admin_required
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -19,6 +21,8 @@ def admin_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+# Utilizamos la definición local del decorador admin_required
+
 # Definir el directorio raíz
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -26,14 +30,180 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 TOOLS_DIR = os.path.join(ROOT_DIR, 'tools')
 
 # Crear el blueprint
-scripts_bp = Blueprint('scripts', __name__, url_prefix='/tools')
+scripts_bp = Blueprint('scripts', __name__, url_prefix='/admin/tools')
 
-@scripts_bp.route('/content/<path:script_path>')
+# Ruta alternativa para ejecutar scripts sin path variables
+@scripts_bp.route('/execute', methods=['POST'])
+@admin_required
+def execute_script():
+    """Ejecuta un script especificado por parámetro y devuelve su salida"""
+    try:
+        # Obtener la ruta del script desde los parámetros del formulario o JSON
+        if request.is_json:
+            data = request.get_json()
+            script_path = data.get('script_path', '')
+        else:
+            script_path = request.form.get('script_path', '')
+        
+        print(f"\n=== Iniciando ejecución de script (método alternativo) ===")
+        print(f"Script solicitado: {script_path}")
+        print(f"URL completa: {request.url}")
+        print(f"Método: {request.method}")
+        print(f"Headers: {dict(request.headers)}")
+        
+        # Obtener la ruta absoluta del script
+        abs_script_path = get_script_path(script_path)
+        print(f"Ruta absoluta del script: {abs_script_path}")
+        
+        if not abs_script_path:
+            print(f"\n❌ ERROR: Script no encontrado: {script_path}")
+            return jsonify({
+                'script': os.path.basename(script_path) if script_path else 'desconocido',
+                'error': f'Script no encontrado: {script_path}',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }), 404
+        
+        # Verificar que el script existe y es ejecutable
+        if not os.path.isfile(abs_script_path):
+            print(f"\n❌ ERROR: No es un archivo regular: {abs_script_path}")
+            return jsonify({
+                'script': os.path.basename(abs_script_path),
+                'error': f'No es un archivo válido: {abs_script_path}',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }), 400
+        
+        if not os.access(abs_script_path, os.X_OK):
+            print(f"\n❌ ERROR: Script no ejecutable: {abs_script_path}")
+            # Intentar corregir los permisos
+            try:
+                os.chmod(abs_script_path, 0o755)
+                print(f"Permisos corregidos para: {abs_script_path}")
+            except Exception as e:
+                print(f"No se pudieron corregir los permisos: {str(e)}")
+                return jsonify({
+                    'script': os.path.basename(abs_script_path),
+                    'error': f'Script no tiene permisos de ejecución: {abs_script_path}',
+                    'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                }), 403
+        
+        # Establecer el tiempo máximo para la ejecución del script
+        timeout = 60  # segundos
+        
+        try:
+            print(f"\n✅ Ejecutando script: {abs_script_path}")
+            # Ejecutar el script capturando la salida estándar y de error
+            process = subprocess.run(
+                [abs_script_path],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False  # No levantar excepción si el comando falla
+            )
+            
+            # Obtener la salida y el código de salida
+            output = process.stdout
+            error_output = process.stderr
+            exit_code = process.returncode
+            
+            print(f"Código de salida: {exit_code}")
+            print(f"Salida:\n{output}")
+            
+            if error_output:
+                print(f"Error:\n{error_output}")
+            
+            # Devolver la respuesta en formato JSON
+            return jsonify({
+                'script': os.path.basename(abs_script_path),
+                'output': output,
+                'error': error_output,
+                'exit_code': exit_code,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            })
+            
+        except subprocess.TimeoutExpired:
+            print(f"\n❌ ERROR: Tiempo de ejecución excedido ({timeout}s): {abs_script_path}")
+            return jsonify({
+                'script': os.path.basename(abs_script_path),
+                'error': f'Tiempo de ejecución excedido ({timeout}s)',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }), 408
+    except Exception as e:
+        print(f"\n❌ Excepción al ejecutar el script: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'script': os.path.basename(script_path) if 'script_path' in locals() else 'desconocido',
+            'error': f'Error al ejecutar el script: {str(e)}',
+            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }), 500
+
+def get_script_path(script_path):
+    """Obtiene la ruta completa del script buscando en todas las ubicaciones posibles.
+    
+    Args:
+        script_path: Ruta relativa o absoluta del script
+        
+    Returns:
+        La ruta absoluta del script o None si no se encuentra
+    """
+    print(f"\n>>> get_script_path: Resolviendo ruta para: {script_path}")
+    
+    # Si la ruta ya es absoluta, verificar que existe
+    if os.path.isabs(script_path) and os.path.exists(script_path):
+        print(f">>> La ruta ya es absoluta y existe: {script_path}")
+        return script_path
+    
+    # Normalizar la ruta para evitar problemas
+    script_path = script_path.strip('/')
+    script_name = os.path.basename(script_path)
+    
+    # Lista de posibles ubicaciones donde buscar el script
+    possible_locations = [
+        os.path.join(ROOT_DIR, script_path),
+        os.path.join(TOOLS_DIR, script_path),
+        os.path.join(ROOT_DIR, 'tools', script_path)
+    ]
+    
+    # Buscar en ubicaciones definidas
+    for location in possible_locations:
+        print(f">>> Verificando ubicación: {location}")
+        if os.path.exists(location):
+            actual_path = os.path.abspath(location)
+            print(f">>> Script encontrado en: {actual_path}")
+            
+            # Verificar si es un enlace simbólico y resolverlo
+            if os.path.islink(actual_path):
+                real_path = os.path.realpath(actual_path)
+                print(f">>> Es un enlace simbólico que apunta a: {real_path}")
+                return real_path
+            
+            return actual_path
+    
+    # Si no se encuentra, buscar en subdirectorios de tools por nombre
+    print(f">>> Buscando en subdirectorios por nombre: {script_name}")
+    for root, dirs, files in os.walk(TOOLS_DIR):
+        if script_name in files:
+            found_path = os.path.abspath(os.path.join(root, script_name))
+            print(f">>> Script encontrado por nombre en: {found_path}")
+            
+            # Verificar si es un enlace simbólico y resolverlo
+            if os.path.islink(found_path):
+                real_path = os.path.realpath(found_path)
+                print(f">>> Es un enlace simbólico que apunta a: {real_path}")
+                return real_path
+            
+            return found_path
+    
+    # No se encontró el script
+    print(f">>> ❌ Script no encontrado: {script_path}")
+    return None
+
+@scripts_bp.route('/view/<path:script_path>')
 @admin_required
 def view_script_content(script_path):
     """Muestra el contenido de un script"""
-    # Obtener la ruta absoluta del script
-    abs_script_path = os.path.abspath(script_path)
+    # Utilizar la función get_script_path para normalizar la ruta
+    abs_script_path = get_script_path(script_path)
     
     print(f"Intentando acceder al script: {abs_script_path}")
     
@@ -99,6 +269,12 @@ def tools_dashboard():
             'path': os.path.join(tools_dir, 'catalog_utils'),
             'color': 'info'
         },
+        'test_scripts': {
+            'name': 'Scripts de Prueba',
+            'description': 'Scripts simples para probar la funcionalidad',
+            'path': os.path.join(tools_dir, 'test_scripts'),
+            'color': 'secondary'
+        },
         'db_utils': {
             'name': 'Utilidades de BD',
             'description': 'Scripts para gestionar la base de datos',
@@ -115,7 +291,7 @@ def tools_dashboard():
             'name': 'Monitoreo',
             'description': 'Scripts para monitorear el sistema',
             'path': os.path.join(tools_dir, 'monitoring'),
-            'color': 'light'
+            'color': 'warning'
         },
         'password_utils': {
             'name': 'Utilidades de Contraseñas',
@@ -168,13 +344,16 @@ def tools_dashboard():
                 else:  # .py
                     description = f"Script de Python para {category_info['name']}"
                 
-                # Añadir el script a la lista
-                print(f"Añadiendo script: {script_path}")
+                # Añadir el script a la lista, pero usando una ruta relativa
+                # para evitar problemas de duplicación de URLs
+                rel_path = os.path.relpath(script_path, TOOLS_DIR)
+                print(f"Añadiendo script: {script_path} (ruta relativa: {rel_path})")
                 scripts.append({
                     'name': script_name,
-                    'path': script_path,
+                    'path': rel_path,  # Usamos la ruta relativa en lugar de la absoluta
                     'category': category_id,
-                    'description': description
+                    'description': description,
+                    'full_path': script_path  # Guardamos la ruta completa para referencia
                 })
         else:
             print(f"Directorio no encontrado: {path}")
@@ -183,70 +362,105 @@ def tools_dashboard():
     if len(scripts) == 0:
         print("ADVERTENCIA: No se encontraron scripts para mostrar")
     
-    return render_template('tools_dashboard.html', scripts=scripts, categories=script_categories)
+    return render_template('admin/tools_dashboard.html', scripts=scripts, categories=script_categories)
 
 @scripts_bp.route('/run/<path:script_path>', methods=['POST'])
 @admin_required
 def run_script(script_path):
     """Ejecuta un script y devuelve su salida"""
-    # Obtener la ruta absoluta del script
-    abs_script_path = os.path.abspath(script_path)
-    
-    print(f"Intentando ejecutar el script: {abs_script_path}")
-    
-    # Verificar que el script existe
-    if not os.path.exists(abs_script_path):
-        return jsonify({
-            'error': 'Script no encontrado: ' + abs_script_path,
-            'script': os.path.basename(script_path)
-        }), 404
-    
-    # Verificar que el script está dentro del directorio del proyecto
-    if not abs_script_path.startswith(ROOT_DIR):
-        return jsonify({
-            'error': 'Script fuera del directorio del proyecto: ' + abs_script_path,
-            'script': os.path.basename(script_path)
-        }), 404
-    
-    # Verificar que el script tiene permisos de ejecución
-    if not os.access(abs_script_path, os.X_OK):
-        try:
-            # Intentar dar permisos de ejecución con sudo
-            sudo_cmd = ['sudo', 'chmod', '+x', abs_script_path]
-            subprocess.run(sudo_cmd, check=True)
-        except Exception as e:
-            return jsonify({
-                'error': f'No se pudieron establecer permisos de ejecución: {str(e)}',
-                'script': os.path.basename(script_path)
-            }), 403
-    
     try:
-        # Ejecutar el script con sudo para evitar problemas de permisos
-        process = subprocess.Popen(
-            ['sudo', abs_script_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=os.path.dirname(abs_script_path),
-            text=True
-        )
-        stdout, stderr = process.communicate(timeout=30)  # Timeout de 30 segundos
+        print(f"\n=== Iniciando ejecución de script ===")
+        print(f"Script solicitado: {script_path}")
+        print(f"URL completa: {request.url}")
+        print(f"Método: {request.method}")
+        print(f"Headers: {dict(request.headers)}")
         
-        result = {
-            'script': os.path.basename(script_path),
-            'exit_code': process.returncode,
-            'output': stdout,
-            'error': stderr,
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
+        # Obtener la ruta absoluta del script usando la función mejorada
+        abs_script_path = get_script_path(script_path)
+        print(f"Ruta absoluta del script: {abs_script_path}")
         
-        return jsonify(result)
-    except subprocess.TimeoutExpired:
-        return jsonify({
-            'script': os.path.basename(script_path),
-            'error': 'El script tardó demasiado tiempo en ejecutarse (más de 30 segundos)',
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }), 408
+        if not abs_script_path:
+            print(f"\n❌ ERROR: Script no encontrado: {script_path}")
+            return jsonify({
+                'error': f'Script no encontrado: {script_path}',
+                'script': os.path.basename(script_path)
+            }), 404
+        
+        # Verificar que el script está dentro del directorio del proyecto
+        if not abs_script_path.startswith(ROOT_DIR):
+            print(f"\n❌ ERROR: Script fuera del directorio del proyecto: {abs_script_path}")
+            return jsonify({
+                'error': 'Script fuera del directorio del proyecto: ' + abs_script_path,
+                'script': os.path.basename(script_path)
+            }), 404
+    
+        # Verificar que el script tiene permisos de ejecución
+        if not os.access(abs_script_path, os.X_OK):
+            try:
+                # Intentar dar permisos de ejecución al archivo
+                os.chmod(abs_script_path, 0o755)
+                print(f"Permisos de ejecución establecidos para: {abs_script_path}")
+            except Exception as e:
+                print(f"\n❌ ERROR al establecer permisos: {str(e)}")
+                return jsonify({
+                    'error': f'No se pudieron establecer permisos de ejecución: {str(e)}',
+                    'script': os.path.basename(script_path)
+                }), 403
+        
+        # Determinar cómo ejecutar el script basado en su tipo
+        script_ext = os.path.splitext(abs_script_path)[1].lower()
+        
+        try:
+            cmd = None
+            if script_ext == '.py':
+                # Para scripts Python, usar el intérprete de Python directamente
+                cmd = [sys.executable, abs_script_path]
+            elif script_ext == '.sh':
+                # Para scripts shell, usar bash
+                cmd = ['/bin/bash', abs_script_path]
+            else:
+                # Para otros ejecutables
+                cmd = [abs_script_path]
+            
+            print(f"\n✅ Ejecutando comando: {' '.join(cmd)}")
+            
+            # Ejecutar el script directamente
+            result_process = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=os.path.dirname(abs_script_path)  # Establecer el directorio de trabajo al directorio del script
+            )
+            
+            stdout = result_process.stdout
+            stderr = result_process.stderr
+            exit_code = result_process.returncode
+            
+            print(f"\n✅ Script ejecutado. Código de salida: {exit_code}")
+            print(f"Salida estándar: {stdout[:100]}..." if len(stdout) > 100 else f"Salida estándar: {stdout}")
+            print(f"Error estándar: {stderr[:100]}..." if len(stderr) > 100 else f"Error estándar: {stderr}")
+            
+            result = {
+                'script': os.path.basename(script_path),
+                'exit_code': exit_code,
+                'output': stdout,
+                'error': stderr,
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }
+            
+            return jsonify(result)
+        except subprocess.TimeoutExpired:
+            print(f"\n❌ Timeout al ejecutar el script: {abs_script_path}")
+            return jsonify({
+                'script': os.path.basename(script_path),
+                'error': 'El script tardó demasiado tiempo en ejecutarse (más de 30 segundos)',
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            }), 408
     except Exception as e:
+        print(f"\n❌ Excepción al ejecutar el script: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'script': os.path.basename(script_path),
             'error': f'Error al ejecutar el script: {str(e)}',
