@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/root/check_user_role.py

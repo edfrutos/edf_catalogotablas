@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/test_scripts/simple_test.sh

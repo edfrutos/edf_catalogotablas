@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/session_utils/session_config.py

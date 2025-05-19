@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # update_catalogs.py
 from pymongo import MongoClient
 from dotenv import load_dotenv

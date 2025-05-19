@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/root/05.-insertar_manualmente_un_documento.py

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from openpyxl import Workbook
 import csv
 

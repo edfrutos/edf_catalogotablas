@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/root/06.-asegurar_que_db_esta_bien_definido.py

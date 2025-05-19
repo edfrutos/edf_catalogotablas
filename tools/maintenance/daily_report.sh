@@ -1,3 +1,4 @@
+#!/bin/bash
 # Ruta: /var/www/vhosts/edefrutos2025.xyz/httpdocs/daily_report.sh
 
 #!/bin/bash

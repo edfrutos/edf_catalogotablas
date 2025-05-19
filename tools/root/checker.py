@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # checker.py
 import os
 from pymongo import MongoClient

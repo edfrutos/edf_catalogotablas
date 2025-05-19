@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Función de decorador para manejar excepciones en rutas
 def route_error_handler(func):
     from functools import wraps

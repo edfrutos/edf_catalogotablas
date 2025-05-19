@@ -1,0 +1,1 @@
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/tools/root/07.-cambiar_definicion_de_coleccion_en_codigo.py

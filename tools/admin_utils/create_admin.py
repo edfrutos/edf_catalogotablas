@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import scrypt
 import base64
 from app.models import get_users_collection

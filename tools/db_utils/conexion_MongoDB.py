@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from pymongo import MongoClient
 
 uri = "mongodb+srv://edfrutos:rYjwUC6pUNrLtbaI@cluster0.pmokh.mongodb.net/app_catalogojoyero?retryWrites=true&w=majority"

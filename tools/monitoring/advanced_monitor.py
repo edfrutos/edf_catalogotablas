@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Ruta: /var/www/vhosts/edefrutos2025.xyz/httpdocs/advanced_monitor.py
 
 #!/usr/bin/env python3

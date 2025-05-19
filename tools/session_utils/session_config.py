@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Configuración de sesión optimizada para Flask
 # Generado automáticamente por aplicar_configuracion_sesion.py
 

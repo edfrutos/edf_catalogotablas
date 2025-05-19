@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Script para reparar problemas de sesión y acceso directo
 Este script puede ejecutarse directamente desde la terminal

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Módulo auxiliar para garantizar el acceso a la ruta /tables/
 Implementación independiente que no depende de blueprints

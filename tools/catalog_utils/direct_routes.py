@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Rutas directas para acceso garantizado sin dependencias
 Este archivo se carga antes de MongoDB y otras dependencias

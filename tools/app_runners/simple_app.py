@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from flask import Flask, send_from_directory
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')

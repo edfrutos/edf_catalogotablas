@@ -5,6 +5,8 @@
 # Importar configuración de sesión corregida
 from session_config import *
 
+import time
+import certifi
 # --- Imports estándar ---
 import os
 import sys
@@ -163,7 +165,8 @@ def create_app():
     # Variables de entorno críticas
     MONGO_URI = os.getenv("MONGO_URI")
     if not MONGO_URI:
-        raise ValueError("MONGO_URI no está configurada en el archivo .env")
+        print("Advertencia: MONGO_URI no está configurada, algunas funciones estarán deshabilitadas")
+        MONGO_URI = "mongodb://localhost:27017/app_catalogojoyero"
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_REGION = os.getenv('AWS_REGION')
@@ -891,160 +894,158 @@ def test_styles():
 # 🛠️ GESTOR DE SCRIPTS
 # ==============================================
 
-@app.route('/tools')
-@admin_required
-def tools_dashboard():
-    """Ruta para acceder al gestor de scripts del sistema"""
-    import os
-    import glob
-    
-    # Definir las categorías de scripts
-    script_categories = {
-        'maintenance': {
-            'name': 'Mantenimiento',
-            'description': 'Scripts para iniciar, supervisar y mantener la aplicación',
-            'path': os.path.join(ROOT_DIR, 'scripts/maintenance')
-        },
-        'organization': {
-            'name': 'Organización',
-            'description': 'Scripts para organizar y limpiar la estructura del proyecto',
-            'path': ROOT_DIR
-        },
-        'deployment': {
-            'name': 'Despliegue',
-            'description': 'Scripts relacionados con el despliegue de la aplicación',
-            'path': os.path.join(ROOT_DIR, 'scripts/deployment')
-        },
-        'system': {
-            'name': 'Sistema',
-            'description': 'Scripts para tareas del sistema operativo y configuración',
-            'path': os.path.join(ROOT_DIR, 'scripts/system')
-        }
-    }
-    
-    # Recopilar todos los scripts
-    scripts = []
-    
-    # Scripts de mantenimiento
-    maintenance_scripts = glob.glob(os.path.join(script_categories['maintenance']['path'], '*.sh'))
-    for script_path in maintenance_scripts:
-        scripts.append({
-            'name': os.path.basename(script_path),
-            'path': script_path,
-            'category': 'maintenance',
-            'description': 'Script de mantenimiento del sistema'
-        })
-    
-    # Scripts de organización
-    organization_scripts = [
-        os.path.join(ROOT_DIR, 'cleanup_duplicates.sh'),
-        os.path.join(ROOT_DIR, 'organize_root_scripts.sh'),
-        os.path.join(ROOT_DIR, 'reorganize_project.sh')
-    ]
-    for script_path in organization_scripts:
-        if os.path.exists(script_path):
-            scripts.append({
-                'name': os.path.basename(script_path),
-                'path': script_path,
-                'category': 'organization',
-                'description': 'Script de organización del proyecto'
-            })
-    
-    # Otros scripts en el directorio raíz
-    root_scripts = glob.glob(os.path.join(ROOT_DIR, '*.sh'))
-    for script_path in root_scripts:
-        if script_path not in organization_scripts:
-            scripts.append({
-                'name': os.path.basename(script_path),
-                'path': script_path,
-                'category': 'system',
-                'description': 'Script del sistema'
-            })
-    
-    return render_template('tools_dashboard.html', scripts=scripts, categories=script_categories)
+# Estas rutas han sido trasladadas al blueprint scripts_bp en scripts_routes.py
+# con el prefijo /admin/tools
 
-@app.route('/tools/view_script')
-@admin_required
-def view_script():
-    """Ruta para ver el contenido de un script"""
-    script_path = request.args.get('path')
-    
-    if not script_path:
-        return jsonify({'error': 'No se ha especificado la ruta del script'}), 400
-    
-    # Verificar que la ruta es válida y apunta a un archivo .sh
-    if not os.path.exists(script_path) or not os.path.isfile(script_path) or not script_path.endswith('.sh'):
-        return jsonify({'error': 'El archivo no existe o no es un script .sh válido'}), 404
-    
-    # Verificar que el archivo está dentro del directorio del proyecto
-    if not script_path.startswith(ROOT_DIR):
-        return jsonify({'error': 'No se permite acceder a archivos fuera del directorio del proyecto'}), 403
-    
-    # Leer y mostrar el contenido del archivo
-    try:
-        with open(script_path, 'r') as file:
-            content = file.read()
-        return jsonify({'content': content, 'name': os.path.basename(script_path)})
-    except Exception as e:
-        return jsonify({'error': f'Error al leer el archivo: {str(e)}'}), 500
+# @app.route('/tools')
+# @admin_required
+# def tools_dashboard():
+#     """Ruta para acceder al gestor de scripts del sistema"""
+#     import os
+#     import glob
+#     
+#     # Definir las categorías de scripts
+#     script_categories = {
+#         'maintenance': {
+#             'name': 'Mantenimiento',
+#             'description': 'Scripts para iniciar, supervisar y mantener la aplicación',
+#             'path': os.path.join(ROOT_DIR, 'scripts/maintenance')
+#         },
+#         'organization': {
+#             'name': 'Organización',
+#             'description': 'Scripts para organizar y limpiar la estructura del proyecto',
+#             'path': ROOT_DIR
+#         },
+#         'deployment': {
+#             'name': 'Despliegue',
+#             'description': 'Scripts relacionados con el despliegue de la aplicación',
+#             'path': os.path.join(ROOT_DIR, 'scripts/deployment')
+#         },
+#         'system': {
+#             'name': 'Sistema',
+#             'description': 'Scripts para tareas del sistema operativo y configuración',
+#             'path': os.path.join(ROOT_DIR, 'scripts/system')
+#         }
+#     }
+#     
+#     # Recopilar todos los scripts
+#     scripts = []
+#     
+#     # Scripts de mantenimiento
+#     maintenance_scripts = glob.glob(os.path.join(script_categories['maintenance']['path'], '*.sh'))
+#     for script_path in maintenance_scripts:
+#         scripts.append({
+#             'name': os.path.basename(script_path),
+#             'path': script_path,
+#             'category': 'maintenance',
+#             'description': 'Script de mantenimiento del sistema'
+#         })
+#     
+#     # Scripts de organización
+#     organization_scripts = [
+#         os.path.join(ROOT_DIR, 'cleanup_duplicates.sh'),
+#         os.path.join(ROOT_DIR, 'organize_root_scripts.sh'),
+#         os.path.join(ROOT_DIR, 'reorganize_project.sh')
+#     ]
+#     for script_path in organization_scripts:
+#         if os.path.exists(script_path):
+#             scripts.append({
+#                 'name': os.path.basename(script_path),
+#                 'path': script_path,
+#                 'category': 'organization',
+#                 'description': 'Script de organización del proyecto'
+#             })
+#     
+#     # Otros scripts en el directorio raíz
+#     root_scripts = glob.glob(os.path.join(ROOT_DIR, '*.sh'))
+#     for script_path in root_scripts:
+#         if script_path not in organization_scripts:
+#             scripts.append({
+#                 'name': os.path.basename(script_path),
+#                 'path': script_path,
+#                 'category': 'system',
+#                 'description': 'Script del sistema'
+#             })
+#     
+#     return render_template('tools_dashboard.html', scripts=scripts, categories=script_categories)
 
-@app.route('/tools/run_script')
-@admin_required
-def run_script():
-    """Ruta para ejecutar un script"""
-    script_path = request.args.get('path')
+# @app.route('/tools/view_script')
+# @admin_required
+# def view_script():
+#     """Ruta para ver el contenido de un script"""
+#     script_path = request.args.get('path')
+#     
+#     if not script_path:
+#         return jsonify({'error': 'No se ha especificado la ruta del script'}), 400
     
-    if not script_path:
-        return jsonify({'error': 'No se ha especificado la ruta del script'}), 400
-    
-    # Verificar que la ruta es válida y apunta a un archivo .sh
-    if not os.path.exists(script_path) or not os.path.isfile(script_path) or not script_path.endswith('.sh'):
-        return jsonify({'error': 'El archivo no existe o no es un script .sh válido'}), 404
-    
-    # Verificar que el archivo está dentro del directorio del proyecto
-    if not script_path.startswith(ROOT_DIR):
-        return jsonify({'error': 'No se permite ejecutar archivos fuera del directorio del proyecto'}), 403
-    
-    # Verificar que el archivo tiene permisos de ejecución
-    if not os.access(script_path, os.X_OK):
-        try:
-            os.chmod(script_path, 0o755)
-        except Exception as e:
-            return jsonify({'error': f'No se pudieron establecer permisos de ejecución: {str(e)}'}), 500
-    
-    # Ejecutar el script y capturar la salida
-    try:
-        import subprocess
-        process = subprocess.Popen(
-            f"cd {os.path.dirname(script_path)} && {script_path}",
-            shell=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        stdout, stderr = process.communicate(timeout=30)  # Timeout de 30 segundos
-        
-        result = {
-            'script': os.path.basename(script_path),
-            'exit_code': process.returncode,
-            'output': stdout,
-            'error': stderr,
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }
-        
-        return jsonify(result)
-    except subprocess.TimeoutExpired:
-        return jsonify({
-            'script': os.path.basename(script_path),
-            'error': 'El script tardó demasiado tiempo en ejecutarse (más de 30 segundos)',
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }), 408
-    except Exception as e:
-        return jsonify({
-            'script': os.path.basename(script_path),
-            'error': f'Error al ejecutar el script: {str(e)}',
-            'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        }), 500
+#     # Verificar que el archivo está dentro del directorio del proyecto
+#     if not script_path.startswith(ROOT_DIR):
+#         return jsonify({'error': 'No se permite acceder a archivos fuera del directorio del proyecto'}), 403
+#     
+#     try:
+#         with open(script_path, 'r') as file:
+#             content = file.read()
+#         return jsonify({'content': content, 'name': os.path.basename(script_path)})
+#     except Exception as e:
+#         return jsonify({'error': f'Error al leer el archivo: {str(e)}'}), 500
+
+# @app.route('/tools/run_script')
+# @admin_required
+# def run_script():
+#     """Ruta para ejecutar un script"""
+#     script_path = request.args.get('path')
+#     
+#     if not script_path:
+#         return jsonify({'error': 'No se ha especificado la ruta del script'}), 400
+#     
+#     # Verificar que la ruta es válida y apunta a un archivo .sh
+#     if not os.path.exists(script_path) or not os.path.isfile(script_path) or not script_path.endswith('.sh'):
+#         return jsonify({'error': 'El archivo no existe o no es un script .sh válido'}), 404
+#     
+#     # Verificar que el archivo está dentro del directorio del proyecto
+#     if not script_path.startswith(ROOT_DIR):
+#         return jsonify({'error': 'No se permite ejecutar archivos fuera del directorio del proyecto'}), 403
+#     
+#     # Verificar que el archivo tiene permisos de ejecución
+#     if not os.access(script_path, os.X_OK):
+#         try:
+#             os.chmod(script_path, 0o755)
+#         except Exception as e:
+#             return jsonify({'error': f'No se pudieron establecer permisos de ejecución: {str(e)}'}), 500
+#     
+#     # Ejecutar el script y capturar la salida
+#     try:
+#         import subprocess
+#         process = subprocess.Popen(
+#             f"cd {os.path.dirname(script_path)} && {script_path}",
+#             shell=True,
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             text=True
+#         )
+#         stdout, stderr = process.communicate(timeout=30)  # Timeout de 30 segundos
+#         
+#         result = {
+#             'script': os.path.basename(script_path),
+#             'exit_code': process.returncode,
+#             'output': stdout,
+#             'error': stderr,
+#             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         }
+#         
+#         return jsonify(result)
+#     except subprocess.TimeoutExpired:
+#         return jsonify({
+#             'script': os.path.basename(script_path),
+#             'error': 'El script tardó demasiado tiempo en ejecutarse (más de 30 segundos)',
+#             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         }), 408
+#     except Exception as e:
+#         return jsonify({
+#             'script': os.path.basename(script_path),
+#             'error': f'Error al ejecutar el script: {str(e)}',
+#             'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#         }), 500
 
 # ==============================================
 # 🔥 AJUSTE FINAL: LANZAMIENTO DE LA APP

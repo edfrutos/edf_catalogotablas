@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # run.py
 
 from app import create_app
