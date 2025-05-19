@@ -30,13 +30,30 @@ backups/*/.env*
 # IGNORAR ARCHIVOS Y CARPETAS TEMPORALES
 # -------------------------------------------
 *.sqlite3
-# *.log
+*.log
 *.zip
 *.tar.gz
-*.bak
+*.bak*
+*.bak.*
 *.tmp
 .DS_Store
 Thumbs.db
+temp_files_to_remove/
+flask_session/
+logs/*
+flask.log
+
+# -------------------------------------------
+# IGNORAR ARCHIVOS DE RESPALDO Y TEMPORALES ESPECÍFICOS
+# -------------------------------------------
+**/scripts_routes.py.bak.*
+app.py.bak.*
+.env.bak.*
+wsgi.py.bak.*
+=*
+*.pid
+journal*.txt
+
 
 # -------------------------------------------
 # IGNORAR ARCHIVOS Y CARPETAS DE DEPLOYMENT
