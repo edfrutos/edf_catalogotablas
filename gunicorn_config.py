@@ -2,25 +2,32 @@
 import multiprocessing
 import os
 
-# Obtener el número de núcleos de CPU disponibles
+# Obtener el número de núcleos de CPU disponibles pero limitar el número de workers
 try:
-    workers = multiprocessing.cpu_count() * 2 + 1
+    cpu_count = multiprocessing.cpu_count()
+    # Usar workers = número de CPUs + 1 para reducir el consumo de recursos
+    # La fórmula anterior (2*CPUs+1) es muy intensiva en recursos
+    workers = cpu_count + 1
 except:
-    workers = 3  # Valor por defecto si no se puede determinar
+    workers = 2  # Valor por defecto más conservador
 
 # Server socket
 bind = '127.0.0.1:8002'
-backlog = 4096  # Número de conexiones en cola
+backlog = 2048  # Reducido para menor consumo de memoria en conexiones pendientes
 
-# Worker processes
+# Worker processes - Configuración optimizada para menor consumo de recursos
 workers = workers
-worker_class = 'sync'  # Considerar 'gthread' o 'gevent' para aplicaciones con E/S
-worker_connections = 1000  # Solo aplica para worker_class='gevent'
-threads = 4  # Solo para worker_class='gthread'
-timeout = 300  # 5 minutos para operaciones largas
+worker_class = 'gthread'  # gthread ofrece mejor rendimiento con menos recursos que sync
+worker_connections = 500  # Reducido para menor consumo de memoria
+threads = 2  # Reducido para menor carga de CPU
+timeout = 180  # 3 minutos para operaciones, balance entre rendimiento y recursos
 keepalive = 2
-max_requests = 1000  # Reiniciar workers después de N peticiones para prevenir fugas de memoria
-max_requests_jitter = 50  # Variabilidad en el reinicio para evitar que todos los workers se reinicien a la vez
+max_requests = 1500  # Incrementado para reducir la frecuencia de reinicio de workers
+max_requests_jitter = 100  # Mayor variabilidad para distribuir mejor los reinicios
+# Agregar configuración para limitar uso de memoria
+worker_tmp_dir = '/dev/shm'  # Usar RAM para archivos temporales mejora rendimiento
+# Limitar la memoria a usar por worker (soft limit en MB)
+worker_max_memory_per_child = 150  # Reinicia workers que superen este límite
 
 # Server mechanics
 daemon = False
@@ -42,16 +49,22 @@ if not os.path.exists(log_dir):
 
 errorlog = os.path.join(log_dir, 'gunicorn_error.log')
 accesslog = os.path.join(log_dir, 'gunicorn_access.log')
-loglevel = 'info'  # Reducir a 'info' en producción para menos ruido
+loglevel = 'warning'  # Reducido a 'warning' para disminuir I/O de disco y tamaño de logs
 access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s" "%({X-Forwarded-For}i)s" %(L)ss'
 
 # Process naming
 proc_name = 'edefrutos2025_gunicorn'
 
-# Server hooks
+# Server hooks optimizados
 def on_starting(server):
     """Ejecutar cuando el maestro arranca"""
     server.log.info("Iniciando servidor Gunicorn para edefrutos2025")
+    # Establecer límites de sistema para el proceso
+    import resource
+    # Limitar el número de archivos abiertos (evita fugas de recursos)
+    resource.setrlimit(resource.RLIMIT_NOFILE, (4096, 4096))
+    # Limitar el uso de memoria virtual (en bytes, 350MB)
+    resource.setrlimit(resource.RLIMIT_AS, (350 * 1024 * 1024, 400 * 1024 * 1024))
 
 
 def when_ready(server):
@@ -76,12 +89,16 @@ def worker_abort(worker):
 
 def pre_request(worker, req):
     """Antes de procesar una petición"""
-    worker.log.debug(f"Petición: {req.method} {req.path}")
+    # Solo registrar en modo debug para reducir I/O
+    if os.environ.get('FLASK_ENV') == 'development':
+        worker.log.debug(f"Petición: {req.method} {req.path}")
 
 
 def post_request(worker, req, environ, resp):
     """Después de procesar una petición"""
-    worker.log.debug(f"Respuesta: {req.method} {req.path} -> {resp.status}")
+    # Solo registrar en modo debug para reducir I/O
+    if os.environ.get('FLASK_ENV') == 'development':
+        worker.log.debug(f"Respuesta: {req.method} {req.path} -> {resp.status}")
 
 
 def child_exit(server, worker):

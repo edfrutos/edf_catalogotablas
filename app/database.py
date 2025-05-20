@@ -69,9 +69,15 @@ def initialize_db(app=None):
     try:
         logging.info(f"Iniciando conexión a MongoDB: {mongo_uri[:20]}...")
         
-        # Configurar un timeout más corto para la conexión inicial
+        # Configuración optimizada para menor consumo de recursos
         config = MONGO_CONFIG.copy()
-        config['serverSelectionTimeoutMS'] = 10000  # 10 segundos
+        config['serverSelectionTimeoutMS'] = 5000  # 5 segundos
+        config['maxPoolSize'] = 10  # Limitar el número máximo de conexiones
+        config['minPoolSize'] = 1   # Mantener al menos una conexión activa
+        config['maxIdleTimeMS'] = 30000  # Cerrar conexiones inactivas después de 30 segundos
+        config['connectTimeoutMS'] = 5000  # Timeout de conexión reducido
+        config['socketTimeoutMS'] = 30000  # Timeout de socket reducido
+        config['waitQueueTimeoutMS'] = 5000  # Espera máxima para obtener una conexión
         
         # Intentar establecer la conexión
         _mongo_client = MongoClient(mongo_uri, **config)
@@ -91,9 +97,16 @@ def initialize_db(app=None):
         # Sincronizar datos para el fallback
         try:
             logging.info("Sincronizando datos para el modo fallback...")
-            sync_users_to_fallback(_mongo_db[COLLECTION_USERS])
-            sync_catalogs_to_fallback(_mongo_db[COLLECTION_CATALOGOS])
-            logging.info("Sincronización de datos completada correctamente")
+            try:
+                sync_users_to_fallback(_mongo_db[COLLECTION_USERS].find({}, limit=100))
+                logging.info("Sincronización de usuarios completada (limitada a 100 documentos)")
+            except Exception as e:
+                logging.error(f"Error al sincronizar usuarios para fallback: {str(e)}")
+            try:
+                sync_catalogs_to_fallback(_mongo_db[COLLECTION_CATALOGOS].find({}, limit=100))
+                logging.info("Sincronización de catálogos completada (limitada a 100 documentos)")
+            except Exception as e:
+                logging.error(f"Error al sincronizar catálogos para fallback: {str(e)}")
         except Exception as e:
             logging.error(f"Error al sincronizar datos para fallback: {str(e)}")
         
@@ -144,58 +157,109 @@ def get_collection(collection_name, fallback_data=None):
 
 # Funciones de utilidad para operaciones comunes
 
-@cached(ttl=600, key_prefix='user')
+@cached(ttl=3600, key_prefix='user')  # Aumentar TTL a 1 hora para reducir consultas
 def get_user_by_email(email):
     """Obtiene un usuario por su email con caché y fallback"""
+    # Verificar primero en la caché
+    cached_user = get_cache(f'user:{email}')
+    if cached_user:
+        return cached_user
+        
     # Primero intentamos obtener de MongoDB
     users = get_collection(COLLECTION_USERS)
     if users:
         try:
-            user = users.find_one({"email": email})
+            # Especificar proyección para traer solo los campos necesarios
+            projection = {
+                "password": 1, "email": 1, "role": 1, "name": 1, 
+                "active": 1, "_id": 1, "last_login": 1
+            }
+            user = users.find_one({"email": email}, projection=projection)
             if user:
+                # Guardar en caché para futuras consultas
+                set_cache(f'user:{email}', user, ttl=3600)
                 return user
         except Exception as e:
             logging.error(f"Error al buscar usuario por email: {str(e)}")
     
     # Si no se encuentra o hay error, usamos el fallback
     logging.info(f"Usando fallback para buscar usuario por email: {email}")
-    return get_fallback_user_by_email(email)
+    fallback_user = get_fallback_user_by_email(email)
+    if fallback_user:
+        set_cache(f'user:{email}', fallback_user, ttl=3600)
+    return fallback_user
 
-@cached(ttl=600, key_prefix='user')
+@cached(ttl=3600, key_prefix='user')  # Aumentar TTL a 1 hora para reducir consultas
 def get_user_by_id(user_id):
     """Obtiene un usuario por su ID con caché y fallback"""
+    # Verificar primero en la caché
+    cached_user = get_cache(f'user_id:{user_id}')
+    if cached_user:
+        return cached_user
+        
     # Primero intentamos obtener de MongoDB
     users = get_collection(COLLECTION_USERS)
     if users:
         try:
             from bson.objectid import ObjectId
-            user = users.find_one({"_id": ObjectId(user_id)})
+            # Especificar proyección para traer solo los campos necesarios
+            projection = {
+                "password": 1, "email": 1, "role": 1, "name": 1, 
+                "active": 1, "_id": 1, "last_login": 1
+            }
+            user = users.find_one({"_id": ObjectId(user_id)}, projection=projection)
             if user:
+                # Guardar en caché para futuras consultas
+                set_cache(f'user_id:{user_id}', user, ttl=3600)
                 return user
         except Exception as e:
             logging.error(f"Error al buscar usuario por ID: {str(e)}")
     
     # Si no se encuentra o hay error, usamos el fallback
     logging.info(f"Usando fallback para buscar usuario por ID: {user_id}")
-    return get_fallback_user_by_id(user_id)
+    fallback_user = get_fallback_user_by_id(user_id)
+    if fallback_user:
+        set_cache(f'user_id:{user_id}', fallback_user, ttl=3600)
+    return fallback_user
 
-@cached(ttl=300, key_prefix='catalogs')
+@cached(ttl=1800, key_prefix='catalogs')  # Aumentar TTL a 30 minutos para reducir consultas
 def get_catalogs_by_user(user_id):
     """Obtiene los catálogos de un usuario con caché y fallback"""
+    # Verificar primero en la caché
+    cache_key = f'catalogs:{user_id}'
+    cached_catalogs = get_cache(cache_key)
+    if cached_catalogs:
+        return cached_catalogs
+        
     # Primero intentamos obtener de MongoDB
     catalogs = get_collection(COLLECTION_CATALOGOS)
     if catalogs:
         try:
             from bson.objectid import ObjectId
-            user_catalogs = list(catalogs.find({"user_id": ObjectId(user_id)}))
+            # Especificar proyección para traer solo los campos necesarios
+            projection = {
+                "_id": 1, "name": 1, "description": 1, "user_id": 1, 
+                "created_at": 1, "updated_at": 1, "status": 1
+            }
+            # Agregar límite para evitar traer demasiados documentos
+            user_catalogs = list(catalogs.find(
+                {"user_id": ObjectId(user_id)}, 
+                projection=projection
+            ).limit(50))
+            
             if user_catalogs:
+                # Guardar en caché para futuras consultas
+                set_cache(cache_key, user_catalogs, ttl=1800)
                 return user_catalogs
         except Exception as e:
             logging.error(f"Error al buscar catálogos del usuario: {str(e)}")
     
     # Si no se encuentra o hay error, usamos el fallback
     logging.info(f"Usando fallback para buscar catálogos del usuario: {user_id}")
-    return get_fallback_catalogs_by_user(user_id)
+    fallback_catalogs = get_fallback_catalogs_by_user(user_id)
+    if fallback_catalogs:
+        set_cache(cache_key, fallback_catalogs, ttl=1800)
+    return fallback_catalogs
 
 # Funciones adicionales para acceder a las colecciones
 
