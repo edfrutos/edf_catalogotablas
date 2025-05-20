@@ -338,8 +338,48 @@ def tools_dashboard():
                 script_name = os.path.basename(script_path)
                 script_ext = os.path.splitext(script_name)[1]
                 
-                # Determinar el tipo de script y su descripción
-                if script_ext == '.sh':
+                # Determinar el tipo de script y su descripción personalizada basada en el nombre del script
+                script_base = os.path.splitext(script_name)[0]
+                
+                # Descripciones detalladas para scripts comunes
+                descriptions = {
+                    # Scripts de mantenimiento
+                    'supervise_gunicorn': 'Supervisa y reinicia automáticamente el servidor Gunicorn si deja de funcionar',
+                    'supervise_gunicorn_web': 'Supervisa el servidor web Gunicorn con interfaz web de monitoreo',
+                    'monitor_socket': 'Monitorea los sockets de red para detectar problemas de conexión',
+                    'update': 'Actualiza el código de la aplicación desde el repositorio',
+                    'iniciar_app_directo': 'Inicia la aplicación en modo directo sin Gunicorn',
+                    'start_gunicorn': 'Inicia el servidor Gunicorn con la configuración óptima',
+                    'setup_monitoring_cron': 'Configura tareas programadas para monitoreo del sistema',
+                    'iniciar_produccion': 'Inicia la aplicación en modo producción con todas las optimizaciones',
+                    'restart_server': 'Reinicia todos los servicios del servidor',
+                    'daily_report': 'Genera un informe diario del estado del sistema',
+                    
+                    # Scripts de DB utils
+                    'fix_mongodb_connection': 'Repara la conexión a MongoDB en caso de problemas',
+                    'fix_mongodb_atlas': 'Configura o repara la conexión a MongoDB Atlas',
+                    
+                    # Scripts de admin utils
+                    'cleanup_backups': 'Limpia archivos de respaldo antiguos conservando los más recientes',
+                    'fix_script_permissions': 'Corrige permisos de ejecución en scripts del sistema',
+                    
+                    # Scripts para sesiones
+                    'session_fix': 'Soluciona problemas con sesiones de usuario',
+                    'session_config': 'Configura opciones avanzadas de sesiones',
+                    
+                    # Scripts de imágenes
+                    'migrate_images_to_s3': 'Migra imágenes locales a almacenamiento S3',
+                    'clean_images': 'Elimina imágenes no utilizadas para liberar espacio',
+                    
+                    # Scripts de monitoreo
+                    'check_logs': 'Analiza logs del sistema en busca de errores',
+                    'monitor_mongodb': 'Monitorea el rendimiento y disponibilidad de MongoDB'
+                }
+                
+                # Obtener descripción personalizada o usar una descripción genérica
+                if script_base in descriptions:
+                    description = descriptions[script_base]
+                elif script_ext == '.sh':
                     description = f"Script de shell para {category_info['name']}"
                 else:  # .py
                     description = f"Script de Python para {category_info['name']}"

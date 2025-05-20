@@ -22,7 +22,17 @@ def print_header(message):
 def backup_file(file_path):
     """Crea una copia de seguridad del archivo"""
     if os.path.exists(file_path):
-        backup_path = f"{file_path}.bak.{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}"
+        # Crear directorio de backup si no existe
+        backup_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), 'backups', 'automated')
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # Crear nombre de archivo de backup con timestamp
+        filename = os.path.basename(file_path)
+        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        backup_filename = f"{filename}.bak.{timestamp}"
+        backup_path = os.path.join(backup_dir, backup_filename)
+        
+        # Copiar el archivo original al backup
         shutil.copy2(file_path, backup_path)
         print(f"Copia de seguridad creada: {backup_path}")
         return True

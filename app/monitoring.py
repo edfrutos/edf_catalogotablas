@@ -241,7 +241,7 @@ def get_health_status():
     
     return health_report
 
-def cleanup_old_temp_files(days=3):  # Reducido a 3 días para limpiar archivos temporales más frecuentemente
+def cleanup_old_temp_files(days=2):  # Reducido a 2 días para limpiar archivos temporales más frecuentemente
     """Limpia archivos temporales antiguos"""
     try:
         now = time.time()

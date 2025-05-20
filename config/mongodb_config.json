@@ -1,0 +1,11 @@
+{
+  "server_ip": "208.76.221.20",
+  "mongodb_info": {
+    "username": "edfrutos",
+    "password": "rYjwUC6pUNrLtbaI",
+    "hostname": "cluster0-shard-00-02.pmokh.mongodb.net",
+    "database": "app_catalogojoyero",
+    "project_name": "cluster0"
+  },
+  "last_updated": "2025-05-18T11:17:36.137836"
+}

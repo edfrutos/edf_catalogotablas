@@ -199,7 +199,7 @@
                         <div class="col-md-4">
                             <div class="card bg-light mb-3">
                                 <div class="card-body text-center">
-                                    <button class="btn btn-warning" id="cleanupTempBtn">Limpiar archivos >7 días</button>
+                                    <button class="btn btn-warning" id="cleanupTempBtn">Limpiar archivos >2 días</button>
                                 </div>
                             </div>
                         </div>
@@ -424,7 +424,7 @@
         const cleanupBtn = document.getElementById('cleanupTempBtn');
         if (cleanupBtn) {
             cleanupBtn.addEventListener('click', function() {
-                if (confirm('¿Seguro que deseas eliminar los archivos temporales con más de 7 días de antigüedad?')) {
+                if (confirm('¿Seguro que deseas eliminar los archivos temporales con más de 2 días de antigüedad?')) {
                     fetch('/admin/api/cleanup-temp', {
                         method: 'POST',
                         headers: {

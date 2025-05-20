@@ -61,13 +61,11 @@
                                                 <div class="d-flex flex-wrap gap-2">
                                                     {% for img in row.images %}
                                                         {% if img.startswith('http') %}
-                                                            <a href="{{ img }}" target="_blank">
-                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
-                                                            </a>
+                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" class="catalog-img img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; cursor: pointer;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
+
                                                         {% else %}
-                                                            <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
-                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
-                                                            </a>
+                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" class="catalog-img img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; cursor: pointer;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
+
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
@@ -75,13 +73,11 @@
                                                 <div class="d-flex flex-wrap gap-2">
                                                     {% for img in row.imagenes %}
                                                         {% if img.startswith('http') %}
-                                                            <a href="{{ img }}" target="_blank">
-                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
-                                                            </a>
+                                                                <img src="{{ img }}" alt="Imagen {{ loop.index }}" class="catalog-img img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; cursor: pointer;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
+
                                                         {% else %}
-                                                            <a href="{{ url_for('static', filename='uploads/' ~ img) }}" target="_blank">
-                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}';">
-                                                            </a>
+                                                                <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="Imagen {{ loop.index }}" class="catalog-img img-thumbnail" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px; border: 1px solid #ccc; cursor: pointer;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'">
+
                                                         {% endif %}
                                                     {% endfor %}
                                                 </div>
@@ -121,6 +117,21 @@
     </div>
 </div>
 
+<!-- Modal para previsualización de imágenes -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="imageModalLabel">Vista Previa de Imagen</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-0">
+        <img src="" id="modalImage" class="img-fluid w-100" alt="imagen">
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal de confirmación para eliminar fila -->
 <div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -155,5 +166,26 @@ function eliminarFila(rowIndex) {
     console.log("URL de eliminación:", form.action);
     modal.show();
 }
+
+// Configurar el modal para imágenes
+document.addEventListener("DOMContentLoaded", function() {
+    console.log("DOM cargado, configurando visor de imágenes");
+    
+    // Obtener referencias
+    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
+    const modalImage = document.getElementById('modalImage');
+    
+    // Event listener para imágenes
+    document.querySelectorAll('.catalog-img').forEach(img => {
+        img.addEventListener('click', function() {
+            console.log("Imagen clickeada");
+            const src = this.getAttribute('src');
+            if (modalImage) {
+                modalImage.src = src;
+                modal.show();
+            }
+        });
+    });
+});
 </script>
 {% endblock %}

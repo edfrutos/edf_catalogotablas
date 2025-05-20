@@ -6,6 +6,7 @@ from functools import wraps
 import os
 import uuid
 import datetime
+import pandas as pd
 from werkzeug.utils import secure_filename
 from app.extensions import mongo
 from app.utils.mongo_utils import is_mongo_available, is_valid_object_id
@@ -578,12 +579,34 @@ def edit_row(catalog_id, row_index, catalog):
             if nuevas_imagenes:
                 row_data['imagenes'].extend(nuevas_imagenes)
                 current_app.logger.info(f"Imágenes actualizadas: {row_data['imagenes']}")
-        # Guardar la fila actualizada en la base de datos
-        mongo.db.catalogs.update_one(
-            {"_id": catalog["_id"]},
-            {"$set": {f"rows.{row_index}": row_data}}
-        )
-        flash("Fila actualizada correctamente", "success")
+        # Determinar en qué colección está el catálogo y guardar la fila actualizada
+        collection_names = ['catalogs', 'spreadsheets']
+        collection_used = None
+        success = False
+        
+        for coll_name in collection_names:
+            try:
+                # Intentar actualizar en cada colección
+                result = mongo.db[coll_name].update_one(
+                    {"_id": catalog["_id"]},
+                    {"$set": {f"rows.{row_index}": row_data}}
+                )
+                
+                if result.matched_count > 0:
+                    collection_used = coll_name
+                    success = result.modified_count > 0
+                    current_app.logger.info(f"Fila actualizada en colección: {coll_name}, matched: {result.matched_count}, modified: {result.modified_count}")
+                    break
+            except Exception as e:
+                current_app.logger.error(f"Error al actualizar en {coll_name}: {str(e)}")
+        
+        if success:
+            flash("Fila actualizada correctamente", "success")
+        else:
+            if collection_used:
+                flash(f"Se encontró el catálogo en {collection_used}, pero no se pudo actualizar la fila. Inténtelo de nuevo.", "warning")
+            else:
+                flash("No se pudo encontrar la colección correcta para actualizar el catálogo. Inténtelo de nuevo.", "warning")
         return redirect(url_for("catalogs.view", catalog_id=str(catalog["_id"])) )
     return render_template("editar_fila.html", catalog=catalog, fila=row_data, row_index=row_index, session=session, headers=catalog["headers"])
 
@@ -678,18 +701,36 @@ def delete_row(catalog_id, row_index, catalog):
         current_app.logger.info(f"Eliminando fila {row_index} del catálogo {catalog_id}")
         current_rows.pop(row_index)
         
-        # Actualizar el documento con las filas restantes
-        result = mongo.db.catalogs.update_one(
-            {"_id": ObjectId(catalog_id)},
-            {"$set": {"rows": current_rows}}
-        )
+        # Determinar en qué colección está el catálogo
+        collection_names = ['catalogs', 'spreadsheets']
+        collection_used = None
+        success = False
+        
+        for coll_name in collection_names:
+            try:
+                # Intentar actualizar en cada colección
+                result = mongo.db[coll_name].update_one(
+                    {"_id": ObjectId(catalog_id)},
+                    {"$set": {"rows": current_rows}}
+                )
+                
+                if result.matched_count > 0:
+                    collection_used = coll_name
+                    success = result.modified_count > 0
+                    current_app.logger.info(f"Catálogo actualizado en colección: {coll_name}, matched: {result.matched_count}, modified: {result.modified_count}")
+                    break
+            except Exception as e:
+                current_app.logger.error(f"Error al actualizar en {coll_name}: {str(e)}")
         
         current_app.logger.info(f"Resultado de la actualización: {result.modified_count} documento(s) modificado(s)")
         
-        if result.modified_count > 0:
+        if success:
             flash("Fila eliminada correctamente", "success")
         else:
-            flash("No se pudo eliminar la fila. Inténtelo de nuevo.", "warning")
+            if collection_used:
+                flash(f"Se encontró el catálogo en {collection_used}, pero no se pudo eliminar la fila. Inténtelo de nuevo.", "warning")
+            else:
+                flash("No se pudo encontrar la colección correcta para actualizar el catálogo. Inténtelo de nuevo.", "warning")
             
     except Exception as e:
         current_app.logger.error(f"Error al eliminar fila: {str(e)}", exc_info=True)

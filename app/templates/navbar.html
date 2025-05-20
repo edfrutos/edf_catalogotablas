@@ -13,12 +13,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if '/tables' in request.path %}active{% endif %}" href="{{ url_for('main.tables') }}">
-                        <i class="fas fa-table"></i> Tablas
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link {% if '/catalogs' in request.path %}active{% endif %}" href="{{ url_for('catalogs.list') }}">
+                    <a class="nav-link {% if '/catalogs' in request.path or '/tables' in request.path %}active{% endif %}" href="{{ url_for('catalogs.list') }}">
                         <i class="fas fa-book"></i> Catálogos
                     </a>
                 </li>
@@ -29,7 +24,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if '/tools' in request.path %}active{% endif %}" href="/tools">
+                    <a class="nav-link {% if '/admin/tools' in request.path %}active{% endif %}" href="{{ url_for('scripts.tools_dashboard') }}">
                         <i class="fas fa-tools"></i> Scripts
                     </a>
                 </li>

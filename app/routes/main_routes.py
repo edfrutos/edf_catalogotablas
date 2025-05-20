@@ -576,7 +576,17 @@ def editar_fila(tabla_id, fila_index):
         update_data = {}
         for header in headers:
             if header != 'Número' and header != 'Imagenes':
-                update_data[f"data.{fila_index}.{header}"] = request.form.get(header, '').strip()
+                # Usamos notación de diccionario para manejar campos con espacios
+                # En lugar de usar dot notation directamente en la clave
+                campo_valor = request.form.get(header, '').strip()
+                data_key = f"data.{fila_index}"
+                
+                # Si el campo no existe en update_data, creamos un diccionario vacío
+                if data_key not in update_data:
+                    update_data[data_key] = {}
+                    
+                # Ahora agregamos el campo al diccionario
+                update_data[data_key][header] = campo_valor
         
         # Procesar imágenes a eliminar
         imagenes_a_eliminar = request.form.get('imagenes_a_eliminar', '')
@@ -740,10 +750,26 @@ def editar_fila(tabla_id, fila_index):
                         update_data[f"data.{fila_index}.imagen_data"] = nuevas_imagenes
                     logger.info(f"Actualizando campo imagen_data con las mismas imágenes")
         
+        # Preparar la actualización para MongoDB
+        mongo_update = {}
+        
+        # Manejar los campos principales
+        for key, value in update_data.items():
+            if isinstance(value, dict):
+                # Si es un diccionario, lo manejamos con $set en campos individuales
+                for subkey, subvalue in value.items():
+                    # Escapar los nombres de campos que tienen caracteres especiales
+                    mongo_update[f"{key}.{subkey}"] = subvalue
+            else:
+                # Si no es un diccionario, lo manejamos directamente
+                mongo_update[key] = value
+        
+        current_app.logger.info(f"Actualizando documento con datos: {mongo_update}")
+        
         # Actualizar la fila en la base de datos
         current_app.spreadsheets_collection.update_one(
             {'_id': ObjectId(tabla_id)},
-            {'$set': update_data}
+            {'$set': mongo_update}
         )
         
         flash('Fila actualizada correctamente.', 'success')
@@ -864,74 +890,37 @@ def agregar_fila(tabla_id):
         return redirect(url_for("main.dashboard_user"))
 
 @main_bp.route("/tables", methods=["GET", "POST"])
-# # @login_required
 def tables():
-    # Verificar si el usuario ha iniciado sesión
-    if "username" not in session:
-        flash("Debe iniciar sesión para acceder a las tablas", "warning")
-        return redirect(url_for("auth.login"))
-        
-    # Obtener el nombre de usuario de la sesión actual
-    owner = session.get("username")
-    logger.info(f"Usuario actual: {owner}")
+    """Redirige las solicitudes de la antigua ruta /tables a la nueva ruta /catalogs.
+    Esta función mantiene la compatibilidad con enlaces antiguos.
+    """
+    current_app.logger.info("Redirigiendo desde /tables a /catalogs")
+    flash("La funcionalidad de Tablas ha sido integrada en Catálogos", "info")
     
-    if not owner:
-        flash("Error de sesión. Por favor, inicie sesión nuevamente.", "warning")
-        return redirect(url_for("auth.login"))
+    # Redirigir a la lista de catálogos
+    return redirect(url_for("catalogs.list"))
+
+@main_bp.route("/ver_tabla/<table_id>", methods=["GET"])
+def ver_tabla_redirect(table_id):
+    """Redirige las solicitudes de la antigua ruta /ver_tabla a la nueva ruta /catalogs/view.
+    Esta función mantiene la compatibilidad con enlaces antiguos.
+    """
+    current_app.logger.info(f"Redirigiendo desde /ver_tabla/{table_id} a /catalogs/view/{table_id}")
+    flash("La vista de Tablas ha sido integrada en Catálogos", "info")
     
-    # Verificar que la colección de spreadsheets esté disponible
-    if not hasattr(current_app, 'spreadsheets_collection'):
-        logger.error("Error: No se encontró la colección spreadsheets_collection en current_app")
-        flash("Error de conexión a la base de datos. Por favor, contacte al administrador.", "danger")
-        return render_template("error.html", error="Error de conexión a la base de datos")
+    # Redirigir a la vista de catálogo
+    return redirect(url_for("catalogs.view", catalog_id=table_id))
+
+@main_bp.route("/editar_fila/<tabla_id>/<int:fila_index>", methods=["GET", "POST"])
+def editar_fila_redirect(tabla_id, fila_index):
+    """Redirige las solicitudes de la antigua ruta /editar_fila a la nueva ruta /catalogs/edit_row.
+    Esta función mantiene la compatibilidad con enlaces antiguos.
+    """
+    current_app.logger.info(f"Redirigiendo desde /editar_fila/{tabla_id}/{fila_index} a /catalogs/edit_row/{tabla_id}/{fila_index}")
+    flash("La edición de filas ahora se realiza en Catálogos", "info")
     
-    # Método GET: Mostrar tablas existentes
-    if request.method == "GET":
-        try:
-            # Los administradores ven todas las tablas, los usuarios normales solo las suyas
-            role = session.get("role", "user")
-            if role == "admin":
-                todas_las_tablas = list(current_app.spreadsheets_collection.find())
-                logger.info(f"[ADMIN] Mostrando todas las tablas para el administrador {owner}")
-            else:
-                # Buscar tablas donde el usuario actual es el propietario (varios campos posibles)
-                query = {
-                    "$or": [
-                        {"owner": owner},
-                        {"created_by": owner},
-                        {"username": owner}
-                    ]
-                }
-                todas_las_tablas = list(current_app.spreadsheets_collection.find(query))
-                logger.info(f"[USER] Mostrando solo las tablas del usuario {owner}. Encontradas: {len(todas_las_tablas)}")
-            
-            # Añadir información adicional a cada tabla para facilitar su visualización
-            for tabla in todas_las_tablas:
-                # Asegurarse de que tiene un campo owner definido
-                if 'owner' not in tabla or not tabla['owner'] or tabla['owner'] == 'usuario_predeterminado':
-                    if 'created_by' in tabla and tabla['created_by']:
-                        tabla['owner'] = tabla['created_by']
-                    elif 'username' in tabla and tabla['username']:
-                        tabla['owner'] = tabla['username']
-                    else:
-                        tabla['owner'] = owner
-                
-                # Contar filas si existe el campo data
-                if 'data' in tabla and isinstance(tabla['data'], list):
-                    tabla['row_count'] = len(tabla['data'])
-                else:
-                    tabla['row_count'] = 0
-            
-            current_app.logger.info(f"[VISIONADO] Tablas encontradas para {owner}: {len(todas_las_tablas)}")
-            
-            # Filtrar para mostrar solo las tablas que realmente pertenecen al usuario
-            if role != "admin":
-                todas_las_tablas = [t for t in todas_las_tablas if t.get('owner') == owner]
-            return render_template("tables.html", tables=todas_las_tablas)
-        except Exception as e:
-            logger.error(f"Error al listar tablas: {str(e)}", exc_info=True)
-            flash("Error al obtener las tablas. Por favor, inténtelo de nuevo.", "danger")
-            return render_template("error.html", error="Error al obtener las tablas")
+    # Redirigir a la edición de fila en catálogos
+    return redirect(url_for("catalogs.edit_row", catalog_id=tabla_id, row_index=fila_index))
     
     # Método POST: Crear nueva tabla
     try:

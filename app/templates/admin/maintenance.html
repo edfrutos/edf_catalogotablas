@@ -58,7 +58,7 @@
                         <button id="cleanupTempBtn" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             <div>
                                 <i class="bi bi-trash"></i> Eliminar archivos temporales
-                                <small class="d-block text-muted">Limpiar archivos con más de 7 días de antigüedad</small>
+                                <small class="d-block text-muted">Limpiar archivos con más de 2 días de antigüedad</small>
                             </div>
                             <span class="badge bg-danger rounded-pill">Ejecutar</span>
                         </button>
@@ -125,7 +125,7 @@
         const cleanupBtn = document.getElementById('cleanupTempBtn');
         if (cleanupBtn) {
             cleanupBtn.addEventListener('click', function() {
-                if (confirm('¿Seguro que deseas eliminar los archivos temporales con más de 7 días de antigüedad?')) {
+                if (confirm('¿Seguro que deseas eliminar los archivos temporales con más de 2 días de antigüedad?')) {
                     fetch('/admin/api/cleanup-temp', {
                         method: 'POST',
                         headers: {
