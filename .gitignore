@@ -43,6 +43,16 @@ flask_session/
 logs/*
 flask.log
 
+# IGNORAR ARCHIVOS DE MÉTRICAS Y MONITOREO
+# -------------------------------------------
+app_data/edefrutos2025_metrics.json
+app_data/*.json
+*_metrics.json
+*_stats.json
+logs/gunicorn_access.log
+logs/flask_debug.log
+logs/gunicorn_error.log
+
 # -------------------------------------------
 # IGNORAR ARCHIVOS DE RESPALDO Y TEMPORALES ESPECÍFICOS
 # -------------------------------------------
