@@ -2,7 +2,7 @@
 // console.log("🔧 Dashboard.js cargado - VERSIÓN COMPLETA - Timestamp:", new Date().toISOString());
 
 $(function () {
-  // console.log("🔧 Inicializando dashboard completo...");
+  console.log("🔧 Inicializando dashboard completo...");
 
   // Variables globales para Google Drive
   let allBackups = [];
@@ -19,63 +19,90 @@ $(function () {
 
     alerts.each(function () {
       const message = $(this).text().trim();
+      const alertId = $(this).attr('id');
+      
+      // Solo eliminar si es exactamente el mismo mensaje Y no es una alerta reciente (últimos 2 segundos)
       if (seenMessages.has(message)) {
-        console.log(`🗑️ Eliminando alerta duplicada: ${message}`);
-        $(this).remove();
+        const isRecent = alertId && alertId.includes(Date.now().toString().slice(0, -3));
+        if (!isRecent) {
+          console.log(`🗑️ Eliminando alerta duplicada: ${message}`);
+          $(this).remove();
+        }
       } else {
         seenMessages.add(message);
       }
     });
   }
 
-  // Función ultra-simple para mostrar alertas
+  // Función mejorada para mostrar alertas
   function showAlert(message, type = "success") {
     console.log(`📢 showAlert: ${message}`);
 
-    // Crear la alerta
+    // Crear la alerta con mejor formato
     const alertId = `alert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const iconClass = {
+      success: "bi-check-circle-fill",
+      warning: "bi-exclamation-triangle-fill", 
+      danger: "bi-x-circle-fill",
+      info: "bi-info-circle-fill"
+    }[type] || "bi-info-circle-fill";
+    
     const alert = `
-      <div id="${alertId}" class="alert alert-${type} fade show" role="alert">
-        ${message}
-        <button type="button" class="btn-close" onclick="$(this).closest('.alert').remove()" aria-label="Cerrar"></button>
+      <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-center">
+          <i class="${iconClass} me-2" style="font-size: 1.1em;"></i>
+          <span>${message}</span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
       </div>
     `;
 
+    // Insertar al principio del contenedor principal
     $(".container").prepend(alert);
 
     // Eliminar duplicados inmediatamente
     removeDuplicateAlerts();
 
-    // Auto-eliminar después de 5 segundos
+    // Auto-eliminar después de 6 segundos
     setTimeout(function () {
       $(`#${alertId}`).fadeOut(500, function () {
         $(this).remove();
       });
-    }, 5000);
+    }, 6000);
   }
 
-  // Función para mostrar alertas en el modal de backups locales
+  // Función mejorada para mostrar alertas en modales
   function showModalAlert(message, type = "success") {
     console.log(`📢 showModalAlert: ${message}`);
 
-    // Crear la alerta
+    // Crear la alerta con mejor formato
     const alertId = `modalAlert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const iconClass = {
+      success: "bi-check-circle-fill",
+      warning: "bi-exclamation-triangle-fill", 
+      danger: "bi-x-circle-fill",
+      info: "bi-info-circle-fill"
+    }[type] || "bi-info-circle-fill";
+    
     const alert = `
-      <div id="${alertId}" class="alert alert-${type} fade show" role="alert">
-        ${message}
-        <button type="button" class="btn-close" onclick="$(this).closest('.alert').remove()" aria-label="Cerrar"></button>
+      <div id="${alertId}" class="alert alert-${type} alert-dismissible fade show" role="alert">
+        <div class="d-flex align-items-center">
+          <i class="${iconClass} me-2" style="font-size: 1.1em;"></i>
+          <span>${message}</span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
       </div>
     `;
 
     // Añadir alerta al modal de backups locales
     $("#localBackupsModal .modal-body").prepend(alert);
 
-    // Auto-eliminar después de 5 segundos
+    // Auto-eliminar después de 6 segundos
     setTimeout(function () {
       $(`#${alertId}`).fadeOut(500, function () {
         $(this).remove();
       });
-    }, 5000);
+    }, 6000);
   }
 
   // Función para mostrar ventanas emergentes de confirmación
@@ -241,128 +268,13 @@ $(function () {
   // ============================================
   // EVENTOS DE BACKUP
   // ============================================
+  // EVENTOS DE BACKUP (SIMPLIFICADO - SOLO ABRE MODAL)
+  // ============================================
   function initializeBackupEvents() {
     console.log("✅ Inicializando eventos de backup...");
-
-    $("#backupBtn")
-      .off("click")
-      .on("click", function () {
-        console.log("✅ Click detectado en botón backup");
-        const btn = $(this);
-        const originalText = btn.html();
-
-        btn
-          .prop("disabled", true)
-          .html(
-            "<span class=\"spinner-border spinner-border-sm\" role=\"status\" aria-hidden=\"true\"></span> Generando backup..."
-          );
-
-        $("#backupResult").html(`
-          <div class="alert alert-info">
-            <i class="bi bi-info-circle"></i> Creando backup de la base de datos...
-          </div>
-        `);
-
-        $.ajax({
-          url: "/admin/maintenance/backup",
-          method: "POST",
-          xhrFields: { withCredentials: true },
-          timeout: 60000,
-          success: function (response) {
-            if (response.status === "success" && response.uploaded_to_drive) {
-              const successMsg = `
-      <div class="alert alert-success">
-        <i class="bi bi-check-circle"></i>
-        <strong>Backup subido a Google Drive exitosamente</strong><br>
-        <small>
-          • Archivo: ${response.filename}<br>
-          • Tamaño: ${(response.size / 1024).toFixed(2)} KB<br>
-          • Documentos: ${response.total_documents}<br>
-          • Colecciones: ${response.total_collections}<br>
-          • Carpeta: ${response.drive_info.folder_name}<br>
-          <a href="${response.drive_info.web_view_url}" target="_blank" class="btn btn-sm btn-outline-primary mt-2">
-            <i class="bi bi-google"></i> Ver en Google Drive
-          </a>
-        </small>
-      </div>
-    `;
-              $("#backupResult").html(successMsg);
-              showAlert("Backup subido a Google Drive correctamente", "success");
-
-              // Actualizar lista de backups de Google Drive si está visible
-              if (typeof window.loadDriveBackups === "function") {
-                setTimeout(() => window.loadDriveBackups(), 2000);
-              }
-
-              // Auto-cerrar el resultado después de 10 segundos
-              setTimeout(() => {
-                $("#backupResult").fadeOut(500, function () {
-                  $(this).empty();
-                });
-              }, 10000);
-
-            } else if (response.status === "warning" && !response.uploaded_to_drive) {
-              const warningMsg = `
-      <div class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle"></i>
-        <strong>Backup creado con advertencias</strong><br>
-        <small>
-          ${response.message}<br>
-          <a href="${response.download_url}" class="btn btn-sm btn-outline-primary mt-2">
-            <i class="bi bi-download"></i> Descargar Backup Local
-          </a>
-        </small>
-      </div>
-    `;
-              $("#backupResult").html(warningMsg);
-              showAlert("Backup creado pero no subido a Google Drive", "warning");
-
-              // Auto-cerrar el resultado después de 10 segundos
-              setTimeout(() => {
-                $("#backupResult").fadeOut(500, function () {
-                  $(this).empty();
-                });
-              }, 10000);
-
-            } else {
-              $("#backupResult").html(`
-      <div class="alert alert-warning">
-        <i class="bi bi-exclamation-triangle"></i>
-        Backup completado con advertencias
-      </div>
-    `);
-
-              // Auto-cerrar el resultado después de 10 segundos
-              setTimeout(() => {
-                $("#backupResult").fadeOut(500, function () {
-                  $(this).empty();
-                });
-              }, 10000);
-            }
-          },
-          error: function (xhr) {
-            const errorMsg = xhr.responseJSON ? xhr.responseJSON.message : xhr.statusText;
-            $("#backupResult").html(`
-              <div class="alert alert-danger">
-                <i class="bi bi-exclamation-triangle"></i>
-                <strong>Error al crear backup</strong><br>
-                <small>${errorMsg}</small>
-              </div>
-            `);
-            showAlert("Error al generar backup: " + errorMsg, "danger");
-
-            // Auto-cerrar el resultado después de 10 segundos
-            setTimeout(() => {
-              $("#backupResult").fadeOut(500, function () {
-                $(this).empty();
-              });
-            }, 10000);
-          },
-          complete: function () {
-            btn.prop("disabled", false).html(originalText);
-          }
-        });
-      });
+    
+    // El botón #backupBtn ahora solo abre el modal de opciones
+    // La funcionalidad real está en createLocalBackup() y createDriveBackup()
   }
 
   // ============================================
@@ -455,33 +367,44 @@ $(function () {
       return false;
     });
 
+    console.log("🔧 Inicializando evento de descarga de Google Drive...");
     $(document).off("click", ".download-drive-backup").on("click", ".download-drive-backup", function (e) {
       e.preventDefault();
       e.stopPropagation();
 
+      const fileId = $(this).data("id");
       const filename = $(this).data("filename");
-      const downloadUrl = $(this).data("download-url");
       const btn = $(this);
       const originalText = btn.html();
 
+      console.log("🔍 Descarga iniciada:", { fileId, filename });
+
       if (btn.prop("disabled")) {
+        console.log("❌ Botón deshabilitado");
         return false;
       }
 
       btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Descargando...");
 
+      // Usar la ruta del backend para descarga segura
+      const downloadUrl = `/admin/maintenance/drive/download/${fileId}?filename=${encodeURIComponent(filename)}`;
+      console.log("📋 URL de descarga:", downloadUrl);
+      
       // Crear enlace temporal para descarga
       const link = document.createElement("a");
       link.href = downloadUrl;
       link.download = filename;
       link.target = "_blank";
       document.body.appendChild(link);
+      
+      console.log("🖱️ Haciendo clic en enlace de descarga...");
       link.click();
       document.body.removeChild(link);
 
       setTimeout(() => {
         btn.prop("disabled", false).html(originalText);
         showAlert(`Descarga iniciada: ${filename}`, "success");
+        console.log("✅ Descarga completada");
       }, 1000);
 
       return false;
@@ -912,8 +835,7 @@ $(function () {
           </div>
         `;
       } else {
-        // Generar URL de descarga directa de Google Drive
-        const downloadUrl = `https://drive.google.com/uc?export=download&id=${backup._id}`;
+        // Generar URL de vista de Google Drive
         const viewUrl = `https://drive.google.com/file/d/${backup._id}/view`;
 
         actionButtons = `
@@ -921,7 +843,6 @@ $(function () {
             <button class="btn btn-sm btn-primary download-drive-backup"
                     data-id="${backup._id}"
                     data-filename="${backup.filename}"
-                    data-download-url="${downloadUrl}"
                     title="Descargar backup">
               <i class="bi bi-download"></i> Descargar
             </button>
@@ -976,6 +897,17 @@ $(function () {
         $('#driveBackupsTable').DataTable().destroy();
       }
 
+      // Plugin personalizado para ordenar tamaños de archivo
+      $.fn.dataTable.ext.type.order['file-size-pre'] = function (data) {
+        if (data === 'N/A') return 0;
+        const match = data.match(/^([\d.]+)\s*(KB|MB|GB|TB)$/i);
+        if (!match) return 0;
+        const size = parseFloat(match[1]);
+        const unit = match[2].toUpperCase();
+        const multipliers = { 'KB': 1, 'MB': 1024, 'GB': 1024*1024, 'TB': 1024*1024*1024 };
+        return size * (multipliers[unit] || 1);
+      };
+
       $('#driveBackupsTable').DataTable({
         "order": [[3, "desc"]], // Ordenar por fecha descendente por defecto
         "pageLength": 25,
@@ -984,8 +916,17 @@ $(function () {
         },
         "columnDefs": [
           { "orderable": false, "targets": [0, 5] }, // Checkbox y acciones no ordenables
-          { "type": "num", "targets": 2 } // Tamaño como número
-        ]
+          { "type": "file-size", "targets": 2 }, // Tamaño con plugin personalizado
+          { "type": "date", "targets": 3 }, // Fecha como fecha
+          { "type": "string", "targets": [1, 4] } // Archivo y Usuario como texto
+        ],
+        "orderClasses": true, // Aplicar clases CSS para indicar orden
+        "responsive": true, // Hacer tabla responsive
+        "stateSave": false, // No guardar estado
+        "searching": true, // Habilitar búsqueda
+        "info": true, // Mostrar información de paginación
+        "lengthChange": true, // Permitir cambiar número de registros por página
+        "processing": false // No mostrar indicador de procesamiento
       });
     }
   }
@@ -1099,23 +1040,11 @@ $(function () {
       });
     });
 
-    // Botón restaurar
+    // Botón restaurar - Solo abre el modal, no activa input file
     $("#restoreBtn").off("click").on("click", function (e) {
       e.preventDefault();
-      $("#restoreFileInput").click();
-    });
-
-    // Manejo de archivo de restauración
-    $("#restoreFileInput").off("change").on("change", function (e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      if (!file.name.toLowerCase().endsWith(".json") && !file.name.toLowerCase().endsWith(".gz")) {
-        showAlert("Tipo de archivo inválido. Seleccione un archivo .json o .gz", "danger");
-        return;
-      }
-
-      showAlert("Iniciando restauración desde archivo local...", "info");
+      // El modal se abre automáticamente por data-bs-toggle y data-bs-target
+      console.log("🔵 Botón restaurar backup local clickeado");
     });
 
     // Modal de backups locales
@@ -1302,8 +1231,17 @@ $(function () {
         },
         "columnDefs": [
           { "orderable": false, "targets": [0, 4] }, // Checkbox y acciones no ordenables
-          { "type": "num", "targets": 2 } // Tamaño como número
-        ]
+          { "type": "file-size", "targets": 2 }, // Tamaño con plugin personalizado
+          { "type": "date", "targets": 3 }, // Fecha como fecha
+          { "type": "string", "targets": 1 } // Archivo como texto
+        ],
+        "orderClasses": true, // Aplicar clases CSS para indicar orden
+        "responsive": true, // Hacer tabla responsive
+        "stateSave": false, // No guardar estado
+        "searching": true, // Habilitar búsqueda
+        "info": true, // Mostrar información de paginación
+        "lengthChange": true, // Permitir cambiar número de registros por página
+        "processing": false // No mostrar indicador de procesamiento
       });
     }
   }
@@ -1842,8 +1780,17 @@ $(function () {
         },
         "columnDefs": [
           { "orderable": false, "targets": [3] }, // Acciones no ordenables
-          { "type": "num", "targets": 1 } // Tamaño como número
-        ]
+          { "type": "file-size", "targets": 1 }, // Tamaño con plugin personalizado
+          { "type": "date", "targets": 2 }, // Fecha como fecha
+          { "type": "string", "targets": 0 } // Archivo como texto
+        ],
+        "orderClasses": true, // Aplicar clases CSS para indicar orden
+        "responsive": true, // Hacer tabla responsive
+        "stateSave": false, // No guardar estado
+        "searching": true, // Habilitar búsqueda
+        "info": true, // Mostrar información de paginación
+        "lengthChange": true, // Permitir cambiar número de registros por página
+        "processing": false // No mostrar indicador de procesamiento
       });
     }
   }
@@ -1938,11 +1885,35 @@ $(function () {
       success: function (response) {
         console.log("✅ Respuesta de creación de backup local:", response);
         if (response.success) {
-          showAlert(`✅ ${response.message}`, "success");
+          // Mostrar información detallada del backup local
+          const successMsg = `
+            <div class="alert alert-success">
+              <i class="bi bi-check-circle"></i>
+              <strong>Backup LOCAL creado exitosamente</strong><br>
+              <small>
+                • Archivo: ${response.filename}<br>
+                • Tamaño: ${response.size_mb} MB<br>
+                • Colecciones: ${response.collections_count}<br>
+                • Ubicación: /var/www/vhosts/edefrutos2025.xyz/httpdocs/backups/
+              </small>
+            </div>
+          `;
+          
+          // Mostrar en el área de resultados si existe
+          if ($("#backupResult").length > 0) {
+            $("#backupResult").html(successMsg);
+            setTimeout(() => {
+              $("#backupResult").fadeOut(500, function () {
+                $(this).empty();
+              });
+            }, 8000);
+          }
+          
+          showAlert(`✅ Backup LOCAL creado exitosamente: ${response.filename} (${response.size_mb} MB)`, "success");
           // Cerrar modal de opciones
           $('#backupOptionsModal').modal('hide');
         } else {
-          showAlert(`❌ Error al crear backup: ${response.error}`, "danger");
+          showAlert(`❌ Error al crear backup LOCAL: ${response.error}`, "danger");
         }
       },
       error: function (xhr) {
@@ -1972,11 +1943,36 @@ $(function () {
       success: function (response) {
         console.log("✅ Respuesta de creación de backup en Drive:", response);
         if (response.success) {
-          showAlert(`✅ ${response.message}`, "success");
+          // Mostrar información detallada del backup de Google Drive
+          const successMsg = `
+            <div class="alert alert-success">
+              <i class="bi bi-check-circle"></i>
+              <strong>Backup GOOGLE DRIVE creado exitosamente</strong><br>
+              <small>
+                • Archivo: ${response.filename}<br>
+                • Tamaño: ${response.size_mb} MB<br>
+                • Colecciones: ${response.collections_count}<br>
+                • ID de Google Drive: ${response.drive_file_id}<br>
+                • Ubicación: Google Drive
+              </small>
+            </div>
+          `;
+          
+          // Mostrar en el área de resultados si existe
+          if ($("#backupResult").length > 0) {
+            $("#backupResult").html(successMsg);
+            setTimeout(() => {
+              $("#backupResult").fadeOut(500, function () {
+                $(this).empty();
+              });
+            }, 8000);
+          }
+          
+          showAlert(`✅ Backup GOOGLE DRIVE creado exitosamente: ${response.filename} (${response.size_mb} MB)`, "success");
           // Cerrar modal de opciones
           $('#backupOptionsModal').modal('hide');
         } else {
-          showAlert(`❌ Error al crear backup: ${response.error}`, "danger");
+          showAlert(`❌ Error al crear backup GOOGLE DRIVE: ${response.error}`, "danger");
         }
       },
       error: function (xhr) {

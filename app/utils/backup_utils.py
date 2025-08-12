@@ -663,29 +663,38 @@ class GoogleDriveManager:
             # Importar funciones de Google Drive
             import sys
             import tempfile
+            import os
             sys.path.append(os.path.join(os.path.dirname(__file__), '../../tools/db_utils'))
             from app.utils.google_drive_wrapper import upload_to_drive
             
-            # Crear archivo temporal
-            with tempfile.NamedTemporaryFile(delete=False, suffix='.json.gz') as temp_file:
-                temp_file.write(content)
-                temp_file_path = temp_file.name
+            # Crear archivo temporal con nombre específico para evitar confusiones
+            temp_dir = tempfile.gettempdir()
+            temp_file_path = os.path.join(temp_dir, f"backup_temp_{filename}")
             
             try:
-                # Subir archivo a Google Drive
-                result = upload_to_drive(temp_file_path, filename, folder_name)
+                # Escribir contenido al archivo temporal
+                with open(temp_file_path, 'wb') as temp_file:
+                    temp_file.write(content)
                 
-                if result and 'file_id' in result:
+                # Subir archivo a Google Drive
+                result = upload_to_drive(temp_file_path, folder_name)
+                
+                if result and result.get('success') and 'file_id' in result:
                     file_id = result['file_id']
                     log_info(f"Archivo subido exitosamente: {file_id}")
                     return file_id
                 else:
-                    raise GoogleDriveError("No se recibió ID del archivo subido")
+                    error_msg = result.get('error', 'Error desconocido') if result else 'No se recibió respuesta'
+                    raise GoogleDriveError(f"No se pudo subir el archivo: {error_msg}")
                     
             finally:
                 # Limpiar archivo temporal
                 if os.path.exists(temp_file_path):
-                    os.unlink(temp_file_path)
+                    try:
+                        os.unlink(temp_file_path)
+                        log_info(f"Archivo temporal eliminado: {temp_file_path}")
+                    except Exception as cleanup_error:
+                        log_warning(f"No se pudo eliminar archivo temporal {temp_file_path}: {cleanup_error}")
                     
         except Exception as e:
             log_error(f"Error subiendo archivo {filename}: {str(e)}")

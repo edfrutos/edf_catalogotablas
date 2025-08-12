@@ -1,5 +1,189 @@
 {% extends "admin/base.html" %} {% block title %}Mantenimiento del Sistema{%
-endblock %} {% block content %}
+endblock %} {% block head %}
+{{ super() }}
+<style>
+  /* Estilos para DataTables */
+  .dataTables_wrapper .dataTables_sorting {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%23666" class="bi bi-arrow-down-up" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center right;
+    padding-right: 20px;
+    cursor: pointer;
+    color: #333 !important;
+  }
+  
+  .dataTables_wrapper .dataTables_sorting_asc {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%230d6efd" class="bi bi-arrow-up" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L7.5 2.707V14.5a.5.5 0 0 0 .5.5z"/></svg>');
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #0d6efd !important;
+    font-weight: bold;
+  }
+  
+  .dataTables_wrapper .dataTables_sorting_desc {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%230d6efd" class="bi bi-arrow-down" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/></svg>');
+    background-color: rgba(13, 110, 253, 0.15);
+    color: #0d6efd !important;
+    font-weight: bold;
+  }
+  
+  /* Mejorar apariencia de las tablas */
+  .table th {
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    color: #333 !important;
+    background-color: #f8f9fa;
+  }
+  
+  .table th.sorting,
+  .table th.sorting_asc,
+  .table th.sorting_desc {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .table th.sorting:hover,
+  .table th.sorting_asc:hover,
+  .table th.sorting_desc:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd !important;
+  }
+  
+  /* Estilos para paginación */
+  .dataTables_paginate .paginate_button {
+    border-radius: 0.375rem;
+    margin: 0 2px;
+  }
+  
+  .dataTables_paginate .paginate_button.current {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white !important;
+  }
+  
+  .dataTables_paginate .paginate_button:hover {
+    background: #0b5ed7;
+    border-color: #0b5ed7;
+    color: white !important;
+  }
+  
+  /* Estilos para búsqueda */
+  .dataTables_filter input {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  .dataTables_filter input:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+  
+  /* Estilos para selector de registros por página */
+  .dataTables_length select {
+    border-radius: 0.375rem;
+    border: 1px solid #ced4da;
+    padding: 0.375rem 0.75rem;
+  }
+  
+  /* Estilos mejorados para alertas */
+  .alert {
+    border: none;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+  }
+  
+  .alert-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left: 4px solid #28a745;
+  }
+  
+  .alert-warning {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    color: #856404;
+    border-left: 4px solid #ffc107;
+  }
+  
+  .alert-danger {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+  }
+  
+  .alert-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+    color: #0c5460;
+    border-left: 4px solid #17a2b8;
+  }
+  
+  .alert .btn-close {
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  
+  .alert .btn-close:hover {
+    opacity: 1;
+  }
+  
+  /* Animación de entrada para alertas */
+  .alert.fade.show {
+    animation: slideInDown 0.3s ease-out;
+  }
+  
+  @keyframes slideInDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  /* Estilos específicos para DataTables */
+  .dataTables_wrapper .dataTables_scrollHead .table th {
+    background-color: #f8f9fa !important;
+    color: #333 !important;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  /* Asegurar visibilidad del texto en cabeceras */
+  .dataTables_wrapper .dataTables_scrollHead .table th.sorting,
+  .dataTables_wrapper .dataTables_scrollHead .table th.sorting_asc,
+  .dataTables_wrapper .dataTables_scrollHead .table th.sorting_desc {
+    color: #333 !important;
+  }
+  
+  .dataTables_wrapper .dataTables_scrollHead .table th.sorting_asc,
+  .dataTables_wrapper .dataTables_scrollHead .table th.sorting_desc {
+    color: #0d6efd !important;
+    font-weight: bold;
+  }
+  
+  /* Estilos para tablas específicas */
+  #driveBackupsTable th,
+  #localBackupsTable th,
+  #restoreLocalBackupsTable th {
+    background-color: #f8f9fa !important;
+    color: #333 !important;
+    border-bottom: 2px solid #dee2e6;
+  }
+  
+  #driveBackupsTable th.sorting_asc,
+  #localBackupsTable th.sorting_asc,
+  #restoreLocalBackupsTable th.sorting_asc,
+  #driveBackupsTable th.sorting_desc,
+  #localBackupsTable th.sorting_desc,
+  #restoreLocalBackupsTable th.sorting_desc {
+    color: #0d6efd !important;
+    font-weight: bold;
+    background-color: rgba(13, 110, 253, 0.15) !important;
+  }
+</style>
+{% endblock %} {% block content %}
 <div class="container">
   {% if not monitoring_enabled %}
   <div class="alert alert-warning mt-3" role="alert">
@@ -435,13 +619,7 @@ Cargando registros...</pre
               </p>
             </div>
 
-            <!-- Input file para restaurar backup local -->
-            <input
-              type="file"
-              id="restoreFileInput"
-              accept=".json,.gz,.zip"
-              style="display: none"
-            />
+
           </div>
           <div class="modal-footer">
             <button

@@ -15,7 +15,7 @@ from pathlib import Path
 
 from bson import ObjectId
 from pymongo import errors as pymongo_errors
-from flask import Blueprint, jsonify, request, send_file
+from flask import Blueprint, jsonify, request, send_file, make_response
 
 import psutil
 import platform
@@ -959,6 +959,37 @@ def restore_from_drive(file_id):
             'details': error_details,
             'file_id': file_id
         }), 500
+
+@maintenance_bp.route('/drive/download/<file_id>', methods=['GET'])
+@admin_required
+def download_drive_backup(file_id):
+    """Descarga un backup de Google Drive."""
+    try:
+        # Obtener nombre del archivo desde query parameter
+        filename = request.args.get('filename', f'backup_{file_id}')
+        
+        log_info(f"Iniciando descarga desde Google Drive: {file_id} ({filename})")
+        
+        # Descargar archivo
+        drive_manager = GoogleDriveManager()
+        content = drive_manager.download_file(file_id, filename)
+        
+        if not content:
+            return jsonify({'error': 'No se pudo descargar el archivo'}), 404
+        
+        log_info(f"Archivo descargado exitosamente: {len(content)} bytes")
+        
+        # Crear respuesta con el archivo
+        response = make_response(content)
+        response.headers['Content-Type'] = 'application/octet-stream'
+        response.headers['Content-Disposition'] = f'attachment; filename="{filename}"'
+        response.headers['Content-Length'] = len(content)
+        
+        return response
+        
+    except Exception as e:
+        log_error(f"Error descargando backup de Google Drive: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @maintenance_bp.route('/drive/delete/<file_id>', methods=['DELETE'])
 @admin_required
