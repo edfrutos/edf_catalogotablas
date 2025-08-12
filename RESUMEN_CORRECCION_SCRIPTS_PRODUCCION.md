@@ -3,7 +3,8 @@
 ## Problema Identificado
 
 El error mostrado en la imagen indicaba:
-```
+
+```json
 Error de conexión: Unexpected token '<', "<!DOCTYPE "... is not valid JSON
 ```
 
@@ -12,13 +13,16 @@ Este error sugería que el script estaba recibiendo HTML (probablemente una pág
 ## Análisis del Problema
 
 ### 1. Diagnóstico Inicial
+
 - ✅ Script `test_date_format.py` existe y es ejecutable
 - ✅ `script_runner.py` existe y tiene permisos correctos
 - ❌ **Problema principal**: El script_runner ejecutaba scripts desde el directorio del script en lugar del directorio raíz del proyecto
 - ❌ **Problema secundario**: Uso de rutas relativas en lugar de absolutas
 
 ### 2. Causa Raíz
+
 El `script_runner.py` tenía dos problemas:
+
 1. **Directorio de trabajo incorrecto**: Usaba `cwd=os.path.dirname(script_path)` lo que causaba que los scripts no encontraran archivos relativos
 2. **Rutas relativas**: No convertía las rutas de scripts a rutas absolutas
 
@@ -27,6 +31,7 @@ El `script_runner.py` tenía dos problemas:
 ### 1. Corrección del Script Runner (`tools/script_runner.py`)
 
 **Antes:**
+
 ```python
 import subprocess
 import sys
@@ -47,6 +52,7 @@ if ext == '.py':
 ```
 
 **Después:**
+
 ```python
 import subprocess
 import sys
@@ -71,6 +77,7 @@ if ext == '.py':
 ### 2. Scripts de Diagnóstico Creados
 
 #### `fix_script_execution.py`
+
 - Verifica el estado del `script_runner.py`
 - Prueba la ejecución de scripts directamente y con script_runner
 - Verifica las rutas web
@@ -78,6 +85,7 @@ if ext == '.py':
 - Proporciona diagnóstico completo
 
 #### `test_web_script_execution.py`
+
 - Prueba la ejecución de scripts desde la interfaz web
 - Verifica el estado del servidor Flask
 - Prueba las rutas `/admin/tools/run/` y `/admin/tools/execute`
@@ -85,14 +93,16 @@ if ext == '.py':
 
 ## Resultados de las Correcciones
 
-### Antes de las Correcciones:
-```
+### Antes de las Correcciones
+
+```bash
 ❌ script_runner falló con código 2
 Error: /usr/bin/python3: can't open file 'tools/production/db_utils/test_date_format.py': [Errno 2] No such file or directory
 ```
 
-### Después de las Correcciones:
-```
+### Después de las Correcciones
+
+```json
 ✅ script_runner devolvió JSON válido
 {
   "script": "test_date_format.py",
@@ -106,13 +116,15 @@ Error: /usr/bin/python3: can't open file 'tools/production/db_utils/test_date_fo
 
 ## Estado Final
 
-### ✅ Sistemas Funcionando Correctamente:
+### ✅ Sistemas Funcionando Correctamente
+
 - **Script Runner**: Ejecuta scripts correctamente y devuelve JSON válido
 - **Ejecución de Scripts**: Los scripts se ejecutan sin errores
 - **Rutas Web**: Las rutas `/admin/tools/run/` y `/admin/tools/execute` están configuradas
 - **Permisos**: Todos los scripts tienen permisos de ejecución (755)
 
-### 📋 Verificaciones Realizadas:
+### 📋 Verificaciones Realizadas
+
 1. ✅ Permisos de `script_runner.py` corregidos
 2. ✅ Permisos de scripts de producción corregidos
 3. ✅ Rutas absolutas implementadas
@@ -122,36 +134,43 @@ Error: /usr/bin/python3: can't open file 'tools/production/db_utils/test_date_fo
 ## Recomendaciones para el Futuro
 
 ### 1. Monitoreo Continuo
+
 - Ejecutar `fix_script_execution.py` periódicamente para verificar el estado
 - Monitorear logs del servidor web para errores de ejecución
 
 ### 2. Mejores Prácticas
+
 - Siempre usar rutas absolutas en scripts de producción
 - Verificar permisos de ejecución antes de desplegar scripts
 - Implementar logging detallado en scripts críticos
 
 ### 3. Documentación
+
 - Mantener documentación actualizada de la estructura de directorios
 - Documentar dependencias y requisitos de cada script
 
 ## Comandos Útiles
 
-### Para verificar el estado:
+### Para verificar el estado
+
 ```bash
 python3 fix_script_execution.py
 ```
 
-### Para probar ejecución web:
+### Para probar ejecución web
+
 ```bash
 python3 test_web_script_execution.py
 ```
 
-### Para ejecutar un script específico:
+### Para ejecutar un script específico
+
 ```bash
 python3 tools/script_runner.py tools/production/db_utils/test_date_format.py
 ```
 
-### Para corregir permisos manualmente:
+### Para corregir permisos manualmente
+
 ```bash
 chmod 755 tools/script_runner.py
 chmod 755 tools/production/db_utils/*.py

@@ -27,11 +27,15 @@ def init_extensions(app):
     
     logger.info("Inicializando extensiones...")
     
-    # Configurar Flask-Session primero
-    app.config["SESSION_TYPE"] = "filesystem"
-    app.config["SESSION_PERMANENT"] = True
-    app.config["SESSION_USE_SIGNER"] = True
-    app.config["SESSION_KEY_PREFIX"] = "edf_catalogo:"
+    # Configurar Flask-Session primero (solo si no está ya configurado)
+    if "SESSION_TYPE" not in app.config:
+        app.config["SESSION_TYPE"] = "filesystem"
+    if "SESSION_PERMANENT" not in app.config:
+        app.config["SESSION_PERMANENT"] = True
+    if "SESSION_USE_SIGNER" not in app.config:
+        app.config["SESSION_USE_SIGNER"] = True
+    if "SESSION_KEY_PREFIX" not in app.config:
+        app.config["SESSION_KEY_PREFIX"] = "edf_catalogo:"
     
     # Asegurarse de que el directorio de sesiones existe
     if getattr(sys, "frozen", False):

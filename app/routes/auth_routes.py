@@ -169,6 +169,8 @@ def register():
             # Si llegamos aquí, la autenticación fue exitosa
             session["user_id"] = str(result.inserted_id)
             session["email"] = nuevo_usuario["email"]
+            session["username"] = nuevo_usuario["username"]
+            session["nombre"] = nuevo_usuario["nombre"]
             session["logged_in"] = True
             session["role"] = nuevo_usuario.get("role", "user")
             session.permanent = True  # Hacer la sesión permanente

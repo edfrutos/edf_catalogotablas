@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-envelope"></i> Contacto
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-info-circle"></i> Información de Contacto</h5>
+                            <p class="text-muted">
+                                ¿Tienes alguna pregunta, sugerencia o necesitas ayuda? 
+                                No dudes en contactarnos. Estaremos encantados de ayudarte.
+                            </p>
+                            <div class="mt-3">
+                                <p><i class="bi bi-envelope-fill text-primary"></i> <strong>Email:</strong> contacto@edefrutos2025.xyz</p>
+                                <p><i class="bi bi-clock-fill text-primary"></i> <strong>Horario:</strong> Lunes a Viernes, 9:00 - 18:00</p>
+                                <p><i class="bi bi-geo-alt-fill text-primary"></i> <strong>Ubicación:</strong> España</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="bi bi-question-circle"></i> ¿Cómo podemos ayudarte?</h5>
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle text-success"></i> Soporte técnico</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Consultas sobre catálogos</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Sugerencias de mejora</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Reporte de problemas</li>
+                                <li><i class="bi bi-check-circle text-success"></i> Información general</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <form method="POST" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nombre" class="form-label">
+                                    <i class="bi bi-person"></i> Nombre completo <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" class="form-control" id="nombre" name="nombre" 
+                                       value="{{ session.get('nombre', '') }}" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingresa tu nombre completo.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    <i class="bi bi-envelope"></i> Email <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ session.get('email', '') }}" required>
+                                <div class="invalid-feedback">
+                                    Por favor ingresa un email válido.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="asunto" class="form-label">
+                                <i class="bi bi-tag"></i> Asunto
+                            </label>
+                            <select class="form-select" id="asunto" name="asunto">
+                                <option value="">Selecciona un asunto...</option>
+                                <option value="Soporte técnico">Soporte técnico</option>
+                                <option value="Consulta sobre catálogos">Consulta sobre catálogos</option>
+                                <option value="Sugerencia de mejora">Sugerencia de mejora</option>
+                                <option value="Reporte de problema">Reporte de problema</option>
+                                <option value="Información general">Información general</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="mensaje" class="form-label">
+                                <i class="bi bi-chat-text"></i> Mensaje <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" id="mensaje" name="mensaje" rows="6" 
+                                      placeholder="Describe tu consulta, sugerencia o problema..." required></textarea>
+                            <div class="invalid-feedback">
+                                Por favor ingresa tu mensaje.
+                            </div>
+                            <div class="form-text">
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i> 
+                                    Cuanto más detallado sea tu mensaje, mejor podremos ayudarte.
+                                </small>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{{ url_for('main.dashboard_user') }}" class="btn btn-secondary me-md-2">
+                                <i class="bi bi-arrow-left"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send"></i> Enviar Mensaje
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Auto-completar asunto si está vacío
+document.getElementById('asunto').addEventListener('change', function() {
+    if (this.value === 'Otro') {
+        this.setAttribute('type', 'text');
+        this.setAttribute('placeholder', 'Especifica el asunto...');
+    }
+});
+</script>
+{% endblock %}

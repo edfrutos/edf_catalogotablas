@@ -45,11 +45,10 @@ class User(UserMixin):
     @property
     def foto_perfil_url(self):
         """Obtiene la URL de la foto de perfil del usuario."""
-        from flask import url_for
         if self.foto_perfil:
-            return url_for('static', filename=f'uploads/{self.foto_perfil}')
+            return f'/imagenes_subidas/{self.foto_perfil}'
         else:
-            return url_for('static', filename='default_profile.png')
+            return '/static/default_profile.png'
 
     def set_password(self, password):
         """Genera un hash de la contraseña y lo guarda."""

@@ -37,6 +37,7 @@ venv*/
 ENV/
 env.bak/
 venv.bak/
+/var/www/vhosts/edefrutos2025.xyz/httpdocs/.vscode
 
 # Archivos de base de datos
 *.db

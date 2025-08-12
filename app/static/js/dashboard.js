@@ -8,6 +8,10 @@ $(function () {
   let allBackups = [];
   let selectedBackups = new Set();
 
+  // Variables globales para control de carga
+  let isLoadingDriveBackups = false;
+  let isLoadingLocalBackups = false;
+
   // Sistema de eliminación automática de alertas duplicadas
   function removeDuplicateAlerts() {
     const alerts = $('.alert');
@@ -373,13 +377,19 @@ $(function () {
 
     $("#restoreDriveModal").off("shown.bs.modal").on("shown.bs.modal", function () {
       console.log("✅ [EVENT] shown.bs.modal - Modal abierto exitosamente");
-      loadDriveBackups();
+      // Solo cargar si no está ya cargando
+      if (!isLoadingDriveBackups) {
+        loadDriveBackups(true);
+      }
     });
 
     // ✅ PRESERVADO: El botón principal sigue funcionando
     $("#restoreDriveBtn").off("click").on("click", function () {
       console.log("🔵 [EVENT] Botón Google Drive clickeado");
-      loadDriveBackups();
+      // Solo cargar si no está ya cargando
+      if (!isLoadingDriveBackups) {
+        loadDriveBackups(true);
+      }
     });
 
     // ✅ CORREGIDO: Solo cambio el selector del botón actualizar
@@ -577,7 +587,8 @@ $(function () {
         .then(() => {
           showAlert(`${selectedBackups.size} backup(s) eliminado(s) correctamente`, "success");
           selectedBackups.clear();
-          loadDriveBackups();
+          // Recargar lista inmediatamente con recarga forzada
+          setTimeout(() => loadDriveBackups(true), 500);
         })
         .catch((error) => {
           showAlert("Error al eliminar algunos backups", "danger");
@@ -589,28 +600,62 @@ $(function () {
   };
 
   // Función para cargar backups de Google Drive
-  window.loadDriveBackups = function () {
-    console.log("🔄 Cargando backups de Google Drive...");
+  window.loadDriveBackups = function (forceRefresh = false) {
+    // Evitar llamadas duplicadas
+    if (isLoadingDriveBackups) {
+      console.log("⚠️ Carga de backups de Google Drive ya en progreso, saltando...");
+      return;
+    }
 
+    console.log("🔄 Cargando backups de Google Drive...", forceRefresh ? "(forzando recarga)" : "");
+
+    isLoadingDriveBackups = true;
+
+    // Limpiar caché si se fuerza la recarga
+    if (forceRefresh) {
+      allBackups = [];
+      console.log("🗑️ Caché de backups limpiada");
+    }
+
+    // Limpiar completamente el DOM
     $("#driveBackupsLoading").show();
     $("#driveBackupsContent").hide();
     $("#driveBackupsEmpty").hide();
     $("#driveBackupsError").hide();
     $("#driveBackupsTableBody").empty();
 
+    // Limpiar selecciones
+    selectedBackups.clear();
+    updateDeleteButton();
+
+    // Agregar timestamp para evitar caché del navegador
+    const timestamp = new Date().getTime();
+    const url = `/admin/maintenance/drive/backups?t=${timestamp}`;
+
     $.ajax({
-      url: "/admin/maintenance/drive/backups",
+      url: url,
       method: "GET",
       xhrFields: { withCredentials: true },
+      cache: false, // Deshabilitar caché de jQuery
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      },
       success: function (response) {
         console.log("📥 Respuesta de backups recibida:", response);
         $("#driveBackupsLoading").hide();
 
         if (response.success && response.backups && response.backups.length > 0) {
+          // Actualizar caché con datos frescos
           allBackups = response.backups;
           displayDriveBackups(response.backups);
           $("#driveBackupsContent").show();
+          // Reinicializar eventos después de cargar
+          initializeDriveBackupsEvents();
         } else {
+          // Limpiar caché si no hay backups
+          allBackups = [];
           $("#driveBackupsEmpty").show();
           $("#driveBackupsCount").text("0 respaldos");
         }
@@ -620,12 +665,230 @@ $(function () {
         $("#driveBackupsLoading").hide();
         $("#driveBackupsError").show();
         $("#driveBackupsErrorMessage").text(`Error: ${xhr.statusText || "Error de conexión"}`);
+        // Limpiar caché en caso de error
+        allBackups = [];
+      },
+      complete: function () {
+        isLoadingDriveBackups = false;
       }
     });
   };
 
+  // Función para inicializar eventos de Google Drive
+  function initializeDriveBackupsEvents() {
+    console.log("🔧 Reinicializando eventos de Google Drive...");
+    
+    // Limpiar eventos existentes
+    $(document).off("click", ".delete-drive-backup");
+    $(document).off("click", ".download-drive-backup");
+    $(document).off("click", ".restore-drive-backup");
+    $(document).off("change", ".backup-checkbox");
+    $(document).off("change", "#selectAllBackups");
+    
+    // Registrar eventos de eliminación individual
+    $(document).on("click", ".delete-drive-backup", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const fileId = $(this).data("id");
+      const filename = $(this).data("filename");
+      const btn = $(this);
+      const originalText = btn.html();
+
+      if (btn.prop("disabled")) {
+        return false;
+      }
+
+      if (!confirm(`¿Estás seguro de que quieres eliminar el backup "${filename}"?\n\nEsta acción no se puede deshacer.`)) {
+        return false;
+      }
+
+      btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Eliminando...");
+
+      $.ajax({
+        url: `/admin/maintenance/drive/delete/${fileId}`,
+        method: "DELETE",
+        xhrFields: { withCredentials: true },
+        success: function (response) {
+          if (response.status === "success" || response.success) {
+            showAlert(`Backup "${filename}" eliminado correctamente`, "success");
+            // Recargar lista inmediatamente con recarga forzada
+            setTimeout(() => loadDriveBackups(true), 500);
+          } else {
+            showAlert(`Error al eliminar backup: ${response.message || "Error desconocido"}`, "danger");
+          }
+        },
+        error: function (xhr) {
+          showAlert(`Error al eliminar backup: ${xhr.responseJSON?.message || xhr.statusText}`, "danger");
+        },
+        complete: function () {
+          btn.prop("disabled", false).html(originalText);
+        }
+      });
+
+      return false;
+    });
+
+    // Registrar eventos de checkbox
+    $(document).on("change", ".backup-checkbox", function () {
+      const backupId = $(this).data("backup-id");
+      if ($(this).prop("checked")) {
+        selectedBackups.add(backupId);
+      } else {
+        selectedBackups.delete(backupId);
+      }
+      updateDeleteButton();
+    });
+
+    $(document).on("change", "#selectAllBackups", function () {
+      const isChecked = $(this).prop("checked");
+      $(".backup-checkbox:not(:disabled)").prop("checked", isChecked);
+
+      if (isChecked) {
+        $(".backup-checkbox:not(:disabled)").each(function () {
+          selectedBackups.add($(this).data("backup-id"));
+        });
+      } else {
+        selectedBackups.clear();
+      }
+
+      updateDeleteButton();
+    });
+  }
+
+  // Función para inicializar eventos individuales de backups locales
+  function initializeLocalBackupsIndividualEvents() {
+    console.log("🔧 Reinicializando eventos individuales de backups locales...");
+    
+    // Limpiar eventos existentes
+    $(document).off("click", ".delete-local-backup");
+    $(document).off("click", ".upload-local-backup");
+    $(document).off("click", ".view-local-backup");
+    
+    // Registrar eventos de eliminación individual
+    $(document).on("click", ".delete-local-backup", async function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const filename = $(this).data("filename");
+      console.log("🗑️ Eliminando backup individual:", filename);
+
+      const confirmed = await showConfirmDialog(
+        "Confirmar Eliminación",
+        `¿Estás seguro de que quieres eliminar el backup "${filename}"?\n\n⚠️ Esta acción no se puede deshacer.`,
+        "danger"
+      );
+
+      if (!confirmed) {
+        console.log("❌ Eliminación cancelada por el usuario");
+        return;
+      }
+
+      const btn = $(this);
+      const originalText = btn.html();
+
+      if (btn.prop("disabled")) {
+        console.log("⚠️ Botón ya deshabilitado, saltando...");
+        return;
+      }
+
+      console.log("🚀 Iniciando eliminación de backup individual...");
+      btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Eliminando...");
+
+      $.ajax({
+        url: `/admin/maintenance/local-backups/delete/${filename}`,
+        method: "DELETE",
+        xhrFields: { withCredentials: true },
+        success: function (response) {
+          console.log("✅ Respuesta de eliminación individual:", response);
+                      if (response.success) {
+              showModalAlert(`✅ ${response.message}`, "success");
+              // Recargar lista inmediatamente con recarga forzada
+              setTimeout(() => loadLocalBackups(true), 500);
+            } else {
+            showModalAlert(`❌ Error al eliminar: ${response.error}`, "danger");
+          }
+        },
+        error: function (xhr) {
+          console.error("❌ Error en eliminación individual:", xhr);
+          const errorMsg = xhr.responseJSON?.error || xhr.statusText || "Error desconocido";
+          showModalAlert(`❌ Error al eliminar backup: ${errorMsg}`, "danger");
+        },
+        complete: function () {
+          btn.prop("disabled", false).html(originalText);
+        }
+      });
+    });
+
+    // Registrar eventos de subida individual
+    $(document).on("click", ".upload-local-backup", async function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const filename = $(this).data("filename");
+      console.log("☁️ Subiendo backup individual:", filename);
+
+      const confirmed = await showConfirmDialog(
+        "Confirmar Subida",
+        `¿Estás seguro de que quieres subir el backup "${filename}" a Google Drive?`,
+        "warning"
+      );
+
+      if (!confirmed) {
+        console.log("❌ Subida cancelada por el usuario");
+        return;
+      }
+
+      const btn = $(this);
+      const originalText = btn.html();
+
+      if (btn.prop("disabled")) {
+        console.log("⚠️ Botón ya deshabilitado, saltando...");
+        return;
+      }
+
+      console.log("🚀 Iniciando subida de backup individual...");
+      btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Subiendo...");
+
+      $.ajax({
+        url: `/admin/maintenance/local-backups/upload-to-drive/${filename}`,
+        method: "POST",
+        xhrFields: { withCredentials: true },
+        success: function (response) {
+          console.log("✅ Respuesta de subida individual:", response);
+          if (response.success) {
+            showModalAlert(`✅ ${response.message}`, "success");
+          } else {
+            showModalAlert(`❌ Error al subir: ${response.error}`, "danger");
+          }
+        },
+        error: function (xhr) {
+          console.error("❌ Error en subida individual:", xhr);
+          const errorMsg = xhr.responseJSON?.error || xhr.statusText || "Error desconocido";
+          showModalAlert(`❌ Error al subir backup: ${errorMsg}`, "danger");
+        },
+        complete: function () {
+          btn.prop("disabled", false).html(originalText);
+        }
+      });
+    });
+
+    // Registrar eventos de vista previa
+    $(document).on("click", ".view-local-backup", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const filename = $(this).data("filename");
+      console.log("🔍 Vista previa de backup:", filename);
+      showLocalBackupPreview(filename);
+    });
+  }
+
   // Función para mostrar backups de Google Drive
   function displayDriveBackups(backups) {
+    // Destruir DataTable si existe
+    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#driveBackupsTable')) {
+      $('#driveBackupsTable').DataTable().destroy();
+    }
+    
+    // Limpiar completamente la tabla
     $("#driveBackupsTableBody").empty();
 
     backups.forEach(function (backup) {
@@ -745,16 +1008,18 @@ $(function () {
 
   // Botón de actualizar backups de Google Drive
   $("#refreshDriveBackups").off("click").on("click", function () {
-    loadDriveBackups();
+    loadDriveBackups(true);
   });
 
   // Evento cuando se abre el modal de Google Drive
   $("#restoreDriveModal").off("shown.bs.modal").on("shown.bs.modal", function () {
     console.log("🔧 Modal de Google Drive abierto, inicializando...");
-    // Cargar backups si no se han cargado aún
-    if (allBackups.length === 0) {
-      loadDriveBackups();
-    }
+    // Forzar recarga completa del modal
+    setTimeout(() => {
+      if (!isLoadingDriveBackups) {
+        loadDriveBackups(true);
+      }
+    }, 100);
   });
 
   // Inicializar botones de tareas
@@ -855,28 +1120,33 @@ $(function () {
 
     // Modal de backups locales
     $("#localBackupsModal").off("show.bs.modal").on("show.bs.modal", function () {
-      console.log("🔵 Modal de backups locales abriéndose - SIMPLIFICADO");
-      // Cargar backups inmediatamente
-      loadLocalBackups();
+      console.log("🔵 Modal de backups locales abriéndose");
+      // Forzar recarga completa del modal
+      setTimeout(() => {
+        if (!isLoadingLocalBackups) {
+          loadLocalBackups(true);
+        }
+      }, 100);
     });
 
     // Botón actualizar backups locales
     $("#refreshLocalBackups").off("click").on("click", function () {
       console.log("🔄 Actualizando lista de backups locales...");
-      loadLocalBackups();
+      loadLocalBackups(true);
     });
   }
 
   // Función para cargar backups locales
-  function loadLocalBackups() {
-    console.log("🔄 Cargando backups locales... - SIMPLIFICADO");
-    console.log("🔍 Elementos del modal:", {
-      loading: $("#localBackupsLoading").length,
-      content: $("#localBackupsContent").length,
-      empty: $("#localBackupsEmpty").length,
-      error: $("#localBackupsError").length,
-      tableBody: $("#localBackupsTableBody").length
-    });
+  function loadLocalBackups(forceRefresh = false) {
+    // Evitar llamadas duplicadas
+    if (isLoadingLocalBackups) {
+      console.log("⚠️ Carga de backups locales ya en progreso, saltando...");
+      return;
+    }
+
+    console.log("🔄 Cargando backups locales...", forceRefresh ? "(forzando recarga)" : "");
+
+    isLoadingLocalBackups = true;
 
     $("#localBackupsLoading").show();
     $("#localBackupsContent").hide();
@@ -884,10 +1154,24 @@ $(function () {
     $("#localBackupsError").hide();
     $("#localBackupsTableBody").empty();
 
+    // Limpiar selecciones
+    $(".local-backup-checkbox").prop("checked", false);
+    updateLocalBackupsSelectionUI();
+
+    // Agregar timestamp para evitar caché del navegador
+    const timestamp = new Date().getTime();
+    const url = `/admin/maintenance/local-backups?t=${timestamp}`;
+
     $.ajax({
-      url: "/admin/maintenance/local-backups",
+      url: url,
       method: "GET",
       xhrFields: { withCredentials: true },
+      cache: false, // Deshabilitar caché de jQuery
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      },
       success: function (response) {
         console.log("📥 Respuesta de backups locales recibida:", response);
         $("#localBackupsLoading").hide();
@@ -895,8 +1179,10 @@ $(function () {
         if (response.success && response.backups && response.backups.length > 0) {
           displayLocalBackups(response.backups);
           $("#localBackupsContent").show();
-          // Inicializar acciones masivas después de mostrar los backups
+          // Reinicializar acciones masivas después de mostrar los backups
           initializeLocalBackupsMassiveActions();
+          // Reinicializar eventos individuales
+          initializeLocalBackupsIndividualEvents();
         } else {
           $("#localBackupsEmpty").show();
           $("#localBackupsCount").text("0 backups");
@@ -907,12 +1193,21 @@ $(function () {
         $("#localBackupsLoading").hide();
         $("#localBackupsError").show();
         $("#localBackupsErrorMessage").text(`Error: ${xhr.statusText || "Error de conexión"}`);
+      },
+      complete: function () {
+        isLoadingLocalBackups = false;
       }
     });
   }
 
   // Función para mostrar backups locales
   function displayLocalBackups(backups) {
+    // Destruir DataTable si existe
+    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#localBackupsTable')) {
+      $('#localBackupsTable').DataTable().destroy();
+    }
+    
+    // Limpiar completamente la tabla
     $("#localBackupsTableBody").empty();
 
     backups.forEach(function (backup) {
@@ -1182,11 +1477,13 @@ $(function () {
 
             if (errorCount === 0) {
               showModalAlert(`✅ ${successCount} backup${successCount !== 1 ? 's' : ''} eliminado${successCount !== 1 ? 's' : ''} correctamente`, "success");
-              loadLocalBackups(); // Recargar lista
+              // Recargar lista inmediatamente con recarga forzada
+              setTimeout(() => loadLocalBackups(true), 500);
             } else {
               const errorMsg = errors.join("\n");
               showModalAlert(`⚠️ Eliminación completada con errores:\n\n${errorMsg}`, "warning");
-              loadLocalBackups(); // Recargar lista
+              // Recargar lista inmediatamente con recarga forzada
+              setTimeout(() => loadLocalBackups(true), 500);
             }
           }
         }
@@ -1407,6 +1704,10 @@ $(function () {
     initializeOtherEvents();
     initializeBackupEvents();
     window.initializeGoogleDriveEvents();
+
+    // Inicializar eventos de Google Drive y locales
+    initializeDriveBackupsEvents();
+    initializeLocalBackupsIndividualEvents();
 
     // Cargar estado del sistema
     loadSystemStatus();

@@ -1,5 +1,66 @@
 {% extends "base.html" %} 
 {% block title %}Ver Catálogo {% endblock %} 
+{% block head %}
+{{ super() }}
+<style>
+  /* Control de ancho de columnas para evitar que los botones se apilen */
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  /* Ancho fijo para la columna de imágenes */
+  .table th:nth-last-child(2),
+  .table td:nth-last-child(2) {
+    width: 200px;
+    max-width: 200px;
+    min-width: 200px;
+  }
+  
+  /* Ancho fijo para la columna de acciones */
+  .table th:last-child,
+  .table td:last-child {
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    white-space: nowrap;
+  }
+  
+  /* Asegurar que los botones se mantengan en línea */
+  .btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+  
+  /* Contenedor de imágenes con scroll horizontal si es necesario */
+  .images-container {
+    max-width: 180px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Imágenes con tamaño fijo */
+  .catalog-img {
+    width: 60px !important;
+    height: 60px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  
+  /* Para URLs largas, mostrar solo una parte */
+  .image-url {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8em;
+    color: #666;
+  }
+</style>
+{% endblock %}
 {% block content %}
 <div class="container mt-4">
   <div class="row justify-content-center">
@@ -69,78 +130,44 @@
                   {% endfor %}
                   <td>
                     {% if row.images and row.images|length > 0 %}
-                    <div class="d-flex flex-wrap gap-2">
-                      {% for img in row.images %} {% if img.startswith('http')
-                      %}
-                      <img
-                        src="{{ img }}"
-                        alt="Imagen {{ loop.index }}"
-                        class="catalog-img img-thumbnail"
-                        style="
-                          width: 60px;
-                          height: 60px;
-                          object-fit: cover;
-                          border-radius: 4px;
-                          border: 1px solid #ccc;
-                          cursor: pointer;
-                        "
-                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
-                      />
-
-                      {% else %}
-                      <img
-                        src="{{ get_image_url(img, use_s3=true) }}"
-                        alt="Imagen {{ loop.index }}"
-                        class="catalog-img img-thumbnail"
-                        style="
-                          width: 60px;
-                          height: 60px;
-                          object-fit: cover;
-                          border-radius: 4px;
-                          border: 1px solid #ccc;
-                          cursor: pointer;
-                        "
-                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
-                      />
-
-                      {% endif %} {% endfor %}
+                    <div class="images-container">
+                      {% for img in row.images %} 
+                        {% if img.startswith('http') %}
+                          <img
+                            src="{{ img }}"
+                            alt="Imagen {{ loop.index }}"
+                            class="catalog-img"
+                            onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
+                          />
+                        {% else %}
+                          <img
+                            src="{{ get_image_url(img, use_s3=true) }}"
+                            alt="Imagen {{ loop.index }}"
+                            class="catalog-img"
+                            onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
+                          />
+                        {% endif %} 
+                      {% endfor %}
                     </div>
                     {% elif row.imagenes and row.imagenes|length > 0 %}
-                    <div class="d-flex flex-wrap gap-2">
-                      {% for img in row.imagenes %} {% if img.startswith('http')
-                      %}
-                      <img
-                        src="{{ img }}"
-                        alt="Imagen {{ loop.index }}"
-                        class="catalog-img img-thumbnail"
-                        style="
-                          width: 60px;
-                          height: 60px;
-                          object-fit: cover;
-                          border-radius: 4px;
-                          border: 1px solid #ccc;
-                          cursor: pointer;
-                        "
-                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
-                      />
-
-                      {% else %}
-                      <img
-                        src="{{ get_image_url(img, use_s3=true) }}"
-                        alt="Imagen {{ loop.index }}"
-                        class="catalog-img img-thumbnail"
-                        style="
-                          width: 60px;
-                          height: 60px;
-                          object-fit: cover;
-                          border-radius: 4px;
-                          border: 1px solid #ccc;
-                          cursor: pointer;
-                        "
-                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
-                      />
-
-                      {% endif %} {% endfor %}
+                    <div class="images-container">
+                      {% for img in row.imagenes %} 
+                        {% if img.startswith('http') %}
+                          <img
+                            src="{{ img }}"
+                            alt="Imagen {{ loop.index }}"
+                            class="catalog-img"
+                            onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
+                          />
+                        {% else %}
+                          <img
+                            src="{{ get_image_url(img, use_s3=true) }}"
+                            alt="Imagen {{ loop.index }}"
+                            class="catalog-img"
+                            onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'"
+                          />
+                        {% endif %} 
+                      {% endfor %}
                     </div>
                     {% else %}
                     <span class="text-muted">Sin imágenes</span>

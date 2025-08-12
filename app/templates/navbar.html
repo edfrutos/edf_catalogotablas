@@ -39,13 +39,18 @@
                         <i class="fas fa-user"></i> {{ session.get('username', 'Usuario') }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        {% if not session.get('is_admin') %}
+                        {% if session.get('role') != 'admin' %}
                         <li>
                             <a class="dropdown-item" href="/perfil">
                                 <i class="bi bi-person-badge"></i> Mi Perfil
                             </a>
                         </li>
                         {% endif %}
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('main.contact') }}">
+                                <i class="bi bi-envelope"></i> Contacto
+                            </a>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a></li>
                     </ul>

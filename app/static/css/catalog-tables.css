@@ -1,0 +1,96 @@
+/* CSS para solucionar el problema de botones apilados en tablas de catálogos */
+
+/* Control de ancho de columnas para evitar que los botones se apilen */
+.table-responsive {
+    overflow-x: auto;
+}
+
+/* Ancho fijo para la columna de imágenes */
+.table th:nth-last-child(2),
+.table td:nth-last-child(2) {
+    width: 200px;
+    max-width: 200px;
+    min-width: 200px;
+}
+
+/* Ancho fijo para la columna de acciones */
+.table th:last-child,
+.table td:last-child {
+    width: 150px;
+    max-width: 150px;
+    min-width: 150px;
+    white-space: nowrap;
+}
+
+/* Asegurar que los botones se mantengan en línea */
+.btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+
+/* Contenedor de imágenes con scroll horizontal si es necesario */
+.images-container {
+    max-width: 180px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* Imágenes con tamaño fijo */
+.catalog-img {
+    width: 60px !important;
+    height: 60px !important;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Para URLs largas, mostrar solo una parte */
+.image-url {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.8em;
+    color: #666;
+}
+
+/* Asegurar que los botones de acción se mantengan en línea */
+.table td:last-child .btn {
+    margin-right: 2px;
+    margin-bottom: 2px;
+}
+
+/* Para formularios inline en la columna de acciones */
+.table td:last-child form {
+    display: inline-block;
+    margin-right: 2px;
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+    .table th:nth-last-child(2),
+    .table td:nth-last-child(2) {
+        width: 150px;
+        max-width: 150px;
+        min-width: 150px;
+    }
+    
+    .table th:last-child,
+    .table td:last-child {
+        width: 120px;
+        max-width: 120px;
+        min-width: 120px;
+    }
+    
+    .images-container {
+        max-width: 130px;
+    }
+    
+    .catalog-img {
+        width: 50px !important;
+        height: 50px !important;
+    }
+}

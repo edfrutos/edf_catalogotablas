@@ -9,8 +9,6 @@ from flask import (
     session,
     request,
     current_app,
-    jsonify,
-    g,
 )
 from bson.objectid import ObjectId
 from functools import wraps
@@ -20,7 +18,7 @@ import datetime
 import pandas as pd
 from werkzeug.utils import secure_filename
 from app.utils.mongo_utils import is_mongo_available, is_valid_object_id
-from app.decorators import is_datetime, is_list, is_string
+
 import logging
 from app.database import get_mongo_db
 
@@ -39,13 +37,7 @@ def is_admin():
 # El campo created_by se compara con el username de sesión
 
 
-def is_valid_object_id(id_str):
-    """Verifica si una cadena es un ObjectId válido"""
-    try:
-        ObjectId(id_str)
-        return True
-    except Exception:
-        return False
+
 
 
 def check_catalog_permission(f):
@@ -962,7 +954,7 @@ def import_catalog():
             return redirect(request.url)
 
         file = request.files["file"]
-        if file.filename == "":
+        if not file or not file.filename or file.filename == "":
             flash("No se ha seleccionado ningún archivo", "danger")
             return redirect(request.url)
 
@@ -978,7 +970,8 @@ def import_catalog():
             # Si no se proporciona un nombre, usar el nombre del archivo sin extensión
             if not catalog_name:
                 # Extraer el nombre del archivo sin extensión
-                catalog_name = os.path.splitext(file.filename)[0]
+                filename = file.filename or "catalogo_importado"
+                catalog_name = os.path.splitext(filename)[0]
                 current_app.logger.info(
                     f"Usando el nombre del archivo como nombre del catálogo: {catalog_name}"
                 )
@@ -997,17 +990,30 @@ def import_catalog():
                 # Procesar CSV
                 df = pd.read_csv(file, encoding="utf-8")
             else:
-                # Procesar Excel
-                df = pd.read_excel(file)
+                # Procesar Excel - especificar parámetros importantes
+                df = pd.read_excel(
+                    file,
+                    sheet_name=0,  # Primera hoja
+                    header=0,      # Primera fila como encabezados
+                    na_values=['', 'nan', 'NaN'],  # Valores nulos
+                    keep_default_na=True
+                )
 
             # Verificar que el archivo tiene datos
             if df.empty:
                 flash("El archivo está vacío", "danger")
                 return redirect(request.url)
 
+            # Logging para debug
+            current_app.logger.info(f"DataFrame shape: {df.shape}")
+            current_app.logger.info(f"DataFrame columns: {df.columns.tolist()}")
+            current_app.logger.info(f"Primeras 3 filas: {df.head(3).to_dict('records')}")
+
             # Convertir DataFrame a lista de diccionarios
             headers = df.columns.tolist()
             rows = df.to_dict("records")
+            
+            current_app.logger.info(f"Total de filas importadas: {len(rows)}")
 
             # Crear el catálogo en la base de datos
             catalog = {
@@ -1022,11 +1028,16 @@ def import_catalog():
                 "updated_at": datetime.datetime.utcnow(),
             }
 
-            result = get_mongo_db().spreadsheets.insert_one(catalog)
+            db = get_mongo_db()
+            if db is None:
+                flash("Error: No se pudo acceder a la base de datos", "error")
+                return redirect(request.url)
+                
+            result = db.spreadsheets.insert_one(catalog)
             catalog_id = str(result.inserted_id)
 
             # Refuerzo: actualizar el campo owner si por alguna razón no se guardó
-            get_mongo_db().spreadsheets.update_one(
+            db.spreadsheets.update_one(
                 {"_id": result.inserted_id}, {"$set": {"owner": username}}
             )
             current_app.logger.info(

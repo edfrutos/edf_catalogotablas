@@ -44,8 +44,16 @@ def welcome():
 
 
 @main_bp.route("/dashboard_user")
-@main_bp.route("/admin/maintenance/dashboard_user")
 def dashboard_user():
+    """Dashboard para usuarios normales"""
+    return dashboard_user_common()
+
+@main_bp.route("/admin/maintenance/dashboard_user")
+def admin_maintenance_dashboard_user():
+    """Dashboard para mantenimiento de administración"""
+    return dashboard_user_common()
+
+def dashboard_user_common():
     # Protección: requerir login
     if not session.get("username") and not session.get("user_id"):
         flash("Debe iniciar sesión para acceder al dashboard de usuario", "warning")
@@ -88,13 +96,13 @@ def dashboard_user():
                 ]
             )
         try:
-            tablas = list(g.spreadsheets_collection.find(query).sort("created_at", -1))
+            tablas = list(db.spreadsheets.find(query).sort("created_at", -1))
             print(f"[DEBUG] tablas: {tablas}")
         except Exception as e:
             print(f"[ERROR] Consulta a spreadsheets falló: {e}")
             tablas = []
         try:
-            catalogos = list(g.catalogs_collection.find(query).sort("created_at", -1))
+            catalogos = list(db.catalogs.find(query).sort("created_at", -1))
             print(f"[DEBUG] catalogos: {catalogos}")
         except Exception as e:
             print(f"[ERROR] Consulta a catalogs falló: {e}")
@@ -235,11 +243,11 @@ def dashboard_user():
                         else:
                             # Usar URL local directamente
                             c['miniatura'] = url_for('static', filename=f'uploads/{img}')
-        registros = tablas + catalogos
-        if not registros:
-            flash("No tienes catálogos ni tablas asociados a tu usuario.", "info")
-            return render_template("dashboard_unificado.html", registros=[])
-        return render_template("dashboard_unificado.html", registros=registros)
+        # Para usuarios normales, usar dashboard_user.html con solo tablas
+        if not tablas:
+            flash("No tienes tablas creadas aún. ¡Crea una nueva o importa un Excel!", "info")
+            return render_template("dashboard_user.html", tablas=[])
+        return render_template("dashboard_user.html", tablas=tablas)
     except Exception as e:
         print(f"[ERROR][DASHBOARD_USER] {e}")
         flash("Error al cargar tus catálogos/tablas.", "error")
@@ -565,9 +573,8 @@ def perfil():
         user = User(user_data)
 
         # Asegurar que existe la imagen de perfil predeterminada
-        default_profile_path = os.path.join(
-            current_app.static_folder, "default_profile.png"
-        )
+        static_folder = current_app.static_folder or os.path.join(current_app.root_path, 'static')
+        default_profile_path = os.path.join(static_folder, "default_profile.png")
         if not os.path.exists(default_profile_path):
             try:
                 # Importar la función para crear la imagen predeterminada
@@ -597,7 +604,11 @@ def editar_perfil():
         # Importar mongo desde app.extensions
         from app.extensions import mongo
 
-        users_collection = mongo.db.users
+        try:
+            users_collection = mongo.db.users
+        except (AttributeError, TypeError):
+            flash("Error: No se pudo acceder a la base de datos", "error")
+            return redirect(url_for("main.dashboard_user"))
 
     # Obtener datos del usuario actual
     try:
@@ -653,15 +664,14 @@ def editar_perfil():
             # Actualizar la contraseña
             update_data["password"] = generate_password_hash(password_nuevo)
 
-        # Asegurarse de que existe la carpeta de uploads
-        uploads_folder = os.path.join(current_app.static_folder, 'uploads')
+        # Asegurarse de que existe la carpeta de imagenes_subidas
+        static_folder = current_app.static_folder or os.path.join(current_app.root_path, 'static')
+        uploads_folder = os.path.join(static_folder, 'imagenes_subidas')
         
         # Crear la carpeta si no existe
         os.makedirs(uploads_folder, exist_ok=True)
         # Asegurar que existe la imagen de perfil predeterminada
-        default_profile_path = os.path.join(
-            current_app.static_folder, "default_profile.png"
-        )
+        default_profile_path = os.path.join(static_folder, "default_profile.png")
         if not os.path.exists(default_profile_path):
             try:
                 # Importar la función para crear la imagen predeterminada
@@ -909,7 +919,7 @@ def editar_fila(tabla_id, fila_index):
             logger.info(f"Procesando {len(archivos)} nuevas imágenes")
 
             for archivo in archivos:
-                if archivo and archivo.filename.strip():
+                if archivo and archivo.filename and archivo.filename.strip():
                     # Generar nombre seguro y único para el archivo
                     nombre_seguro = secure_filename(archivo.filename)
                     extension = os.path.splitext(nombre_seguro)[1].lower()
@@ -921,7 +931,8 @@ def editar_fila(tabla_id, fila_index):
                         continue
 
                     # Guardar la imagen en la carpeta de uploads
-                    ruta_uploads = os.path.join(current_app.static_folder, "uploads")
+                    static_folder = current_app.static_folder or os.path.join(current_app.root_path, 'static')
+                    ruta_uploads = os.path.join(static_folder, "uploads")
                     if not os.path.exists(ruta_uploads):
                         os.makedirs(ruta_uploads)
                         logger.info(f"Carpeta de uploads creada: {ruta_uploads}")
@@ -1650,3 +1661,46 @@ def soporte():
             )
         return redirect(url_for("main.guia_rapida"))
     return render_template("soporte.html")
+
+
+@main_bp.route("/contact", methods=["GET", "POST"])
+def contact():
+    """Página de contacto para usuarios normales"""
+    if request.method == "POST":
+        nombre = request.form.get("nombre", "")
+        email = request.form.get("email", "")
+        asunto = request.form.get("asunto", "")
+        mensaje = request.form.get("mensaje", "")
+        
+        # Validar campos requeridos
+        if not all([nombre, email, mensaje]):
+            flash("Por favor completa todos los campos requeridos.", "warning")
+            return render_template("contact.html")
+        
+        # Enviar email de contacto
+        subject = f"[Contacto] {asunto} - {nombre}"
+        body_html = f"""
+        <h3>Nuevo mensaje de contacto recibido</h3>
+        <ul>
+            <li><strong>Nombre:</strong> {nombre}</li>
+            <li><strong>Email:</strong> {email}</li>
+            <li><strong>Asunto:</strong> {asunto}</li>
+        </ul>
+        <p><strong>Mensaje:</strong></p>
+        <div style='white-space: pre-line; border:1px solid #eee; padding:10px; background:#f9f9f9;'>{mensaje}</div>
+        <hr>
+        <small>Este mensaje fue enviado desde el formulario de contacto de la aplicación.</small>
+        """
+        
+        # Destinatario: el correo de contacto configurado
+        recipients = ["contacto@edefrutos2025.xyz"]
+        ok = notifications.send_email(subject, body_html, recipients)
+        
+        if ok:
+            flash("Tu mensaje ha sido enviado. Te contactaremos pronto.", "success")
+        else:
+            flash("No se pudo enviar el mensaje. Intenta más tarde o contacta por email.", "danger")
+        
+        return redirect(url_for("main.contact"))
+    
+    return render_template("contact.html")
