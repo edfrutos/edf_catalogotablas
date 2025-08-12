@@ -1129,6 +1129,39 @@ $(function () {
       }, 100);
     });
 
+    // Modal de opciones de backup
+    $("#backupOptionsModal").off("show.bs.modal").on("show.bs.modal", function () {
+      console.log("🔵 Modal de opciones de backup abriéndose");
+    });
+
+    // Modal de restauración local
+    $("#restoreLocalModal").off("show.bs.modal").on("show.bs.modal", function () {
+      console.log("🔵 Modal de restauración local abriéndose");
+      // Forzar recarga completa del modal
+      setTimeout(() => {
+        if (!isLoadingLocalBackups) {
+          loadRestoreLocalBackups(true);
+        }
+      }, 100);
+    });
+
+    // Botones de creación de backups
+    $("#createLocalBackupBtn").off("click").on("click", function () {
+      console.log("🔄 Botón crear backup local clickeado");
+      createLocalBackup();
+    });
+
+    $("#createDriveBackupBtn").off("click").on("click", function () {
+      console.log("🔄 Botón crear backup en Drive clickeado");
+      createDriveBackup();
+    });
+
+    // Botón actualizar backups de restauración local
+    $("#refreshRestoreLocalBackups").off("click").on("click", function () {
+      console.log("🔄 Actualizando lista de backups de restauración local...");
+      loadRestoreLocalBackups(true);
+    });
+
     // Botón actualizar backups locales
     $("#refreshLocalBackups").off("click").on("click", function () {
       console.log("🔄 Actualizando lista de backups locales...");
@@ -1691,6 +1724,268 @@ $(function () {
       },
       error: function () {
         console.error("Error al cargar estado del sistema");
+      }
+    });
+  }
+
+  // Función para cargar backups de restauración local
+  function loadRestoreLocalBackups(forceRefresh = false) {
+    // Evitar llamadas duplicadas
+    if (isLoadingLocalBackups) {
+      console.log("⚠️ Carga de backups de restauración local ya en progreso, saltando...");
+      return;
+    }
+
+    console.log("🔄 Cargando backups de restauración local...", forceRefresh ? "(forzando recarga)" : "");
+
+    isLoadingLocalBackups = true;
+
+    $("#restoreLocalBackupsLoading").show();
+    $("#restoreLocalBackupsContent").hide();
+    $("#restoreLocalBackupsEmpty").hide();
+    $("#restoreLocalBackupsError").hide();
+    $("#restoreLocalBackupsTableBody").empty();
+
+    // Agregar timestamp para evitar caché del navegador
+    const timestamp = new Date().getTime();
+    const url = `/admin/maintenance/local-backups?t=${timestamp}`;
+
+    $.ajax({
+      url: url,
+      method: "GET",
+      xhrFields: { withCredentials: true },
+      cache: false, // Deshabilitar caché de jQuery
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      },
+      success: function (response) {
+        console.log("📥 Respuesta de backups de restauración local recibida:", response);
+        $("#restoreLocalBackupsLoading").hide();
+
+        if (response.success && response.backups && response.backups.length > 0) {
+          displayRestoreLocalBackups(response.backups);
+          $("#restoreLocalBackupsContent").show();
+          // Reinicializar eventos después de cargar
+          initializeRestoreLocalBackupsEvents();
+        } else {
+          $("#restoreLocalBackupsEmpty").show();
+          $("#restoreLocalBackupsCount").text("0 backups");
+        }
+      },
+      error: function (xhr, status, error) {
+        console.error("❌ Error cargando backups de restauración local:", xhr.status, xhr.statusText, error);
+        $("#restoreLocalBackupsLoading").hide();
+        $("#restoreLocalBackupsError").show();
+        $("#restoreLocalBackupsErrorMessage").text(`Error: ${xhr.statusText || "Error de conexión"}`);
+      },
+      complete: function () {
+        isLoadingLocalBackups = false;
+      }
+    });
+  }
+
+  // Función para mostrar backups de restauración local
+  function displayRestoreLocalBackups(backups) {
+    // Destruir DataTable si existe
+    if ($.fn.DataTable && $.fn.DataTable.isDataTable('#restoreLocalBackupsTable')) {
+      $('#restoreLocalBackupsTable').DataTable().destroy();
+    }
+    
+    // Limpiar completamente la tabla
+    $("#restoreLocalBackupsTableBody").empty();
+
+    backups.forEach(function (backup) {
+      const sizeDisplay = backup.size_mb ? `${backup.size_mb} MB` : "N/A";
+      const modifiedDate = backup.modified_at ? new Date(backup.modified_at).toLocaleString() : "N/A";
+
+      const actionButtons = `
+        <div class="btn-group" role="group">
+          <button class="btn btn-sm btn-warning restore-local-backup"
+                  data-filename="${backup.filename}"
+                  title="Restaurar backup">
+            <i class="bi bi-arrow-counterclockwise"></i> Restaurar
+          </button>
+          <button class="btn btn-sm btn-info view-restore-local-backup"
+                  data-filename="${backup.filename}"
+                  title="Ver detalles">
+            <i class="bi bi-eye"></i> Ver
+          </button>
+        </div>
+      `;
+
+      const row = `
+        <tr data-backup-filename="${backup.filename}">
+          <td>
+            <i class="bi bi-file-earmark-zip text-warning"></i>
+            ${backup.filename}
+          </td>
+          <td>${sizeDisplay}</td>
+          <td>${modifiedDate}</td>
+          <td>${actionButtons}</td>
+        </tr>
+      `;
+
+      $("#restoreLocalBackupsTableBody").append(row);
+    });
+
+    $("#restoreLocalBackupsCount").text(`${backups.length} backup${backups.length !== 1 ? 's' : ''}`);
+
+    // Inicializar DataTable para ordenamiento
+    if ($.fn.DataTable) {
+      $('#restoreLocalBackupsTable').DataTable({
+        "order": [[2, "desc"]], // Ordenar por fecha descendente por defecto
+        "pageLength": 25,
+        "language": {
+          "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json"
+        },
+        "columnDefs": [
+          { "orderable": false, "targets": [3] }, // Acciones no ordenables
+          { "type": "num", "targets": 1 } // Tamaño como número
+        ]
+      });
+    }
+  }
+
+  // Función para inicializar eventos de restauración local
+  function initializeRestoreLocalBackupsEvents() {
+    console.log("🔧 Reinicializando eventos de restauración local...");
+    
+    // Limpiar eventos existentes
+    $(document).off("click", ".restore-local-backup");
+    $(document).off("click", ".view-restore-local-backup");
+    
+    // Registrar eventos de restauración
+    $(document).on("click", ".restore-local-backup", async function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const filename = $(this).data("filename");
+      console.log("🔄 Restaurando backup local:", filename);
+
+      const confirmed = await showConfirmDialog(
+        "Confirmar Restauración",
+        `¿Estás seguro de que quieres restaurar el backup "${filename}"?\n\n⚠️ Esta acción sobrescribirá todos los datos actuales y no se puede deshacer.\n\nAsegúrate de tener un backup reciente antes de continuar.`,
+        "danger"
+      );
+
+      if (!confirmed) {
+        console.log("❌ Restauración cancelada por el usuario");
+        return;
+      }
+
+      const btn = $(this);
+      const originalText = btn.html();
+
+      if (btn.prop("disabled")) {
+        console.log("⚠️ Botón ya deshabilitado, saltando...");
+        return;
+      }
+
+      console.log("🚀 Iniciando restauración de backup local...");
+      btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Restaurando...");
+
+      $.ajax({
+        url: `/admin/maintenance/local-backups/restore/${filename}`,
+        method: "POST",
+        xhrFields: { withCredentials: true },
+        success: function (response) {
+          console.log("✅ Respuesta de restauración local:", response);
+          if (response.success) {
+            showModalAlert(`✅ ${response.message}`, "success");
+            // Cerrar modal después de restauración exitosa
+            setTimeout(() => {
+              $('#restoreLocalModal').modal('hide');
+            }, 2000);
+          } else {
+            showModalAlert(`❌ Error al restaurar: ${response.error}`, "danger");
+          }
+        },
+        error: function (xhr) {
+          console.error("❌ Error en restauración local:", xhr);
+          const errorMsg = xhr.responseJSON?.error || xhr.statusText || "Error desconocido";
+          showModalAlert(`❌ Error al restaurar backup: ${errorMsg}`, "danger");
+        },
+        complete: function () {
+          btn.prop("disabled", false).html(originalText);
+        }
+      });
+    });
+
+    // Registrar eventos de vista previa
+    $(document).on("click", ".view-restore-local-backup", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      const filename = $(this).data("filename");
+      console.log("🔍 Vista previa de backup de restauración:", filename);
+      showLocalBackupPreview(filename);
+    });
+  }
+
+  // Función para crear backup local
+  function createLocalBackup() {
+    console.log("🔄 Creando backup local...");
+    
+    const btn = $("#createLocalBackupBtn");
+    const originalText = btn.html();
+    
+    btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Creando...");
+
+    $.ajax({
+      url: "/admin/maintenance/backup/local",
+      method: "POST",
+      xhrFields: { withCredentials: true },
+      success: function (response) {
+        console.log("✅ Respuesta de creación de backup local:", response);
+        if (response.success) {
+          showAlert(`✅ ${response.message}`, "success");
+          // Cerrar modal de opciones
+          $('#backupOptionsModal').modal('hide');
+        } else {
+          showAlert(`❌ Error al crear backup: ${response.error}`, "danger");
+        }
+      },
+      error: function (xhr) {
+        console.error("❌ Error creando backup local:", xhr);
+        const errorMsg = xhr.responseJSON?.error || xhr.statusText || "Error desconocido";
+        showAlert(`❌ Error al crear backup local: ${errorMsg}`, "danger");
+      },
+      complete: function () {
+        btn.prop("disabled", false).html(originalText);
+      }
+    });
+  }
+
+  // Función para crear backup en Google Drive
+  function createDriveBackup() {
+    console.log("🔄 Creando backup en Google Drive...");
+    
+    const btn = $("#createDriveBackupBtn");
+    const originalText = btn.html();
+    
+    btn.prop("disabled", true).html("<span class=\"spinner-border spinner-border-sm\"></span> Creando...");
+
+    $.ajax({
+      url: "/admin/maintenance/backup/drive",
+      method: "POST",
+      xhrFields: { withCredentials: true },
+      success: function (response) {
+        console.log("✅ Respuesta de creación de backup en Drive:", response);
+        if (response.success) {
+          showAlert(`✅ ${response.message}`, "success");
+          // Cerrar modal de opciones
+          $('#backupOptionsModal').modal('hide');
+        } else {
+          showAlert(`❌ Error al crear backup: ${response.error}`, "danger");
+        }
+      },
+      error: function (xhr) {
+        console.error("❌ Error creando backup en Drive:", xhr);
+        const errorMsg = xhr.responseJSON?.error || xhr.statusText || "Error desconocido";
+        showAlert(`❌ Error al crear backup en Google Drive: ${errorMsg}`, "danger");
+      },
+      complete: function () {
+        btn.prop("disabled", false).html(originalText);
       }
     });
   }

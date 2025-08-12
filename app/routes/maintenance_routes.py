@@ -9,16 +9,13 @@ import json
 import gzip
 import csv
 import io
-import tempfile
-import shutil
 from datetime import datetime
-from typing import Dict, Any, List, Optional, Tuple, Union
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 
 from bson import ObjectId
-import pymongo
 from pymongo import errors as pymongo_errors
-from flask import current_app, Blueprint, jsonify, request, send_file
+from flask import Blueprint, jsonify, request, send_file
 
 import psutil
 import platform
@@ -42,8 +39,22 @@ def log_error(msg):
 def log_warning(msg):
     logger.warning(msg)
 
+def serialize_for_json(obj):
+    """Convierte objetos no serializables a formatos JSON compatibles."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    elif isinstance(obj, ObjectId):
+        return str(obj)
+    elif isinstance(obj, dict):
+        return {key: serialize_for_json(value) for key, value in obj.items()}
+    elif isinstance(obj, list):
+        return [serialize_for_json(item) for item in obj]
+    else:
+        return obj
+
 # Blueprint para rutas de mantenimiento
 maintenance_bp = Blueprint('maintenance', __name__, url_prefix='/admin/maintenance')
+
 
 # ============================================================================
 # CLASES DE UTILIDAD PARA PROCESAMIENTO DE ARCHIVOS
@@ -1255,6 +1266,265 @@ def delete_local_backup(filename):
         
     except Exception as e:
         log_error(f"Error eliminando backup local {filename}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@maintenance_bp.route('/backup/local', methods=['POST'])
+@admin_required
+def create_local_backup():
+    """Crea un backup local del sistema."""
+    try:
+        log_info("Iniciando creación de backup local...")
+        
+        # Obtener la base de datos
+        db = get_mongo_db()
+        if db is None:
+            return jsonify({'success': False, 'error': 'No se pudo conectar a la base de datos'}), 500
+        
+        # Crear directorio de backups si no existe
+        backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # Generar nombre del archivo con timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'backup_{timestamp}.json.gz'
+        file_path = os.path.join(backup_dir, filename)
+        
+        # Crear el backup
+        backup_data = {
+            'metadata': {
+                'created_at': datetime.now().isoformat(),
+                'created_by': 'admin',
+                'version': '1.0',
+                'description': 'Backup local del sistema'
+            },
+            'collections': {}
+        }
+        
+        # Obtener todas las colecciones
+        collections = db.list_collection_names()
+        
+        for collection_name in collections:
+            try:
+                # Obtener todos los documentos de la colección
+                documents = list(db[collection_name].find())
+                
+                # Serializar documentos para JSON (convierte datetime, ObjectId, etc.)
+                serialized_documents = serialize_for_json(documents)
+                
+                backup_data['collections'][collection_name] = serialized_documents
+                log_info(f"Colección {collection_name}: {len(documents)} documentos")
+                
+            except Exception as e:
+                log_error(f"Error procesando colección {collection_name}: {str(e)}")
+                continue
+        
+        # Comprimir y guardar el backup
+        json_data = json.dumps(backup_data, ensure_ascii=False, indent=2)
+        with gzip.open(file_path, 'wt', encoding='utf-8') as f:
+            f.write(json_data)
+        
+        file_size = os.path.getsize(file_path)
+        file_size_mb = round(file_size / (1024 * 1024), 2)
+        
+        log_info(f"Backup local creado exitosamente: {filename} ({file_size_mb} MB)")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Backup local creado exitosamente: {filename}',
+            'filename': filename,
+            'size': file_size,
+            'size_mb': file_size_mb,
+            'collections_count': len(backup_data['collections'])
+        })
+        
+    except Exception as e:
+        log_error(f"Error creando backup local: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@maintenance_bp.route('/backup/drive', methods=['POST'])
+@admin_required
+def create_drive_backup():
+    """Crea un backup y lo sube a Google Drive."""
+    try:
+        log_info("Iniciando creación de backup para Google Drive...")
+        
+        # Obtener la base de datos
+        db = get_mongo_db()
+        if db is None:
+            return jsonify({'success': False, 'error': 'No se pudo conectar a la base de datos'}), 500
+        
+        # Crear directorio de backups si no existe
+        backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # Generar nombre del archivo con timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f'backup_{timestamp}.json.gz'
+        file_path = os.path.join(backup_dir, filename)
+        
+        # Crear el backup
+        backup_data = {
+            'metadata': {
+                'created_at': datetime.now().isoformat(),
+                'created_by': 'admin',
+                'version': '1.0',
+                'description': 'Backup del sistema para Google Drive'
+            },
+            'collections': {}
+        }
+        
+        # Obtener todas las colecciones
+        collections = db.list_collection_names()
+        
+        for collection_name in collections:
+            try:
+                # Obtener todos los documentos de la colección
+                documents = list(db[collection_name].find())
+                
+                # Serializar documentos para JSON (convierte datetime, ObjectId, etc.)
+                serialized_documents = serialize_for_json(documents)
+                
+                backup_data['collections'][collection_name] = serialized_documents
+                log_info(f"Colección {collection_name}: {len(documents)} documentos")
+                
+            except Exception as e:
+                log_error(f"Error procesando colección {collection_name}: {str(e)}")
+                continue
+        
+        # Comprimir y guardar el backup temporalmente
+        json_data = json.dumps(backup_data, ensure_ascii=False, indent=2)
+        with gzip.open(file_path, 'wt', encoding='utf-8') as f:
+            f.write(json_data)
+        
+        # Subir a Google Drive
+        try:
+            drive_manager = GoogleDriveManager()
+            
+            # Leer el archivo
+            with open(file_path, 'rb') as f:
+                file_content = f.read()
+            
+            # Subir a Google Drive
+            file_id = drive_manager.upload_file(filename, file_content)
+            
+            file_size = os.path.getsize(file_path)
+            file_size_mb = round(file_size / (1024 * 1024), 2)
+            
+            log_info(f"Backup subido a Google Drive exitosamente: {filename} ({file_size_mb} MB) con ID: {file_id}")
+            
+            # Eliminar archivo temporal local
+            os.remove(file_path)
+            
+            return jsonify({
+                'success': True,
+                'message': f'Backup creado y subido a Google Drive exitosamente: {filename}',
+                'filename': filename,
+                'size': file_size,
+                'size_mb': file_size_mb,
+                'collections_count': len(backup_data['collections']),
+                'drive_file_id': file_id
+            })
+            
+        except Exception as drive_error:
+            log_error(f"Error subiendo a Google Drive: {str(drive_error)}")
+            # Si falla la subida, mantener el archivo local
+            return jsonify({
+                'success': False, 
+                'error': f'Error subiendo a Google Drive: {str(drive_error)}. El backup se guardó localmente.',
+                'filename': filename,
+                'local_backup': True
+            }), 500
+        
+    except Exception as e:
+        log_error(f"Error creando backup para Google Drive: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@maintenance_bp.route('/local-backups/restore/<filename>', methods=['POST'])
+@admin_required
+def restore_local_backup(filename):
+    """Restaura un backup local."""
+    try:
+        log_info(f"Iniciando restauración de backup local: {filename}")
+        
+        # Obtener la base de datos
+        db = get_mongo_db()
+        if db is None:
+            return jsonify({'success': False, 'error': 'No se pudo conectar a la base de datos'}), 500
+        
+        # Usar el sistema de detección de entorno
+        from app.utils.environment_detector import EnvironmentDetector
+        env_detector = EnvironmentDetector()
+        
+        # Determinar el directorio de backups según el entorno
+        if env_detector.environment == 'development':
+            backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        else:
+            backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
+        
+        file_path = os.path.join(backup_dir, filename)
+        
+        if not os.path.exists(file_path):
+            log_error(f"Archivo de backup no encontrado: {file_path}")
+            return jsonify({'success': False, 'error': 'Archivo de backup no encontrado'}), 404
+        
+        # Verificar que el archivo sea un backup válido
+        if not filename.endswith(('.json', '.gz', '.zip')):
+            return jsonify({'success': False, 'error': 'Tipo de archivo no válido'}), 400
+        
+        # Leer y procesar el backup
+        try:
+            if filename.endswith('.gz'):
+                with gzip.open(file_path, 'rt', encoding='utf-8') as f:
+                    backup_data = json.load(f)
+            else:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    backup_data = json.load(f)
+        except Exception as e:
+            log_error(f"Error leyendo archivo de backup: {str(e)}")
+            return jsonify({'success': False, 'error': f'Error leyendo archivo de backup: {str(e)}'}), 400
+        
+        # Verificar estructura del backup
+        if 'collections' not in backup_data:
+            return jsonify({'success': False, 'error': 'Formato de backup inválido'}), 400
+        
+        # Restaurar colecciones
+        restored_count = 0
+        for collection_name, documents in backup_data['collections'].items():
+            try:
+                # Limpiar colección existente
+                db[collection_name].delete_many({})
+                
+                # Insertar documentos del backup
+                if documents:
+                    # Convertir string IDs de vuelta a ObjectId
+                    for doc in documents:
+                        if '_id' in doc and isinstance(doc['_id'], str):
+                            try:
+                                doc['_id'] = ObjectId(doc['_id'])
+                            except Exception:
+                                # Si no es un ObjectId válido, generar uno nuevo
+                                del doc['_id']
+                    
+                    result = db[collection_name].insert_many(documents)
+                    restored_count += len(result.inserted_ids)
+                    log_info(f"Colección {collection_name} restaurada: {len(result.inserted_ids)} documentos")
+                
+            except Exception as e:
+                log_error(f"Error restaurando colección {collection_name}: {str(e)}")
+                continue
+        
+        log_info(f"Restauración completada: {restored_count} documentos restaurados")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Backup "{filename}" restaurado exitosamente. {restored_count} documentos restaurados.',
+            'filename': filename,
+            'restored_documents': restored_count,
+            'collections_restored': len(backup_data['collections'])
+        })
+        
+    except Exception as e:
+        log_error(f"Error restaurando backup local {filename}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================================================
