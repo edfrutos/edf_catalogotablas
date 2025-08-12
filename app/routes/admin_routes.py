@@ -45,7 +45,7 @@ import json
 import os
 import shutil
 from flask import send_file
-from tools.db_utils.google_drive_utils import upload_to_drive, list_files_in_folder
+from app.utils.google_drive_wrapper import upload_to_drive, list_files_in_folder
 import traceback
 import psutil  # type: ignore
 import platform
@@ -2735,7 +2735,7 @@ def db_monitor():
 
 
 # Variables globales para el seguimiento de operaciones
-last_ops: dict[str, int] = {}
+last_ops: Dict[str, int] = {}
 last_update = time.time()
 
 
@@ -3912,7 +3912,7 @@ def restore_drive_backup():
         from bson import ObjectId
 
         # Descargar el archivo desde Google Drive usando la API
-        from tools.db_utils.google_drive_utils import download_file
+        from app.utils.google_drive_wrapper import download_file
 
         # Obtener el file_id del backup_id (que es el mismo en este caso)
         file_id = backup_id
@@ -4118,7 +4118,7 @@ def reset_gdrive_token_route():
 
     try:
         script_path = os.path.join(
-            os.path.dirname(__file__), "../../tools/db_utils/google_drive_utils.py"
+            os.path.dirname(__file__), "tools/production/db_utils/google_drive_utils.py"
         )
         result = subprocess.run(
             [sys.executable, script_path, "--reset-token"],
@@ -4143,7 +4143,7 @@ def reset_gdrive_token_route():
 def gdrive_upload_test():
     import os
     from werkzeug.utils import secure_filename
-    from tools.db_utils.google_drive_utils import upload_to_drive
+    from app.utils.google_drive_wrapper import upload_to_drive
 
     uploaded_links = []
     if request.method == "POST":
@@ -4266,7 +4266,7 @@ def create_and_upload_backup():
 
         # Subir a Google Drive
         try:
-            from tools.db_utils.google_drive_utils import upload_to_drive
+            from app.utils.google_drive_wrapper import upload_to_drive
 
             # Subir archivo a Google Drive
             upload_result = upload_to_drive(backup_file, "Backups_CatalogoTablas")
@@ -4421,7 +4421,7 @@ def upload_backup_to_drive(filename: str):
     )
     if db_utils_path not in sys.path:
         sys.path.insert(0, db_utils_path)
-    from google_drive_utils import upload_to_drive
+    from app.utils.google_drive_wrapper import upload_to_drive
 
     try:
         # Validar el nombre del archivo

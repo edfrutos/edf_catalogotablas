@@ -113,7 +113,7 @@ def show_readme():
           <span class="badge bg-info text-dark">Vista Markdown</span>
         </div>
         <div class="card card-body">
-          {{ html|safe }}
+          {{ Union[html, safe] }}
         </div>
         <a href="/admin" class="btn btn-link mt-3"><i class="bi bi-arrow-left"></i> Volver al panel</a>
       </div>
@@ -156,7 +156,7 @@ def update_tests_readme():
     START = "<!-- TESTS-AUTO-START -->"
     END = "<!-- TESTS-AUTO-END -->"
     table_lines = []
-    table_lines.append("| Ruta | Descripción |")
+    table_lines.append("| Union[Ruta, Descripción] |")
     table_lines.append("|------|-------------|")
     for root, dirs, files in os.walk(TESTS_DIR):
         rel_dir = os.path.relpath(root, TESTS_DIR)

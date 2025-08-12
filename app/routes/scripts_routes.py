@@ -98,6 +98,18 @@ def scripts_metadata():
             "tests/local/functional",
             "tests/local/performance",
             "tests/local/security",
+            "tools/testing",
+        ],
+        "Diagnostic Tools": [
+            "tools/diagnostic",
+            "tools/local/diagnostico",
+        ],
+        "Migration Tools": [
+            "tools/migration",
+            "tools/local/aws_utils",
+        ],
+        "Configuration Tools": [
+            "tools/configuration",
         ],
         "Development Tools": ["tools/local/app", "tools/local/src"],
         "Infrastructure": ["tools/local/aws_utils", "tools/local/session_utils"],
@@ -130,6 +142,15 @@ def scripts_metadata():
             "tests/production/functional",
             "tests/production/performance",
             "tests/production/security",
+        ],
+        "Diagnostic Tools": [
+            "tools/production/diagnostico",
+        ],
+        "Migration Tools": [
+            "tools/production/aws_utils",
+        ],
+        "Configuration Tools": [
+            "tools/production/configuration",
         ],
         "Development Tools": ["tools/production/app", "tools/production/src"],
         "Infrastructure": [

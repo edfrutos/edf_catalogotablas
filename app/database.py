@@ -20,13 +20,25 @@ from pymongo.errors import (
     ServerSelectionTimeoutError,
     OperationFailure,
 )
-from config import (
-    MONGO_CONFIG,
-    COLLECTION_USERS,
-    COLLECTION_CATALOGOS,
-    COLLECTION_RESET_TOKENS,
-    COLLECTION_AUDIT_LOGS,
-)
+# Configuración de MongoDB - valores por defecto
+MONGO_CONFIG = {
+    'serverSelectionTimeoutMS': 10000,
+    'connectTimeoutMS': 5000,
+    'socketTimeoutMS': 30000,
+    'retryWrites': True,
+    'retryReads': True,
+    'maxPoolSize': 10,
+    'minPoolSize': 1,
+    'maxIdleTimeMS': 60000,
+    'waitQueueTimeoutMS': 10000,
+    'appName': 'edefrutos2025_app'
+}
+
+# Nombres de colecciones
+COLLECTION_USERS = 'users'
+COLLECTION_CATALOGOS = 'catalogs'
+COLLECTION_RESET_TOKENS = 'reset_tokens'
+COLLECTION_AUDIT_LOGS = 'audit_logs'
 import certifi  # Añadir al inicio junto con los otros imports
 
 # Importar sistemas de caché y fallback
@@ -340,3 +352,22 @@ def get_reset_tokens_collection():
 def get_audit_logs_collection():
     """Obtiene la colección de logs de auditoría"""
     return get_collection(COLLECTION_AUDIT_LOGS)
+
+def get_users_collection_safe():
+    """
+    Obtiene la colección 'users' de forma segura.
+    Retorna la colección si está disponible, None si no.
+    """
+    try:
+        from flask import g
+        users_collection = getattr(g, "users_collection", None)
+        if users_collection is None:
+            # Intentar obtener desde la conexión global
+            if _mongo_db:
+                users_collection = _mongo_db.get_collection(COLLECTION_USERS)
+            else:
+                return None
+        return users_collection
+    except Exception as e:
+        logging.error(f"Error obteniendo colección users: {e}")
+        return None

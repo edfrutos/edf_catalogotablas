@@ -1,5 +1,5 @@
 # Script: s3_utils.py
-# Descripción: [Explica brevemente qué hace el script]
+# Descripción: [EObtiene un cliente de AWS S3 configurado con las credenciales del archivo .env]
 # Uso: python3 s3_utils.py [opciones]
 # Requiere: [librerías externas, si aplica]
 # Variables de entorno: [si aplica]

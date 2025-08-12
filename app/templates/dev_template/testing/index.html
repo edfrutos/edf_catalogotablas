@@ -128,13 +128,16 @@
             <a href="#local-tests" class="list-group-item list-group-item-action active" data-bs-toggle="list">
               <i class="bi bi-laptop me-2"></i>Tests Locales
             </a>
+            <!-- FUNCIONALIDAD COMENTADA: Tests de Producción no disponibles
             <a href="#production-tests" class="list-group-item list-group-item-action" data-bs-toggle="list">
               <i class="bi bi-server me-2"></i>Tests de Producción
             </a>
+            -->
           </div>
         </div>
       </div>
       
+      <!-- FUNCIONALIDAD COMENTADA: Selector de categorías no funcional
       <div class="card mt-3">
         <div class="card-header">
           <h5 class="mb-0">
@@ -143,10 +146,11 @@
         </div>
         <div class="card-body p-0">
           <div class="list-group list-group-flush" id="category-menu">
-            <!-- Se llena dinámicamente -->
+            Se llena dinámicamente
           </div>
         </div>
       </div>
+      -->
     </div>
 
     <!-- Contenido de tests -->
@@ -168,7 +172,7 @@
           </div>
         </div>
         
-        <!-- Pestaña de Tests de Producción -->
+        <!-- FUNCIONALIDAD COMENTADA: Pestaña de Tests de Producción no disponible
         <div class="tab-pane fade" id="production-tests">
           <div class="card">
             <div class="card-header">
@@ -178,11 +182,12 @@
             </div>
             <div class="card-body">
               <div id="production-tests-content">
-                <!-- Se llena dinámicamente -->
+                Se llena dinámicamente
               </div>
             </div>
           </div>
         </div>
+        -->
       </div>
     </div>
   </div>
@@ -202,7 +207,7 @@
           data-bs-dismiss="modal"
         ></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
         <div id="executionProgress" class="text-center">
           <div class="spinner-border text-primary mb-3" role="status">
             <span class="visually-hidden">Ejecutando...</span>
@@ -216,11 +221,11 @@
           </div>
           <div class="mb-3">
             <h6>Salida estándar:</h6>
-            <pre id="executionStdout" class="bg-light p-3 rounded"></pre>
+            <pre id="executionStdout" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto; white-space: pre-wrap;"></pre>
           </div>
           <div class="mb-3">
             <h6>Errores:</h6>
-            <pre id="executionStderr" class="bg-light p-3 rounded"></pre>
+            <pre id="executionStderr" class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto; white-space: pre-wrap;"></pre>
           </div>
         </div>
       </div>
@@ -308,57 +313,39 @@
 
   // Función para renderizar tests
   function renderTests() {
-    const categoryMenu = document.getElementById("category-menu");
     const localTestsContent = document.getElementById("local-tests-content");
-    const productionTestsContent = document.getElementById("production-tests-content");
+    
+    // Verificar que el elemento existe antes de usarlo
+    if (!localTestsContent) {
+      console.error("Elemento local-tests-content no encontrado");
+      return;
+    }
 
     // Limpiar contenido
-    categoryMenu.innerHTML = "";
     localTestsContent.innerHTML = "";
-    productionTestsContent.innerHTML = "";
 
-    // Obtener todas las categorías únicas
-    const allCategories = new Set();
-    testsData.local.forEach(cat => allCategories.add(cat.categoria));
-    testsData.produccion.forEach(cat => allCategories.add(cat.categoria));
-
-    // Crear menú de categorías
-    Array.from(allCategories).forEach((category, index) => {
-      const menuItem = document.createElement("a");
-      menuItem.href = `#cat-${index}`;
-      menuItem.className = `list-group-item list-group-item-action ${index === 0 ? "active" : ""}`;
-      menuItem.setAttribute("data-bs-toggle", "list");
-      menuItem.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <span>${category}</span>
-                <span class="badge bg-primary rounded-pill">${getTestCountForCategory(category)}</span>
-            </div>
-        `;
-      categoryMenu.appendChild(menuItem);
-    });
-
-    // Renderizar tests locales
-    renderEnvironmentTests(localTestsContent, testsData.local, "local");
-    
-    // Renderizar tests de producción
-    renderEnvironmentTests(productionTestsContent, testsData.produccion, "produccion");
+    // Renderizar solo tests locales (producción comentada)
+    if (testsData.local && testsData.local.length > 0) {
+      renderEnvironmentTests(localTestsContent, testsData.local, "local");
+    } else {
+      localTestsContent.innerHTML = '<div class="alert alert-info">No hay tests locales disponibles.</div>';
+    }
   }
 
-  // Función para obtener el conteo de tests por categoría
+  // Función para obtener el conteo de tests por categoría (simplificada)
   function getTestCountForCategory(category) {
     let count = 0;
-    testsData.local.forEach(cat => {
-      if (cat.categoria === category) count += cat.tests.length;
-    });
-    testsData.produccion.forEach(cat => {
-      if (cat.categoria === category) count += cat.tests.length;
-    });
+    if (testsData.local) {
+      testsData.local.forEach(cat => {
+        if (cat.categoria === category) count += cat.tests.length;
+      });
+    }
     return count;
   }
 
   // Función para renderizar tests de un entorno específico
   function renderEnvironmentTests(container, tests, environment) {
-    if (tests.length === 0) {
+    if (!tests || tests.length === 0) {
       container.innerHTML = '<div class="alert alert-info">No hay tests disponibles en este entorno.</div>';
       return;
     }
@@ -613,103 +600,133 @@
   // ========================================
 
   // Actualizar README de tests
-  document.getElementById("update-tests-readme-btn").addEventListener("click", async function() {
-    try {
-      const response = await fetch("/dev-template/api/update-tests-readme", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }
-      });
-      const data = await response.json();
-      
-      if (data.success) {
-        showNotification("Éxito", "README de tests actualizado correctamente", "success");
-      } else {
-        showNotification("Error", data.error || "Error al actualizar README", "error");
+  const updateReadmeBtn = document.getElementById("update-tests-readme-btn");
+  if (updateReadmeBtn) {
+    updateReadmeBtn.addEventListener("click", async function() {
+      try {
+        const response = await fetch("/dev-template/api/update-tests-readme", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" }
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          showNotification("Éxito", "README de tests actualizado correctamente", "success");
+        } else {
+          showNotification("Error", data.error || "Error al actualizar README", "error");
+        }
+      } catch (error) {
+        showNotification("Error", "Error de conexión al actualizar README", "error");
       }
-    } catch (error) {
-      showNotification("Error", "Error de conexión al actualizar README", "error");
-    }
-  });
+    });
+  }
 
   // Generador de plantilla de test
-  document.getElementById("test-template-generator-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById("model-endpoint-name").value.trim();
-    if (!name) {
-      showNotification("Error", "Por favor ingresa un nombre", "error");
-      return;
-    }
-
-    try {
-      const response = await fetch("/dev-template/generate-test-template", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name })
-      });
-      const data = await response.json();
+  const testTemplateForm = document.getElementById("test-template-generator-form");
+  if (testTemplateForm) {
+    testTemplateForm.addEventListener("submit", async function(e) {
+      e.preventDefault();
       
-      if (data.success) {
-        document.getElementById("generated-template-code").textContent = data.code;
-        document.getElementById("generated-template-block").style.display = "block";
-        showNotification("Éxito", "Plantilla generada correctamente", "success");
-      } else {
-        showNotification("Error", data.error || "Error al generar plantilla", "error");
+      const nameInput = document.getElementById("model-endpoint-name");
+      const name = nameInput ? nameInput.value.trim() : "";
+      if (!name) {
+        showNotification("Error", "Por favor ingresa un nombre", "error");
+        return;
       }
-    } catch (error) {
-      showNotification("Error", "Error de conexión al generar plantilla", "error");
-    }
-  });
+
+      try {
+        const response = await fetch("/dev-template/generate-test-template", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: name })
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+          const codeEl = document.getElementById("generated-template-code");
+          const blockEl = document.getElementById("generated-template-block");
+          if (codeEl) codeEl.textContent = data.code;
+          if (blockEl) blockEl.style.display = "block";
+          showNotification("Éxito", "Plantilla generada correctamente", "success");
+        } else {
+          showNotification("Error", data.error || "Error al generar plantilla", "error");
+        }
+      } catch (error) {
+        showNotification("Error", "Error de conexión al generar plantilla", "error");
+      }
+    });
+  }
 
   // Copiar código generado
-  document.getElementById("copy-template-btn").addEventListener("click", function() {
-    const code = document.getElementById("generated-template-code").textContent;
-    navigator.clipboard.writeText(code).then(() => {
-      showNotification("Éxito", "Código copiado al portapapeles", "success");
-    }).catch(() => {
-      showNotification("Error", "No se pudo copiar el código", "error");
+  const copyTemplateBtn = document.getElementById("copy-template-btn");
+  if (copyTemplateBtn) {
+    copyTemplateBtn.addEventListener("click", function() {
+      const codeEl = document.getElementById("generated-template-code");
+      const code = codeEl ? codeEl.textContent : "";
+      if (code) {
+        navigator.clipboard.writeText(code).then(() => {
+          showNotification("Éxito", "Código copiado al portapapeles", "success");
+        }).catch(() => {
+          showNotification("Error", "No se pudo copiar el código", "error");
+        });
+      }
     });
-  });
+  }
 
   // Modal para parámetros de test
   let currentTestPath = "";
   
   function showParamsModal(testPath, testName) {
     currentTestPath = testPath;
-    document.getElementById("paramsScriptName").textContent = testName;
-    document.getElementById("paramsInput").value = "";
-    document.getElementById("paramsHelpBlock").textContent = "Ingresa parámetros adicionales para el test (opcional)";
     
-    const modal = new bootstrap.Modal(document.getElementById("paramsModal"));
-    modal.show();
+    const scriptNameEl = document.getElementById("paramsScriptName");
+    const inputEl = document.getElementById("paramsInput");
+    const helpBlockEl = document.getElementById("paramsHelpBlock");
+    
+    if (scriptNameEl) scriptNameEl.textContent = testName || "";
+    if (inputEl) inputEl.value = "";
+    if (helpBlockEl) helpBlockEl.textContent = "Ingresa parámetros adicionales para el test (opcional)";
+    
+    const modalEl = document.getElementById("paramsModal");
+    if (modalEl && typeof bootstrap !== "undefined" && bootstrap.Modal) {
+      const modal = new bootstrap.Modal(modalEl);
+      modal.show();
+    }
   }
 
   // Ejecutar test con parámetros
-  document.getElementById("runWithParamsBtn").addEventListener("click", async function() {
-    const params = document.getElementById("paramsInput").value.trim();
-    
-    try {
-      const response = await fetch("/dev-template/run-test", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          test_file: currentTestPath,
-          params: params
-        })
-      });
-      const data = await response.json();
+  const runWithParamsBtn = document.getElementById("runWithParamsBtn");
+  if (runWithParamsBtn) {
+    runWithParamsBtn.addEventListener("click", async function() {
+      const paramsInput = document.getElementById("paramsInput");
+      const params = paramsInput ? paramsInput.value.trim() : "";
       
-      // Cerrar modal
-      bootstrap.Modal.getInstance(document.getElementById("paramsModal")).hide();
-      
-      // Mostrar resultado
-      showNotification("Test ejecutado", "Revisa la consola para ver el resultado", "info");
-      console.log("Resultado del test:", data);
-      
-    } catch (error) {
-      showNotification("Error", "Error al ejecutar test con parámetros", "error");
-    }
-  });
+      try {
+        const response = await fetch("/dev-template/run-test", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            test_file: currentTestPath,
+            params: params
+          })
+        });
+        const data = await response.json();
+        
+        // Cerrar modal
+        const paramsModal = document.getElementById("paramsModal");
+        if (paramsModal && typeof bootstrap !== "undefined" && bootstrap.Modal) {
+          bootstrap.Modal.getInstance(paramsModal).hide();
+        }
+        
+        // Mostrar resultado
+        showNotification("Test ejecutado", "Revisa la consola para ver el resultado", "info");
+        console.log("Resultado del test:", data);
+        
+      } catch (error) {
+        showNotification("Error", "Error al ejecutar test con parámetros", "error");
+      }
+    });
+  }
 </script>
 
 <!-- Modal para parámetros -->

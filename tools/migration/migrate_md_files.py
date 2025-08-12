@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Descripción: Migra archivos markdown al sistema
 """
 Script para migrar archivos .md a la estructura de docs/ organizados por categorías
 """

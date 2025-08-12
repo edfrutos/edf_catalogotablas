@@ -12,6 +12,7 @@ from flask_mail import Mail  # noqa: F401  # Usado condicionalmente en diferente
 from dotenv import load_dotenv
 from pymongo import MongoClient  # noqa: F401  # Usado en algunos entornos específicos
 from werkzeug.exceptions import HTTPException  # noqa: F401  # Para manejo de errores en producción
+from typing import Union
 
 from config import Config  # noqa: F401  # Usado condicionalmente según entorno
 from app.logging_config import setup_logging  # noqa: F401  # Usado en otros módulos
@@ -129,7 +130,7 @@ def create_app(testing=False):
     from app.models.user import User
 
     @login_manager.user_loader
-    def load_user(user_id: str | None):
+    def load_user(user_id: Union[str, None]):
         if user_id is None or user_id == "":
             return None
         # Usar g para la colección de usuarios

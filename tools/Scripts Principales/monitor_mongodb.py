@@ -16,10 +16,11 @@ from email.mime.multipart import MIMEMultipart
 from dotenv import load_dotenv
 
 # Configuración
-LOG_FILE = "/logs/mongodb_monitor.log"
-GUNICORN_ERROR_LOG = "/logs/gunicorn_error.log"
-GUNICORN_ACCESS_LOG = "/logs/gunicorn_access.log"
-APP_LOG = "/logs/app.log"
+BASE_DIR = "/var/www/vhosts/edefrutos2025.xyz/httpdocs"
+LOG_FILE = f"{BASE_DIR}/logs/mongodb_monitor.log"
+GUNICORN_ERROR_LOG = f"{BASE_DIR}/logs/gunicorn_error.log"
+GUNICORN_ACCESS_LOG = f"{BASE_DIR}/logs/gunicorn_access.log"
+APP_LOG = f"{BASE_DIR}/logs/app.log"
 MAX_LOG_SIZE = 10 * 1024 * 1024  # 10 MB
 
 # Inicializar archivo de log si no existe

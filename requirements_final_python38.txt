@@ -1,0 +1,97 @@
+# Requirements finales compatibles con Python 3.8.10
+# Paquetes core
+anyio==4.5.2
+asgiref==3.8.1
+fastapi==0.104.1
+starlette==0.27.0
+uvicorn==0.24.0
+pydantic==2.5.0
+pydantic_core==2.14.5
+typing_extensions==4.8.0
+
+# Flask y extensiones
+Flask==3.0.0
+Werkzeug==3.0.1
+Jinja2==3.1.2
+click==8.1.7
+itsdangerous==2.1.2
+MarkupSafe==2.1.3
+blinker==1.8.2
+Flask-Login==0.6.3
+Flask-Mail==0.9.1
+Flask-Session==0.5.0
+Flask-WTF==1.2.1
+WTForms==3.1.1
+Flask-Limiter==3.5.0
+Flask-PyMongo==2.3.0
+flask-redis==0.4.0
+
+# Base de datos
+pymongo==4.6.0
+redis==5.0.1
+SQLAlchemy==2.0.23
+
+# HTTP y requests
+requests==2.31.0
+urllib3==2.0.7
+httpx==0.25.2
+httpcore==1.0.2
+websockets==12.0
+httpx-sse==0.4.0
+sse-starlette==1.8.2
+
+# Autenticación y seguridad
+Authlib==1.3.2
+bcrypt==4.1.2
+passlib==1.7.4
+email-validator==2.1.0
+pyotp==2.9.0
+
+# Utilidades
+python-dotenv==1.0.0
+python-dateutil==2.8.2
+python-multipart==0.0.6
+pytz==2023.3
+tzdata==2023.3
+certifi==2023.11.17
+charset-normalizer==3.3.2
+idna==3.6
+six==1.16.0
+
+# Google Cloud
+google-auth==2.23.4
+google-api-python-client==2.108.0
+google-cloud-storage==2.10.0
+google-cloud-bigquery==3.13.0
+google-cloud-aiplatform==1.38.1
+grpcio==1.59.3
+protobuf==4.25.1
+
+# AWS
+boto3==1.34.0
+botocore==1.34.0
+
+# Procesamiento de datos
+numpy==1.24.4
+pandas==2.0.3
+scipy==1.11.4
+pillow==10.1.0
+openpyxl==3.1.2
+beautifulsoup4==4.12.2
+lxml==4.9.3
+
+# Herramientas de desarrollo
+pytest==7.4.3
+black==23.11.0
+isort==5.12.0
+pylint==3.0.3
+gunicorn==21.2.0
+
+# Utilidades adicionales
+qrcode==7.4.2
+Faker==20.1.0
+tenacity==8.2.3
+tabulate==0.9.0
+rich==13.7.0
+tqdm==4.66.1
+watchdog==3.0.0

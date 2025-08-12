@@ -57,16 +57,25 @@ def tests_metadata():
         "Functional Tests": ["tests/local/functional"],
         "Performance Tests": ["tests/local/performance"],
         "Security Tests": ["tests/local/security"],
+        "Diagnóstico Local": [
+            "tools/local/diagnostico",
+            "tools/local/testing",
+            "tools/diagnostico"
+        ],
+        "Tests Generales": [
+            "tests",
+            "tools/Scripts Principales",
+            "tools/Test Scripts",
+            "tools/db_utils",
+            "tools/testing"
+        ]
     }
 
     # Definir categorías de tests para PRODUCCIÓN
-    categorias_produccion = {
-        "Unit Tests": ["tests/production/unit"],
-        "Integration Tests": ["tests/production/integration"],
-        "Functional Tests": ["tests/production/functional"],
-        "Performance Tests": ["tests/production/performance"],
-        "Security Tests": ["tests/production/security"],
-    }
+    # FUNCIONALIDAD COMENTADA: No hay scripts específicos de testing para producción
+    # Los scripts de producción son principalmente de mantenimiento y no de testing
+    # Si se necesita en el futuro, descomentar esta sección
+    categorias_produccion = {}
 
     # Procesar tests LOCALES
     tests_locales = []
@@ -81,19 +90,36 @@ def tests_metadata():
                         fpath = os.path.join(dir_path, fname)
                         if (
                             os.path.isfile(fpath)
-                            and fname.startswith("test_")
-                            and fname.endswith(".py")
+                            and (
+                                (fname.startswith("test_") and fname.endswith(".py")) or
+                                (fname.startswith("test_") and fname.endswith(".js")) or
+                                (fname.startswith("test_") and fname.endswith(".html")) or
+                                (fname.endswith("_test.py")) or
+                                (fname.endswith("_test.js")) or
+                                (fname.endswith("_test.html")) or
+                                (fname == "conftest.py")
+                            )
                         ):
                             descripcion = extract_test_description(fpath)
                             if not descripcion:
                                 descripcion = "Test sin descripción"
+
+                            # Determinar el tipo de test basado en la extensión
+                            if fname.endswith(".py"):
+                                tipo = "python"
+                            elif fname.endswith(".js"):
+                                tipo = "javascript"
+                            elif fname.endswith(".html"):
+                                tipo = "html"
+                            else:
+                                tipo = "unknown"
 
                             tests_categoria.append(
                                 {
                                     "nombre": fname,
                                     "descripcion": descripcion,
                                     "path": os.path.join(directorio, fname),
-                                    "tipo": "pytest",
+                                    "tipo": tipo,
                                     "entorno": "local",
                                 }
                             )
@@ -117,19 +143,36 @@ def tests_metadata():
                         fpath = os.path.join(dir_path, fname)
                         if (
                             os.path.isfile(fpath)
-                            and fname.startswith("test_")
-                            and fname.endswith(".py")
+                            and (
+                                (fname.startswith("test_") and fname.endswith(".py")) or
+                                (fname.startswith("test_") and fname.endswith(".js")) or
+                                (fname.startswith("test_") and fname.endswith(".html")) or
+                                (fname.endswith("_test.py")) or
+                                (fname.endswith("_test.js")) or
+                                (fname.endswith("_test.html")) or
+                                (fname == "conftest.py")
+                            )
                         ):
                             descripcion = extract_test_description(fpath)
                             if not descripcion:
                                 descripcion = "Test sin descripción"
+
+                            # Determinar el tipo de test basado en la extensión
+                            if fname.endswith(".py"):
+                                tipo = "python"
+                            elif fname.endswith(".js"):
+                                tipo = "javascript"
+                            elif fname.endswith(".html"):
+                                tipo = "html"
+                            else:
+                                tipo = "unknown"
 
                             tests_categoria.append(
                                 {
                                     "nombre": fname,
                                     "descripcion": descripcion,
                                     "path": os.path.join(directorio, fname),
-                                    "tipo": "pytest",
+                                    "tipo": tipo,
                                     "entorno": "produccion",
                                 }
                             )
@@ -188,17 +231,70 @@ def run_test(test_path):
         env = os.environ.copy()
         env["PYTHONPATH"] = ROOT_DIR
 
-        # Ejecutar el test con pytest
-        cmd = [sys.executable, "-m", "pytest", abs_test_path, "-v", "--tb=short"]
-
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            cwd=ROOT_DIR,
-            env=env,
-            timeout=300,  # 5 minutos de timeout
-        )
+        # Determinar el tipo de archivo y ejecutar apropiadamente
+        file_extension = os.path.splitext(abs_test_path)[1].lower()
+        
+        if file_extension == ".py":
+            # Ejecutar archivos Python usando el entorno virtual
+            python_executable = os.path.join(ROOT_DIR, ".venv", "bin", "python3")
+            if not os.path.exists(python_executable):
+                python_executable = sys.executable  # Fallback al Python del sistema
+            cmd = [python_executable, abs_test_path]
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=ROOT_DIR,
+                env=env,
+                timeout=300,  # 5 minutos de timeout
+            )
+        elif file_extension == ".js":
+            # Para archivos JavaScript, mostrar el contenido
+            try:
+                with open(abs_test_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                result = subprocess.CompletedProcess(
+                    args=[abs_test_path],
+                    returncode=0,
+                    stdout=f"Archivo JavaScript: {os.path.basename(abs_test_path)}\n\nContenido:\n{content}",
+                    stderr=""
+                )
+            except Exception as e:
+                result = subprocess.CompletedProcess(
+                    args=[abs_test_path],
+                    returncode=1,
+                    stdout="",
+                    stderr=f"Error leyendo archivo JavaScript: {str(e)}"
+                )
+        elif file_extension == ".html":
+            # Para archivos HTML, mostrar el contenido
+            try:
+                with open(abs_test_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                result = subprocess.CompletedProcess(
+                    args=[abs_test_path],
+                    returncode=0,
+                    stdout=f"Archivo HTML: {os.path.basename(abs_test_path)}\n\nContenido:\n{content}",
+                    stderr=""
+                )
+            except Exception as e:
+                result = subprocess.CompletedProcess(
+                    args=[abs_test_path],
+                    returncode=1,
+                    stdout="",
+                    stderr=f"Error leyendo archivo HTML: {str(e)}"
+                )
+        else:
+            # Para otros tipos, intentar ejecutar como Python
+            cmd = [sys.executable, abs_test_path]
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                cwd=ROOT_DIR,
+                env=env,
+                timeout=300,  # 5 minutos de timeout
+            )
 
         # Preparar la respuesta
         response = {

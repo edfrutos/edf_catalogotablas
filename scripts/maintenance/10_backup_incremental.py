@@ -12,7 +12,7 @@ from pymongo import MongoClient
 import json
 from datetime import datetime, timezone
 from bson import ObjectId
-from tools.db_utils.google_drive_utils import upload_to_drive
+from app.utils.google_drive_wrapper import upload_to_drive
 
 MONGO_URI = os.getenv('MONGO_URI')
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where())

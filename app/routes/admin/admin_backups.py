@@ -21,7 +21,7 @@ from bson import ObjectId
 from app.decorators import admin_required
 from app.database import get_catalogs_collection, get_mongo_client
 from app.audit import audit_log
-from tools.db_utils.google_drive_utils import upload_to_drive
+from app.utils.google_drive_wrapper import upload_to_drive
 
 admin_backups_bp = Blueprint('admin_backups', __name__, url_prefix='/admin/backups')
 logger = logging.getLogger(__name__)

@@ -38,7 +38,7 @@ def upload_file_to_s3(file_path, object_name=None, delete_local=True):
         delete_local (bool): Si es True, elimina el archivo local tras subirlo.
 
     Returns:
-        str|None: Ruta S3 si sube correctamente, None si falla.
+        Union[str, None]: Ruta S3 si sube correctamente, None si falla.
     """
     if object_name is None:
         object_name = os.path.basename(file_path)
@@ -74,7 +74,7 @@ def get_s3_url(object_name, expiration=3600):
         expiration (int): Tiempo de expiración de la URL en segundos (por defecto 1 hora).
 
     Returns:
-        str|None: URL prefirmada o None si falla.
+        Union[str, None]: URL prefirmada o None si falla.
     """
     try:
         url = s3_client.generate_presigned_url(

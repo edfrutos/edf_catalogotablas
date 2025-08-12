@@ -25,7 +25,8 @@ logging.basicConfig(
 )
 
 # Cache en memoria principal con capacidad limitada
-_memory_cache: dict[str, dict[str, str | float]] = {}
+from typing import Dict, Union
+_memory_cache: Dict[str, Dict[str, Union[str, float]]] = {}
 _cache_lock = threading.RLock()
 _cache_file = (
     None  # Desactivamos el archivo de respaldo para evitar problemas de permisos

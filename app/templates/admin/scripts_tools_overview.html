@@ -93,7 +93,7 @@ endblock %} {% block content %}
           data-bs-dismiss="modal"
         ></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
         <div id="executionProgress" class="text-center">
           <div class="spinner-border text-primary mb-3" role="status">
             <span class="visually-hidden">Ejecutando...</span>
@@ -107,11 +107,11 @@ endblock %} {% block content %}
           </div>
           <div class="mb-3">
             <h6>Salida estándar:</h6>
-            <pre id="executionStdout" class="bg-light p-3 rounded"></pre>
+            <pre id="executionStdout" class="bg-light p-3 rounded" style="max-height: 300px; overflow-y: auto; white-space: pre-wrap;"></pre>
           </div>
           <div class="mb-3">
             <h6>Errores:</h6>
-            <pre id="executionStderr" class="bg-light p-3 rounded"></pre>
+            <pre id="executionStderr" class="bg-light p-3 rounded" style="max-height: 200px; overflow-y: auto; white-space: pre-wrap;"></pre>
           </div>
         </div>
       </div>

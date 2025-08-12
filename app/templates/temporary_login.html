@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">
+                        <i class="bi bi-key"></i>
+                        Acceso Temporal
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6><i class="bi bi-info-circle"></i> Instrucciones</h6>
+                        <p class="mb-0">
+                            Usa tu <strong>email</strong> y tu <strong>contraseña temporal</strong> 
+                            (tu username + "123") para acceder. Después serás redirigido a cambiar tu contraseña.
+                        </p>
+                    </div>
+
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña temporal</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="password" name="password" required>
+                                <button type="button" class="btn btn-outline-secondary toggle-password">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            <div class="form-text">
+                                <i class="bi bi-lightbulb"></i> 
+                                Si no recuerdas tu contraseña temporal, usa: <strong>tu_username123</strong>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-box-arrow-in-right"></i>
+                            Acceder temporalmente
+                        </button>
+                    </form>
+
+                    <div class="mt-3 text-center">
+
+                            <i class="bi bi-arrow-left"></i> Volver a la información
+                        </a>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="card border-secondary">
+                            <div class="card-body">
+                                <h6><i class="bi bi-question-circle"></i> ¿Necesitas ayuda?</h6>
+                                <p class="mb-2">Si no recuerdas tus credenciales:</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="bi bi-search"></i> Buscar mis credenciales</li>
+                                    <li><i class="bi bi-envelope"></i> Contactar al administrador</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.querySelectorAll('.toggle-password').forEach(function(btn) {
+    btn.addEventListener('click', function () {
+        const pwd = this.parentElement.querySelector('input[type="password"], input[type="text"]');
+        const icon = this.querySelector('i');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            if (icon) { icon.classList.remove('bi-eye'); icon.classList.add('bi-eye-slash'); }
+        } else {
+            pwd.type = 'password';
+            if (icon) { icon.classList.remove('bi-eye-slash'); icon.classList.add('bi-eye'); }
+        }
+    });
+});
+</script>
+{% endblock %}

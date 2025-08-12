@@ -5,11 +5,11 @@
 El sistema de ejecución de scripts está **funcionando correctamente** con las siguientes características:
 
 - ✅ **473 scripts** encontrados en el proyecto
-- ✅ **script_runner.py** principal ubicado en `/tools/script_runner.py`
-- ✅ **scripts_routes.py** configurado correctamente en `/app/routes/scripts_routes.py`
-- ✅ **Ruta de ejecución**: `/admin/tools/run/<script_path>`
+- ✅ __script_runner.py__ principal ubicado en `/tools/script_runner.py`
+- ✅ __scripts_routes.py__ configurado correctamente en `/app/routes/scripts_routes.py`
+- ✅ __Ruta de ejecución__: `/admin/tools/run/<script_path>`
 - ✅ **Blueprint prefix**: `/admin/tools`
-- ✅ **Función get_script_path**: Implementada correctamente
+- ✅ __Función get_script_path__: Implementada correctamente
 - ✅ **Sistema de búsqueda**: Funciona en 18 ubicaciones diferentes
 
 ---
@@ -17,108 +17,122 @@ El sistema de ejecución de scripts está **funcionando correctamente** con las 
 ## 📂 **Ubicaciones Principales de Scripts**
 
 ### 🔧 **Scripts Principales** (`/tools/Scripts Principales/`)
-- **supervise_gunicorn.sh** - Supervisión de Gunicorn (requiere root)
-- **supervise_gunicorn_web.sh** - Supervisión web de Gunicorn ✅
-- **script_runner.py** - Ejecutor de scripts ✅
-- **03_validar_integridad.py** - Validación de integridad de BD
-- **04_limpieza_automatizada.py** - Limpieza automática
-- **08_backup_colecciones.py** - Backup de colecciones
-- **09_backup_restore_total.py** - Backup y restauración total
-- **10_backup_incremental.py** - Backup incremental
+
+
+- __supervise_gunicorn.sh__ - Supervisión de Gunicorn (requiere root)
+- __supervise_gunicorn_web.sh__ - Supervisión web de Gunicorn ✅
+- __script_runner.py__ - Ejecutor de scripts ✅
+- __03_validar_integridad.py__ - Validación de integridad de BD
+- __04_limpieza_automatizada.py__ - Limpieza automática
+- __08_backup_colecciones.py__ - Backup de colecciones
+- __09_backup_restore_total.py__ - Backup y restauración total
+- __10_backup_incremental.py__ - Backup incremental
 
 ### 🏭 **Scripts de Producción** (`/tools/producción/`)
-- **supervise_gunicorn.sh** - Supervisión de Gunicorn
-- **supervise_gunicorn_web.sh** - Supervisión web de Gunicorn ✅
-- **start_app.sh** - Inicio de aplicación
-- **start_gunicorn.sh** - Inicio de Gunicorn
-- **restart_server.sh** - Reinicio del servidor
+
+- __supervise_gunicorn.sh__ - Supervisión de Gunicorn
+- __supervise_gunicorn_web.sh__ - Supervisión web de Gunicorn ✅
+- __start_app.sh__ - Inicio de aplicación
+- __start_gunicorn.sh__ - Inicio de Gunicorn
+- __restart_server.sh__ - Reinicio del servidor
 
 ### 🛠️ **Scripts de Mantenimiento** (`/scripts/maintenance/`)
-- **supervise_gunicorn.sh** - Supervisión de Gunicorn
-- **supervise_gunicorn_web.sh** - Supervisión web de Gunicorn ✅
-- **script_runner.py** - Ejecutor de scripts
-- **clean_images.py** - Limpieza de imágenes
-- **monitor_mongodb.py** - Monitoreo de MongoDB
+
+- __supervise_gunicorn.sh__ - Supervisión de Gunicorn
+- __supervise_gunicorn_web.sh__ - Supervisión web de Gunicorn ✅
+- __script_runner.py__ - Ejecutor de scripts
+- __clean_images.py__ - Limpieza de imágenes
+- __monitor_mongodb.py__ - Monitoreo de MongoDB
 
 ### 🔍 **Scripts de Diagnóstico** (`/tools/diagnostico/`)
-- **debug_users.py** - Diagnóstico de usuarios ✅
-- **diagnose_script_execution.py** - Diagnóstico de ejecución ✅
-- **test_script_execution.py** - Pruebas de ejecución
-- **03_validar_integridad.py** - Validación de integridad
+
+- __debug_users.py__ - Diagnóstico de usuarios ✅
+- __diagnose_script_execution.py__ - Diagnóstico de ejecución ✅
+- __test_script_execution.py__ - Pruebas de ejecución
+- __03_validar_integridad.py__ - Validación de integridad
 
 ### 👥 **Scripts de Usuarios** (`/tools/Users Tools/`)
-- **check_users.py** - Verificación de usuarios
-- **debug_users.py** - Depuración de usuarios
-- **check_user.py** - Verificación de usuario individual
-- **migrate_users.py** - Migración de usuarios
+
+- __check_users.py__ - Verificación de usuarios
+- __debug_users.py__ - Depuración de usuarios
+- __check_user.py__ - Verificación de usuario individual
+- __migrate_users.py__ - Migración de usuarios
 
 ### 🔐 **Scripts de Administración** (`/tools/Admin Utils/`)
-- **show_admin_user.py** - Mostrar usuario admin
-- **06_eliminar_duplicados_users.py** - Eliminar duplicados
-- **normalize_users.py** - Normalización de usuarios
+
+- __show_admin_user.py__ - Mostrar usuario admin
+- __06_eliminar_duplicados_users.py__ - Eliminar duplicados
+- __normalize_users.py__ - Normalización de usuarios
 
 ---
 
 ## 🚀 **Funcionalidad del Sistema**
 
 ### **1. Ejecución de Scripts**
-- **Ruta**: `/admin/tools/run/<script_path>`
+
+- __Ruta__: `/admin/tools/run/<script_path>`
 - **Método**: POST
 - **Autenticación**: Requiere rol admin
 - **Timeout**: 5 minutos
 
-### **2. script_runner.py Principal**
-- **Ubicación**: `/tools/script_runner.py`
+### __2. script_runner.py Principal__
+
+- __Ubicación__: `/tools/script_runner.py`
 - **Función**: Ejecutor intermediario para scripts
 - **Salida**: JSON con resultados
 - **Timeout**: 30 segundos
 
 ### **3. Búsqueda de Scripts**
-El sistema busca scripts en múltiples ubicaciones:
-1. `/tools/Scripts Principales/`
 
-3. `/tools/maintenance/`
-4. `/tools/producción/`
-5. `/scripts/maintenance/`
-6. `/tools/db_utils/`
-7. `/tools/diagnostico/`
-8. `/tools/system/`
-9. `/tools/Users Tools/`
-10. `/tools/Admin Utils/`
-11. `/tools/utils/`
-12. `/tools/monitoring/`
-13. `/tools/aws_utils/`
-14. `/tools/Test Scripts/`
-15. `/tools/app/`
-16. `/tools/src/`
-17. `/tools/`
-18. `/scripts/`
+El sistema busca scripts en múltiples ubicaciones:
+
+1. `/tools/Scripts Principales/`
+2. `/tools/maintenance/`
+3. `/tools/producción/`
+4. `/scripts/maintenance/`
+5. `/tools/db_utils/`
+6. `/tools/diagnostico/`
+7. `/tools/system/`
+8. `/tools/Users Tools/`
+9. `/tools/Admin Utils/`
+10. `/tools/utils/`
+11. `/tools/monitoring/`
+12. `/tools/aws_utils/`
+13. `/tools/Test Scripts/`
+14. `/tools/app/`
+15. `/tools/src/`
+16. `/tools/`
+17. `/scripts/`
 
 ---
 
 ## ⚠️ **Scripts que Requieren Atención**
 
 ### **Scripts que Requieren Root**
-- **supervise_gunicorn.sh** - Requiere permisos de root
+
+- __supervise_gunicorn.sh__ - Requiere permisos de root
 - **Recomendación**: Crear versión alternativa sin privilegios
 
 ### **Scripts Funcionando Correctamente**
-- **supervise_gunicorn_web.sh** ✅
-- **debug_users.py** ✅
-- **script_runner.py** ✅
-- **test_script.sh** ✅
+
+- __supervise_gunicorn_web.sh__ ✅
+- __debug_users.py__ ✅
+- __script_runner.py__ ✅
+- __test_script.sh__ ✅
 
 ---
 
 ## 🔧 **Configuración del Sistema**
 
 ### **Variables de Entorno Requeridas**
+
 - `MONGO_URI` - Conexión a MongoDB
 - `SECRET_KEY` - Clave secreta de Flask
 - `AWS_ACCESS_KEY_ID` - Credenciales AWS (opcional)
 - `AWS_SECRET_ACCESS_KEY` - Credenciales AWS (opcional)
 
 ### **Permisos de Archivos**
+
 - Scripts ejecutables: `chmod +x`
 - Archivos de configuración: `chmod 644`
 - Directorios: `chmod 755`
@@ -156,4 +170,4 @@ El sistema busca scripts en múltiples ubicaciones:
 
 ---
 
-*Documento generado automáticamente por el script de diagnóstico* 
+*Documento generado automáticamente por el script de diagnóstico*

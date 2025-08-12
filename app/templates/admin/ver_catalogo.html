@@ -50,7 +50,15 @@
                                         {% if imgs %}
                                             <div class="d-flex flex-wrap gap-2">
                                                 {% for img in imgs %}
-                                                    <img src="{{ url_for('static', filename='uploads/' ~ img) }}" alt="img" class="img-thumbnail" style="height:60px;margin-right:4px;cursor:pointer;">
+                                                    {% if img.startswith('http') %}
+                                                        {# Imagen de S3 (URL completa) #}
+                                                        <img src="{{ img }}" alt="img" class="img-thumbnail" style="height:60px;margin-right:4px;cursor:pointer;" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
+                                                        <span style="display:none; color:red; font-size:10px;">Error</span>
+                                                    {% else %}
+                                                        {# Imagen local o S3 (solo nombre de archivo) - intentar S3 primero, luego local #}
+                                                        <img src="{{ get_image_url(img, use_s3=true) }}" alt="img" class="img-thumbnail" style="height:60px;margin-right:4px;cursor:pointer;" onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/image-placeholder.png') }}'; this.nextElementSibling.style.display='inline';">
+                                                        <span style="display:none; color:red; font-size:10px;">Error</span>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </div>
                                         {% else %}-{% endif %}

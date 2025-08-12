@@ -63,6 +63,21 @@ class FileProcessor:
             # Intentar decodificar como texto
             text_content = content.decode('utf-8')
             
+            # Verificar si es Markdown (contiene # al inicio de líneas)
+            lines = text_content.split('\n')
+            markdown_indicators = 0
+            for line in lines[:10]:  # Revisar las primeras 10 líneas
+                if line.strip().startswith('#'):
+                    markdown_indicators += 1
+                if line.strip().startswith('```'):
+                    markdown_indicators += 1
+                if line.strip().startswith('- ') or line.strip().startswith('* '):
+                    markdown_indicators += 1
+            
+            # Si tiene múltiples indicadores de Markdown, no es JSON
+            if markdown_indicators >= 2:
+                return 'text'
+            
             # Verificar si es JSON
             try:
                 data = json.loads(text_content)
@@ -74,7 +89,6 @@ class FileProcessor:
                 pass
             
             # Verificar si es CSV
-            lines = text_content.split('\n')
             if len(lines) > 1 and ',' in lines[0]:
                 # Verificar que tenga estructura de CSV
                 first_line = lines[0]
@@ -207,7 +221,7 @@ class GoogleDriveManager:
             sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'db_utils'))
             # Import google_drive_utils from the correct path
             sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools'))
-            from db_utils.google_drive_utils import list_files_in_folder
+            from app.utils.google_drive_wrapper import list_files_in_folder
             
             # Listar archivos en la carpeta de backups
             files = list_files_in_folder('Backups_CatalogoTablas')
@@ -241,11 +255,14 @@ class GoogleDriveManager:
             import sys
             import os
             sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'db_utils'))
-            from google_drive_utils import download_file
+            from app.utils.google_drive_wrapper import download_file
             
             # Descargar el archivo y devolver el contenido como bytes
             content = download_file(file_id)
-            return content
+            if isinstance(content, bytes):
+                return content
+            else:
+                raise TypeError("El contenido descargado no es de tipo bytes")
             
         except Exception as e:
             log_error(f"Error descargando archivo {filename}: {str(e)}")
@@ -258,7 +275,7 @@ class GoogleDriveManager:
             import sys
             import os
             sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'db_utils'))
-            from google_drive_utils import delete_file
+            from app.utils.google_drive_wrapper import delete_file
             
             # Eliminar el archivo usando la función real
             success = delete_file(file_id)
@@ -281,7 +298,7 @@ class GoogleDriveManager:
             import os
             import tempfile
             sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'db_utils'))
-            from google_drive_utils import upload_to_drive
+            from app.utils.google_drive_wrapper import upload_to_drive
             
             # Crear archivo temporal
             with tempfile.NamedTemporaryFile(delete=False, suffix=os.path.splitext(filename)[1]) as temp_file:
@@ -294,12 +311,13 @@ class GoogleDriveManager:
                 
                 if result and result.get('success'):
                     file_id = result.get('file_id')
+                    if file_id is None:
+                        raise Exception("Error subiendo a Google Drive: No se pudo obtener el ID del archivo")
                     log_info(f"Archivo {filename} subido exitosamente a Google Drive con ID: {file_id}")
                     return file_id
                 else:
                     error_msg = result.get('error', 'Error desconocido') if result else 'No se pudo subir el archivo'
                     raise Exception(f"Error subiendo a Google Drive: {error_msg}")
-                    
             finally:
                 # Limpiar archivo temporal
                 if os.path.exists(temp_file_path):
@@ -724,7 +742,7 @@ def create_backup():
         db_utils_path = os.path.join(os.path.dirname(__file__), '..', '..', 'tools', 'db_utils')
         if db_utils_path not in sys.path:
             sys.path.insert(0, db_utils_path)
-        from google_drive_utils import upload_to_drive
+        from app.utils.google_drive_wrapper import upload_to_drive
         
         backup_manager = BackupManager()
         backup_data = backup_manager.create_backup()
@@ -1089,8 +1107,15 @@ def get_system_status_data():
 def list_local_backups():
     """Lista los backups disponibles localmente."""
     try:
-        # Directorio de backups (usando ruta absoluta directa)
-        backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        # Usar el sistema de detección de entorno
+        from app.utils.environment_detector import EnvironmentDetector
+        env_detector = EnvironmentDetector()
+        
+        # Determinar el directorio de backups según el entorno
+        if env_detector.environment == 'development':
+            backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        else:
+            backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
         
         log_info(f"🔍 DEBUG: Función list_local_backups llamada")
         log_info(f"🔍 DEBUG: backup_dir = {backup_dir}")
@@ -1145,7 +1170,15 @@ def list_local_backups():
 def upload_local_backup_to_drive(filename):
     """Sube un backup local a Google Drive."""
     try:
-        backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        # Usar el sistema de detección de entorno
+        from app.utils.environment_detector import EnvironmentDetector
+        env_detector = EnvironmentDetector()
+        
+        # Determinar el directorio de backups según el entorno
+        if env_detector.environment == 'development':
+            backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        else:
+            backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
         file_path = os.path.join(backup_dir, filename)
         
         if not os.path.exists(file_path):
@@ -1191,7 +1224,15 @@ def upload_local_backup_to_drive(filename):
 def delete_local_backup(filename):
     """Elimina un backup local."""
     try:
-        backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        # Usar el sistema de detección de entorno
+        from app.utils.environment_detector import EnvironmentDetector
+        env_detector = EnvironmentDetector()
+        
+        # Determinar el directorio de backups según el entorno
+        if env_detector.environment == 'development':
+            backup_dir = '/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/backups'
+        else:
+            backup_dir = '/var/www/vhosts/edefrutos2025.xyz/httpdocs/backups'
         file_path = os.path.join(backup_dir, filename)
         
         if not os.path.exists(file_path):

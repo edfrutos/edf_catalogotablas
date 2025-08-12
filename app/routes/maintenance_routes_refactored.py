@@ -59,6 +59,21 @@ class FileProcessor:
             # Intentar decodificar como texto
             text_content = content.decode('utf-8')
             
+            # Verificar si es Markdown (contiene # al inicio de líneas)
+            lines = text_content.split('\n')
+            markdown_indicators = 0
+            for line in lines[:10]:  # Revisar las primeras 10 líneas
+                if line.strip().startswith('#'):
+                    markdown_indicators += 1
+                if line.strip().startswith('```'):
+                    markdown_indicators += 1
+                if line.strip().startswith('- ') or line.strip().startswith('* '):
+                    markdown_indicators += 1
+            
+            # Si tiene múltiples indicadores de Markdown, no es JSON
+            if markdown_indicators >= 2:
+                return 'text'
+            
             # Verificar si es JSON
             try:
                 json.loads(text_content)
@@ -195,7 +210,7 @@ class GoogleDriveManager:
     def download_file(self, file_id: str, filename: str) -> bytes:
         """Descarga un archivo de Google Drive."""
         try:
-            from tools.db_utils.google_drive_utils import download_file
+            from app.utils.google_drive_wrapper import download_file
             return download_file(file_id)
         except Exception as e:
             log_error(f"Error descargando archivo {filename}: {str(e)}")
@@ -204,7 +219,7 @@ class GoogleDriveManager:
     def delete_file(self, file_id: str) -> bool:
         """Elimina un archivo de Google Drive."""
         try:
-            from tools.db_utils.google_drive_utils import delete_file
+            from app.utils.google_drive_wrapper import delete_file
             from app.database import get_mongo_db
             
             # Eliminar de Google Drive

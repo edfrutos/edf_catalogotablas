@@ -112,6 +112,8 @@ class FileProcessor:
                     return 'json'
                 elif file_path.suffix.lower() == '.csv':
                     return 'csv'
+                elif file_path.suffix.lower() in ['.md', '.markdown']:
+                    return 'text'
             
             # Verificar por contenido
             if content.startswith(b'\x1f\x8b'):
@@ -120,6 +122,21 @@ class FileProcessor:
             # Intentar decodificar como texto
             try:
                 text_content = content.decode('utf-8')
+                
+                # Verificar si es Markdown (contiene # al inicio de líneas)
+                lines = text_content.split('\n')
+                markdown_indicators = 0
+                for line in lines[:10]:  # Revisar las primeras 10 líneas
+                    if line.strip().startswith('#'):
+                        markdown_indicators += 1
+                    if line.strip().startswith('```'):
+                        markdown_indicators += 1
+                    if line.strip().startswith('- ') or line.strip().startswith('* '):
+                        markdown_indicators += 1
+                
+                # Si tiene múltiples indicadores de Markdown, no es JSON
+                if markdown_indicators >= 2:
+                    return 'text'
                 
                 # Verificar si es JSON válido
                 try:
@@ -577,7 +594,7 @@ class GoogleDriveManager:
             # Importar funciones de Google Drive
             import sys
             sys.path.append(os.path.join(os.path.dirname(__file__), '../../tools/db_utils'))
-            from google_drive_utils import get_or_create_folder, list_files_in_folder
+            from app.utils.google_drive_wrapper import get_or_create_folder, list_files_in_folder
             
             # Obtener o crear la carpeta de backups
             folder_id = get_or_create_folder(folder_name)
@@ -618,7 +635,7 @@ class GoogleDriveManager:
             # Importar función de descarga
             import sys
             sys.path.append(os.path.join(os.path.dirname(__file__), '../../tools/db_utils'))
-            from google_drive_utils import download_file
+            from app.utils.google_drive_wrapper import download_file
             
             # Descargar el archivo
             content = download_file(file_id)
@@ -647,7 +664,7 @@ class GoogleDriveManager:
             import sys
             import tempfile
             sys.path.append(os.path.join(os.path.dirname(__file__), '../../tools/db_utils'))
-            from google_drive_utils import upload_to_drive
+            from app.utils.google_drive_wrapper import upload_to_drive
             
             # Crear archivo temporal
             with tempfile.NamedTemporaryFile(delete=False, suffix='.json.gz') as temp_file:

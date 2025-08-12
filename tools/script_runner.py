@@ -67,22 +67,24 @@ def run_script(script_path):
     try:
         # Determinar el comando adecuado según la extensión
         _, ext = os.path.splitext(script_path)
+        script_abs_path = os.path.abspath(script_path)
         if ext == '.py':
-            cmd = [sys.executable, script_path]
+            cmd = [sys.executable, script_abs_path]
         elif ext == '.sh':
-            cmd = ['/bin/bash', script_path]
+            cmd = ['/bin/bash', script_abs_path]
         else:
-            cmd = [script_path]
+            cmd = [script_abs_path]
         
         result["diagnostics"]["command"] = cmd
         
-        # Ejecutar el script
+        # Ejecutar el script desde el directorio raíz del proyecto
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         process = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
             timeout=30,
-            cwd=os.path.dirname(script_path)
+            cwd=project_root
         )
         
         result["exit_code"] = process.returncode

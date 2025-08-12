@@ -9,7 +9,72 @@ import logging
 import tempfile
 import zipfile
 import secrets
-from typing import Any
+import socket
+from typing import Any, Optional, List, Dict
+
+# ==============================================
+# 🌍 DETECCIÓN DE ENTORNO (DESARROLLO/PRODUCCIÓN)
+# ==============================================
+
+def detect_environment():
+    """
+    Detecta automáticamente si la aplicación está ejecutándose en desarrollo o producción
+    basándose en la ruta del archivo y el hostname del sistema
+    """
+    # Obtener la ruta absoluta del archivo actual
+    current_file_path = os.path.abspath(__file__)
+    
+    # Obtener el hostname del sistema
+    hostname = socket.gethostname()
+    
+    # Detectar entorno basándose en la ruta
+    if "/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas" in current_file_path:
+        environment = "development"
+        base_url = "http://localhost:5001"
+        upload_folder = "/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/uploads"
+        logs_folder = "/Users/edefrutos/_Repositorios/01.IDE_Cursor/edf_catalogotablas/branch_edf_catalogotablas/edf_catalogotablas/logs"
+    elif "/var/www/vhosts/edefrutos2025.xyz/httpdocs" in current_file_path:
+        environment = "production"
+        base_url = "https://edefrutos2025.xyz"
+        upload_folder = "/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/static/imagenes_subidas"
+        logs_folder = "/var/www/vhosts/edefrutos2025.xyz/httpdocs/logs"
+    else:
+        # Detección por hostname como fallback
+        if "localhost" in hostname or "127.0.0.1" in hostname:
+            environment = "development"
+            base_url = "http://localhost:5001"
+            upload_folder = os.path.join(os.path.dirname(current_file_path), "uploads")
+            logs_folder = os.path.join(os.path.dirname(current_file_path), "logs")
+        else:
+            environment = "production"
+            base_url = "https://edefrutos2025.xyz"
+            upload_folder = os.path.join(os.path.dirname(current_file_path), "uploads")
+            logs_folder = os.path.join(os.path.dirname(current_file_path), "logs")
+    
+    # Crear directorios si no existen
+    os.makedirs(upload_folder, exist_ok=True)
+    os.makedirs(logs_folder, exist_ok=True)
+    
+    return {
+        "environment": environment,
+        "base_url": base_url,
+        "upload_folder": upload_folder,
+        "logs_folder": logs_folder,
+        "hostname": hostname,
+        "current_path": current_file_path
+    }
+
+# Detectar entorno al importar el módulo
+ENV_CONFIG = detect_environment()
+
+# Configurar logging para mostrar el entorno detectado
+print(f"🌍 Entorno detectado: {ENV_CONFIG['environment'].upper()}")
+print(f"📍 Ruta: {ENV_CONFIG['current_path']}")
+print(f"🌐 URL Base: {ENV_CONFIG['base_url']}")
+print(f"📁 Upload: {ENV_CONFIG['upload_folder']}")
+print(f"📝 Logs: {ENV_CONFIG['logs_folder']}")
+print(f"🖥️  Hostname: {ENV_CONFIG['hostname']}")
+print("=" * 60)
 
 # traceback removido - no usado
 import hashlib
@@ -83,14 +148,14 @@ def eliminar_archivo_imagen(ruta: str) -> None:
                 current_app.logger.error(f"Error eliminando imagen local: {e}")
 
 
-def get_current_spreadsheet() -> str | None:
+def get_current_spreadsheet() -> Optional[str]:
     selected_table = session.get("selected_table")
     if not selected_table:
         return None
     return os.path.join(current_app.config["UPLOAD_FOLDER"], selected_table)
 
 
-def leer_datos_excel(filepath: str) -> list[dict[str, Any]]:
+def leer_datos_excel(filepath: str) -> List[Dict[str, Any]]:
     wb = openpyxl.load_workbook(filepath)
     hoja = wb.active
     if hoja is None:
@@ -124,6 +189,20 @@ def create_app():
         static_folder=STATIC_DIR,
         static_url_path="/static",
     )
+
+    # Configurar variables de entorno detectadas
+    app.config["ENVIRONMENT"] = ENV_CONFIG["environment"]
+    app.config["BASE_URL"] = ENV_CONFIG["base_url"]
+    app.config["UPLOAD_FOLDER"] = ENV_CONFIG["upload_folder"]
+    app.config["LOGS_FOLDER"] = ENV_CONFIG["logs_folder"]
+    app.config["HOSTNAME"] = ENV_CONFIG["hostname"]
+    
+    # Log de configuración del entorno
+    app.logger.info(f"🌍 Entorno: {ENV_CONFIG['environment'].upper()}")
+    app.logger.info(f"🌐 URL Base: {ENV_CONFIG['base_url']}")
+    app.logger.info(f"📁 Upload: {ENV_CONFIG['upload_folder']}")
+    app.logger.info(f"📝 Logs: {ENV_CONFIG['logs_folder']}")
+    app.logger.info(f"🖥️  Hostname: {ENV_CONFIG['hostname']}")
 
     # --- Registrar blueprint de imágenes ---
     from app.routes.images_routes import images_bp
@@ -229,7 +308,17 @@ def create_app():
     # --- Inyectar variables globales en todas las plantillas ---
     @app.context_processor
     def inject_template_vars():
-        return {"now": datetime.now(), "css_version": CSS_VERSION}
+        from app.utils.image_manager import get_image_url
+        return {
+            "now": datetime.now(), 
+            "css_version": CSS_VERSION,
+            "environment": ENV_CONFIG["environment"],
+            "base_url": ENV_CONFIG["base_url"],
+            "hostname": ENV_CONFIG["hostname"],
+            "is_development": ENV_CONFIG["environment"] == "development",
+            "is_production": ENV_CONFIG["environment"] == "production",
+            "get_image_url": get_image_url
+        }
 
     # --- Configurar archivos estáticos personalizados ---
     @app.route("/static/<path:filename>")
@@ -300,6 +389,8 @@ def create_app():
     )  # Blueprint para gestión de scripts (/admin/tools)
 
     # Registrar rutas de mantenimiento y API usando la función dedicada
+    from app.routes.unified_scripts_routes import unified_scripts_bp
+    app.register_blueprint(unified_scripts_bp)
     register_maintenance_routes(app)
     print("RUTAS DE MANTENIMIENTO Y API REGISTRADAS EXITOSAMENTE")
 
@@ -457,11 +548,56 @@ def create_app():
             g.spreadsheets_collection = None
 
     app.before_request(ensure_db)
+    
+    # Middleware para detectar usuarios que necesitan cambiar contraseña
+    @app.before_request
+    def check_password_change_required():
+        """Verifica si el usuario necesita cambiar su contraseña"""
+        # Rutas que no requieren verificación
+        exempt_routes = [
+            'auth.login',
+            'auth.register', 
+            'auth.forgot_password',
+            'auth.reset_password',
+            'password_notification.password_reset_notification',
+            'password_notification.temporary_login',
+            'password_notification.check_password_status',
+            'password_notification.get_temporary_credentials',
+            'usuarios.force_password_change',
+            'static'
+        ]
+        
+        # Si la ruta actual está exenta, no hacer nada
+        if request.endpoint in exempt_routes:
+            return None
+            
+        # Si el usuario está logueado y necesita cambiar contraseña
+        if session.get("force_password_change") and session.get("force_password_user_id"):
+            # Si no está en la página de cambio de contraseña, redirigir
+            if request.endpoint != 'usuarios.force_password_change':
+                flash("Debes cambiar tu contraseña temporal antes de continuar.", "warning")
+                return redirect(url_for("usuarios.force_password_change"))
+        
+        return None
 
     # Registrar blueprint de autenticación
     from app.routes.auth_routes import auth_bp
+    # from app.routes.password_notification_routes import password_notification_bp
 
     app.register_blueprint(auth_bp, url_prefix="/auth")
+    # app.register_blueprint(password_notification_bp, url_prefix="/password")
+
+    # Ruta de redirección para /login
+    @app.route("/login")
+    def login_redirect():
+        """Redirige /login a /auth/login para mantener compatibilidad"""
+        return redirect(url_for("auth.login"))
+
+    # Ruta de redirección para /auth/login/
+    @app.route("/auth/login/")
+    def auth_login_trailing_slash():
+        """Redirige /auth/login/ a /auth/login para mantener compatibilidad"""
+        return redirect(url_for("auth.login"))
 
     # Rutas de prueba directas
     @app.route("/ping")
@@ -571,7 +707,7 @@ if __name__ == "__main__":
 # Variables para carpetas
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 SPREADSHEET_FOLDER = os.path.join(ROOT_DIR, "spreadsheets")
-UPLOAD_FOLDER = os.path.join(ROOT_DIR, "imagenes_subidas")
+UPLOAD_FOLDER = os.path.join(ROOT_DIR, "app", "static", "imagenes_subidas")
 
 # Extensiones de imagen permitidas
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
@@ -606,7 +742,7 @@ sys.excepthook = handle_exception
 
 def upload_file_to_s3(
     file_path: str,
-    object_name: str | None = None,
+    object_name: Optional[str] = None,
     max_retries: int = 3,
     delete_local: bool = True,
 ) -> bool:

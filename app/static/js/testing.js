@@ -11,38 +11,42 @@ document.addEventListener("DOMContentLoaded", function () {
   const copyBtn = document.getElementById("copy-template-btn");
 
   function bindTemplateListeners() {
-    genForm && genForm.removeEventListener("submit", genForm._submit);
-    genForm._submit = async function(e) {
-      e.preventDefault();
-      const name = nameInput.value.trim();
-      if (!name) return;
-      codeBlock.textContent = "Generando...";
-      templateBlock.style.display = "block";
-      try {
-        const resp = await fetch("/dev-template/generate-test-template", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({name})
-        });
-        const data = await resp.json();
-        if (data.success) {
-          codeBlock.textContent = data.code;
-        } else {
-          codeBlock.textContent = "Error: " + (data.error || "No se pudo generar la plantilla.");
+    if (genForm) {
+      genForm.removeEventListener("submit", genForm._submit);
+      genForm._submit = async function(e) {
+        e.preventDefault();
+        const name = nameInput.value.trim();
+        if (!name) return;
+        codeBlock.textContent = "Generando...";
+        templateBlock.style.display = "block";
+        try {
+          const resp = await fetch("/dev-template/generate-test-template", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({name})
+          });
+          const data = await resp.json();
+          if (data.success) {
+            codeBlock.textContent = data.code;
+          } else {
+            codeBlock.textContent = "Error: " + (data.error || "No se pudo generar la plantilla.");
+          }
+        } catch (_) { // eslint-disable-line no-unused-vars
+          codeBlock.textContent = "Error de red o backend.";
         }
-      } catch (_) { // eslint-disable-line no-unused-vars
-        codeBlock.textContent = "Error de red o backend.";
-      }
-    };
-    genForm && genForm.addEventListener("submit", genForm._submit);
+      };
+      genForm.addEventListener("submit", genForm._submit);
+    }
 
-    copyBtn && copyBtn.removeEventListener("click", copyBtn._click);
-    copyBtn._click = function() {
-      if (codeBlock.textContent) {
-        navigator.clipboard.writeText(codeBlock.textContent);
-      }
-    };
-    copyBtn && copyBtn.addEventListener("click", copyBtn._click);
+    if (copyBtn) {
+      copyBtn.removeEventListener("click", copyBtn._click);
+      copyBtn._click = function() {
+        if (codeBlock && codeBlock.textContent) {
+          navigator.clipboard.writeText(codeBlock.textContent);
+        }
+      };
+      copyBtn.addEventListener("click", copyBtn._click);
+    }
   }
 
   bindTemplateListeners();
@@ -52,7 +56,9 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.removeEventListener("click", btn._runClick);
     btn._runClick = function() {
       const testFile = btn.getAttribute("data-test");
-      window.runTest(testFile);
+      if (testFile) {
+        window.runTest(testFile);
+      }
     };
     btn.addEventListener("click", btn._runClick);
   });
@@ -65,30 +71,44 @@ document.addEventListener("DOMContentLoaded", function () {
     btn._paramsClick = async function() {
       selectedScript = btn.getAttribute("data-script");
       selectedScriptName = btn.getAttribute("data-scriptname");
-      document.getElementById("paramsScriptName").textContent = selectedScriptName;
-      document.getElementById("paramsInput").value = "";
-      // Nueva lógica: mostrar ayuda de parámetros
+      
+      const scriptNameEl = document.getElementById("paramsScriptName");
+      const inputEl = document.getElementById("paramsInput");
       const helpBlock = document.getElementById("paramsHelpBlock");
-      helpBlock.textContent = "Cargando ayuda...";
-      try {
-        const resp = await fetch("/dev-template/api/script-params-help", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ script_path: selectedScript })
-        });
-        const data = await resp.json();
-        if (data.success) {
-          helpBlock.textContent = data.help;
-        } else {
-          helpBlock.textContent = data.error || "No se pudo obtener ayuda.";
+      
+      if (scriptNameEl) scriptNameEl.textContent = selectedScriptName || "";
+      if (inputEl) inputEl.value = "";
+      
+      // Nueva lógica: mostrar ayuda de parámetros
+      if (helpBlock) {
+        helpBlock.textContent = "Cargando ayuda...";
+        try {
+          const resp = await fetch("/dev-template/api/script-params-help", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ script_path: selectedScript })
+          });
+          const data = await resp.json();
+          if (data.success) {
+            helpBlock.textContent = data.help;
+          } else {
+            helpBlock.textContent = data.error || "No se pudo obtener ayuda.";
+          }
+        } catch (_) { // eslint-disable-line no-unused-vars
+          helpBlock.textContent = "Error obteniendo ayuda de parámetros.";
         }
-      } catch (_) { // eslint-disable-line no-unused-vars
-        helpBlock.textContent = "Error obteniendo ayuda de parámetros.";
       }
+      
       console.log("[DEBUG] Pulsado botón parámetros para", selectedScriptName, selectedScript);
       var modalEl = document.getElementById("paramsModal");
-      if (!modalEl) { console.error("No se encuentra el modal paramsModal"); return; }
-      if (typeof bootstrap === "undefined" || !bootstrap.Modal) { console.error("Bootstrap Modal no está disponible"); return; }
+      if (!modalEl) { 
+        console.error("No se encuentra el modal paramsModal"); 
+        return; 
+      }
+      if (typeof bootstrap === "undefined" || !bootstrap.Modal) { 
+        console.error("Bootstrap Modal no está disponible"); 
+        return; 
+      }
       let paramsModal = new bootstrap.Modal(modalEl);
       paramsModal.show();
     };
@@ -96,12 +116,19 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Ejecutar con parámetros
-  document.getElementById("runWithParamsBtn").addEventListener("click", function() {
-    let params = document.getElementById("paramsInput").value.trim();
-    if (!selectedScript) return;
-    window.runTest(selectedScript, params);
-    bootstrap.Modal.getInstance(document.getElementById("paramsModal")).hide();
-  });
+  const runWithParamsBtn = document.getElementById("runWithParamsBtn");
+  if (runWithParamsBtn) {
+    runWithParamsBtn.addEventListener("click", function() {
+      const paramsInput = document.getElementById("paramsInput");
+      let params = paramsInput ? paramsInput.value.trim() : "";
+      if (!selectedScript) return;
+      window.runTest(selectedScript, params);
+      const paramsModal = document.getElementById("paramsModal");
+      if (paramsModal && typeof bootstrap !== "undefined" && bootstrap.Modal) {
+        bootstrap.Modal.getInstance(paramsModal).hide();
+      }
+    });
+  }
 
   // Función global para ejecutar test
   window.runTest = function(script, params = "") {
@@ -114,10 +141,18 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .then(response => response.json())
     .then(res => {
-      showScriptResultModal(res.result || res.error || "Sin salida", "Resultado de Test/Script"); // eslint-disable-line no-undef
+      if (typeof showScriptResultModal !== "undefined") {
+        showScriptResultModal(res.result || res.error || "Sin salida", "Resultado de Test/Script");
+      } else {
+        console.log("Resultado:", res.result || res.error || "Sin salida");
+      }
     })
     .catch(err => {
-      showScriptResultModal("Error ejecutando test: " + err, "Error"); // eslint-disable-line no-undef
+      if (typeof showScriptResultModal !== "undefined") {
+        showScriptResultModal("Error ejecutando test: " + err, "Error");
+      } else {
+        console.error("Error ejecutando test:", err);
+      }
     });
   };
 
@@ -150,10 +185,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Botón de ejecutar todos los tests
-  document.getElementById("run-all-tests").addEventListener("click", function() {
-    window.runTest("");
-  });
+  const runAllTestsBtn = document.getElementById("run-all-tests");
+  if (runAllTestsBtn) {
+    runAllTestsBtn.addEventListener("click", function() {
+      window.runTest("");
+    });
+  }
 });
+
 // Modal para mostrar resultados de test/script
 window.showScriptResultModal = function(content, title = "Resultado") {
   let modalId = "scriptResultModal";
@@ -178,8 +217,17 @@ window.showScriptResultModal = function(content, title = "Resultado") {
       </div>`;
     document.body.appendChild(modalEl);
   }
-  modalEl.querySelector(".modal-title").textContent = title;
-  modalEl.querySelector("pre").textContent = content;
-  let modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-  modal.show();
+  
+  const titleEl = modalEl.querySelector(".modal-title");
+  const contentEl = modalEl.querySelector("pre");
+  
+  if (titleEl) titleEl.textContent = title;
+  if (contentEl) contentEl.textContent = content;
+  
+  if (typeof bootstrap !== "undefined" && bootstrap.Modal) {
+    let modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
+  } else {
+    console.error("Bootstrap Modal no está disponible");
+  }
 };

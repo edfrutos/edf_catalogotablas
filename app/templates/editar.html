@@ -90,7 +90,7 @@
                         {% if imagenes_actuales[i] %}
                         {% if imagenes_actuales[i] and imagenes_actuales[i].startswith('s3://') %}
                             {% set filename = imagenes_actuales[i].split('/')[-1] %}
-                            <img src="/imagenes_subidas/{{ filename }}?s3=true" alt="Imagen actual" class="thumbnail">
+                            <img src="/imagenes_subidas/{{ filename }}" alt="Imagen actual" class="thumbnail">
                         {% else %}
                             <img src="{{ imagenes_actuales[i] }}" alt="Imagen actual" class="thumbnail">
                         {% endif %}

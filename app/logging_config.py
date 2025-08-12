@@ -3,7 +3,9 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-from config import LOG_ROTATION_SIZE, LOG_BACKUP_COUNT
+# Configuración de logs - valores por defecto si no están disponibles
+LOG_ROTATION_SIZE = 2  # Tamaño en MB para rotación de logs
+LOG_BACKUP_COUNT = 3   # Número de copias de logs a mantener
 
 
 def setup_logging(app):

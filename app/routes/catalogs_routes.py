@@ -601,7 +601,22 @@ def edit_row(catalog_id, row_index, catalog):
                     filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
                     file_path = os.path.join(upload_dir, filename)
                     file.save(file_path)
-                    nuevas_imagenes.append(filename)
+                    
+                    # Usar el gestor de imágenes inteligente
+                    try:
+                        from app.utils.image_manager import upload_image
+                        upload_result = upload_image(file_path, filename)
+                        if upload_result['success']:
+                            nuevas_imagenes.append(filename)
+                            # El gestor maneja automáticamente S3 vs local
+                            current_app.logger.info(f"Imagen subida exitosamente: {filename}")
+                        else:
+                            nuevas_imagenes.append(filename)
+                            current_app.logger.warning(f"Error al subir imagen {filename}: {upload_result.get('error')}")
+                    except Exception as e:
+                        nuevas_imagenes.append(filename)
+                        current_app.logger.error(f"Error al subir imagen {filename}: {e}")
+                        
             if nuevas_imagenes:
                 row_data["images"] = row_data.get("images", []) + nuevas_imagenes
         # Eliminar imágenes seleccionadas
@@ -658,7 +673,24 @@ def add_row(catalog_id, catalog):
                     filename = secure_filename(f"{uuid.uuid4().hex}_{file.filename}")
                     file_path = os.path.join(upload_dir, filename)
                     file.save(file_path)
-                    row["images"].append(filename)
+                    
+                    # Subir a S3 si está habilitado
+                    try:
+                        from app.utils.s3_utils import upload_file_to_s3
+                        s3_result = upload_file_to_s3(file_path, filename)
+                        if s3_result.get('success'):
+                            # Guardar solo el nombre del archivo, no la URL completa
+                            row["images"].append(filename)
+                            # Eliminar archivo local después de subir a S3
+                            os.remove(file_path)
+                        else:
+                            # Si falla S3, usar ruta local
+                            row["images"].append(filename)
+                            print(f"Warning: S3 upload failed for {filename}: {s3_result.get('error')}")
+                    except Exception as e:
+                        # Si hay error, usar ruta local
+                        row["images"].append(filename)
+                        print(f"Warning: S3 upload error for {filename}: {e}")
         # Agregar la fila a ambas claves
         for collection_name in ["spreadsheets"]:
             try:

@@ -16,7 +16,7 @@ import secrets
 try:
     import sys
     sys.path.append(os.path.join(os.path.dirname(__file__), '../../tools/db_utils'))
-    from google_drive_utils import get_drive
+    from app.utils.google_drive_wrapper import get_drive
 except ImportError:
     get_drive = None
 
@@ -68,7 +68,7 @@ def get_storage_client():
             return None
         
         # Intentar obtener el cliente de Google Drive
-        drive_client = get_drive()
+        drive_client = run_db_script("google_drive_utils.py", "get_drive", )
         if drive_client:
             print("Cliente de Google Drive inicializado correctamente")
             return drive_client

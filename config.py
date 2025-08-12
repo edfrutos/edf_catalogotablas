@@ -118,7 +118,7 @@ class ProductionConfig(BaseConfig):
     DEBUG = False
     ENV = 'production'
     SESSION_COOKIE_SECURE = True
-    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/static/uploads')
+    UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/var/www/vhosts/edefrutos2025.xyz/httpdocs/app/static/imagenes_subidas')
     LOG_DIR = os.getenv('LOG_DIR', '/logs')
 
 def get_config():

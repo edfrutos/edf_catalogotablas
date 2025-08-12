@@ -42,7 +42,7 @@ def verificar_directorio_sesiones(directorio):
             logging.info(f"✅ Directorio de sesiones existe: {directorio}")
         
         # Verificar permisos
-        if os.access(directorio, os.R_OK | os.W_OK):
+        if os.access(directorio, os.Union[R_OK, os].W_OK):
             logging.info(f"✅ Permisos correctos en directorio de sesiones")
         else:
             logging.warning(f"⚠️ Permisos insuficientes en directorio de sesiones")

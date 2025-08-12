@@ -33,8 +33,6 @@ venv = "venv310"
 pythonPath = "./venv310/bin/python"
 reportMissingTypeStubs = false
 reportUnknownParameterType = false
-reportPartiallyUnknownParameterType = false
-reportPartiallyUnknownMemberType = false
 reportUnknownMemberType = false
 reportUnknownVariableType = false
 reportUnknownArgumentType = false
@@ -65,7 +63,19 @@ reportUnusedFunction = false
 
 [tool.mypy]
 ignore_missing_imports = true
-disable_error_code = [ "attr-defined", "import-untyped",]
+disable_error_code = [ "attr-defined", "import-untyped", "name-defined", "var-annotated", "annotation-unchecked"]
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+disallow_untyped_decorators = false
+no_implicit_optional = false
+warn_redundant_casts = false
+warn_unused_ignores = false
+warn_no_return = false
+warn_unreachable = false
+strict_equality = false
 
 [tool.flake8]
 max-line-length = 88

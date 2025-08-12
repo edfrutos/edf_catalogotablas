@@ -1,8 +1,8 @@
 // Dashboard.js - VERSIÓN COMPLETA CON ELIMINACIÓN AUTOMÁTICA
-console.log("🔧 Dashboard.js cargado - VERSIÓN COMPLETA - Timestamp:", new Date().toISOString());
+// console.log("🔧 Dashboard.js cargado - VERSIÓN COMPLETA - Timestamp:", new Date().toISOString());
 
 $(function () {
-  console.log("🔧 Inicializando dashboard completo...");
+  // console.log("🔧 Inicializando dashboard completo...");
 
   // Variables globales para Google Drive
   let allBackups = [];
@@ -1427,7 +1427,7 @@ $(function () {
 
     function checkElements() {
       attempts++;
-      console.log(`🔍 Verificando elementos (${attempts}/${maxAttempts})...`);
+              // console.log(`🔍 Verificando elementos (${attempts}/${maxAttempts})...`);
 
       const runTaskButtons = $(".run-task");
       const backupBtn = $("#backupBtn");

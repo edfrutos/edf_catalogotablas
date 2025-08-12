@@ -229,7 +229,7 @@ def crear_app_diagnostico():
                         
                         {% if diagnostico.mongodb.status == 'success' %}
                             <h6>Usuario Administrador:</h6>
-                            <pre>{{ diagnostico.mongodb.admin_user|tojson(indent=2) }}</pre>
+                            <pre>{{ diagnostico.mongodb.Union[admin_user, tojson](indent=2) }}</pre>
                             <p>Total de usuarios: {{ diagnostico.mongodb.total_users }}</p>
                         {% endif %}
                     </div>
@@ -247,10 +247,10 @@ def crear_app_diagnostico():
                         
                         {% if diagnostico.blueprints.status == 'success' %}
                             <h6>Blueprints Registrados:</h6>
-                            <pre>{{ diagnostico.blueprints.blueprints|tojson(indent=2) }}</pre>
+                            <pre>{{ diagnostico.blueprints.Union[blueprints, tojson](indent=2) }}</pre>
                             
                             <h6>Rutas Disponibles (primeras 20):</h6>
-                            <pre>{{ diagnostico.blueprints.routes|tojson(indent=2) }}</pre>
+                            <pre>{{ diagnostico.blueprints.Union[routes, tojson](indent=2) }}</pre>
                         {% endif %}
                     </div>
                 </div>
@@ -267,7 +267,7 @@ def crear_app_diagnostico():
                         
                         {% if diagnostico.session.status == 'success' %}
                             <h6>Configuración:</h6>
-                            <pre>{{ diagnostico.session.session_config|tojson(indent=2) }}</pre>
+                            <pre>{{ diagnostico.session.Union[session_config, tojson](indent=2) }}</pre>
                             
                             <p>Directorio de sesiones existe: {{ diagnostico.session.session_dir_exists }}</p>
                             <p>Número de archivos de sesión: {{ diagnostico.session.session_files_count }}</p>
