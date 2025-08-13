@@ -16,7 +16,7 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt pyinstaller
+        run: pip install -r requirements_python38.txt pyinstaller
 
       - name: Build App
         run: pyinstaller EDF_CatalogoDeTablas.spec
