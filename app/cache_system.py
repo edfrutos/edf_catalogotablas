@@ -303,7 +303,6 @@ def start_cache_persistence():
         _save_thread.start()
         logging.info("Hilo de persistencia de caché iniciado")
 
-
 def stop_cache_persistence():
     """Detiene el hilo de persistencia de caché"""
     global _save_thread_enabled
