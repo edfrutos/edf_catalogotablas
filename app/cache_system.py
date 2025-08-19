@@ -276,16 +276,38 @@ def get_cache_stats():
 _load_cache_from_disk()
 
 
-# Iniciar un hilo para guardar la caché periódicamente
+# Hilo para guardar la caché periódicamente (iniciado bajo demanda)
+_save_thread = None
+_save_thread_enabled = False
+
 def _periodic_cache_save():
-    while True:
+    """Función que ejecuta el guardado periódico de caché"""
+    global _save_thread_enabled
+    while _save_thread_enabled:
         time.sleep(300)  # Cada 5 minutos
-        _save_cache_to_disk()
+        if _save_thread_enabled:  # Verificar de nuevo antes de guardar
+            _save_cache_to_disk()
 
 
-save_thread = threading.Thread(target=_periodic_cache_save)
-save_thread.daemon = True
-save_thread.start()
+def start_cache_persistence():
+    """Inicia el hilo de persistencia de caché solo cuando es necesario"""
+    global _save_thread, _save_thread_enabled
+    
+    if _save_thread is None or not _save_thread.is_alive():
+        _save_thread_enabled = True
+        _save_thread = threading.Thread(target=_periodic_cache_save)
+        _save_thread.daemon = True
+        _save_thread.start()
+        logging.info("Hilo de persistencia de caché iniciado")
 
-# Hacer un guardado inicial
-_save_cache_to_disk()
+
+def stop_cache_persistence():
+    """Detiene el hilo de persistencia de caché"""
+    global _save_thread_enabled
+    _save_thread_enabled = False
+    logging.info("Hilo de persistencia de caché marcado para detenerse")
+
+
+# Hacer un guardado inicial solo si el archivo de caché está habilitado
+if _cache_file is not None:
+    _save_cache_to_disk()

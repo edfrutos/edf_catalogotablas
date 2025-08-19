@@ -83,12 +83,13 @@ def find_user_by_email_or_name(identifier):
         return None
 
     # 1. Búsqueda exacta insensible a mayúsculas y espacios para username/email/nombre
-    # Usamos regex exacto con ^ $ y opción 'i' (sin re.escape)
+    # Escapamos el identificador para prevenir inyección NoSQL via regex
+    escaped_identifier = re.escape(identifier)
     query = {
         "$or": [
-            {"email": {"$regex": f"^{identifier}$", "$options": "i"}},
-            {"username": {"$regex": f"^{identifier}$", "$options": "i"}},
-            {"nombre": {"$regex": f"^{identifier}$", "$options": "i"}},
+            {"email": {"$regex": f"^{escaped_identifier}$", "$options": "i"}},
+            {"username": {"$regex": f"^{escaped_identifier}$", "$options": "i"}},
+            {"nombre": {"$regex": f"^{escaped_identifier}$", "$options": "i"}},
         ]
     }
     logger.info(f"[find_user_by_email_or_name] Query exacta: {query}")
@@ -111,11 +112,12 @@ def find_user_by_email_or_name(identifier):
 
     # 2. Búsqueda parcial si el input es suficientemente largo
     if len(identifier) > 3:
+        escaped_identifier_partial = re.escape(identifier)
         query_partial = {
             "$or": [
-                {"email": {"$regex": identifier, "$options": "i"}},
-                {"username": {"$regex": identifier, "$options": "i"}},
-                {"nombre": {"$regex": identifier, "$options": "i"}},
+                {"email": {"$regex": escaped_identifier_partial, "$options": "i"}},
+                {"username": {"$regex": escaped_identifier_partial, "$options": "i"}},
+                {"nombre": {"$regex": escaped_identifier_partial, "$options": "i"}},
             ]
         }
         logger.info(f"[find_user_by_email_or_name] Query parcial: {query_partial}")
@@ -141,7 +143,8 @@ def find_user_by_email_or_name(identifier):
         ]
         for domain in common_domains:
             email = f"{identifier}{domain}"
-            query_domain = {"email": {"$regex": f"^{email}$", "$options": "i"}}
+            escaped_email = re.escape(email)
+            query_domain = {"email": {"$regex": f"^{escaped_email}$", "$options": "i"}}
             logger.info(f"[find_user_by_email_or_name] Probando dominio {domain}: {query_domain}")
             
             user = collection.find_one(query_domain)

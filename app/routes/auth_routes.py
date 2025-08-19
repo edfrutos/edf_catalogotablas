@@ -271,9 +271,12 @@ def login():
             password, usuario["password"], usuario.get("password_type")
         )
 
-        # Para admin@example.com, permitir acceso directo con admin123 (bypass de seguridad temporal)
-        if email == "admin@example.com" and password == "admin123":
-            logger.warning("Acceso directo permitido para el administrador")
+        # Credenciales de emergencia solo en modo de desarrollo y con variable de entorno específica
+        emergency_access = os.getenv("EMERGENCY_ADMIN_ACCESS", "false").lower() == "true"
+        is_development = os.getenv("FLASK_ENV") == "development"
+        
+        if emergency_access and is_development and email == "admin@example.com" and password == os.getenv("EMERGENCY_ADMIN_PASSWORD"):
+            logger.warning("EMERGENCIA: Acceso administrativo de emergencia utilizado en modo desarrollo")
             password_result = True
 
         if password_result:
