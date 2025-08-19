@@ -36,7 +36,6 @@ from flask import (
     url_for,
 )
 from werkzeug.utils import secure_filename
-
 from app.database import get_mongo_db
 from app.utils.image_utils import get_images_for_template, upload_image_to_s3
 from app.utils.mongo_utils import is_mongo_available, is_valid_object_id
@@ -698,7 +697,7 @@ def view(catalog_id, catalog):
             )
             # Procesar manualmente si no está disponible la utilidad
             for i, fila in enumerate(catalog.get("data", [])):
-                if fila:
+                if fila and isinstance(fila, dict):
                     imagenes_urls = []
 
                     # 1. URLs externas (campo Imagen)
@@ -1745,27 +1744,12 @@ def import_catalog():
                 return redirect(request.url)
 
             # Procesar el archivo según su formato
-            if not pandas_available:
-                flash(
-                    "Funcionalidad de importación no disponible. pandas no está instalado.",
-                    "danger",
-                )
-                return redirect(request.url)
-
-            # Verificar que pandas esté disponible antes de procesar
-            if not pandas_available or pd is None:
-                flash(
-                    "Funcionalidad de importación no disponible. pandas no está instalado.",
-                    "danger",
-                )
-                return redirect(request.url)
-
             if file.filename and file.filename.endswith(".csv"):
                 # Procesar CSV - usar el stream del archivo
                 df = pd.read_csv(file.stream, encoding="utf-8")
             else:
                 # Procesar Excel - usar el stream del archivo
-                df = pd.read_excel(file)
+                df = pd.read_excel(file.stream)
 
             # Verificar que el archivo tiene datos
             if df.empty:

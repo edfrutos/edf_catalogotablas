@@ -1210,7 +1210,7 @@
                 </td>
               {% endfor %}
               <td style="width: 150px !important; min-width: 150px !important; max-width: 150px !important; text-align: center !important;">
-                {% if row.imagen_urls and row.imagen_urls|length > 0 %}
+                {% if row._imagenes and row._imagenes|length > 0 %}
                   <div class="d-flex flex-wrap gap-1">
                     {% for img_url in row.imagen_urls %}
                       <a href="#" onclick="showImageModal('{{ img_url }}', '{{ img_url.split('/')[-1] }}'); return false;">
@@ -1218,7 +1218,7 @@
                              onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzUiIGhlaWdodD0iMzUiIHZpZXdCb3g9IjAgMCAzNSAzNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjM1IiBoZWlnaHQ9IjM1IiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0xNy41IDEwQzE5LjQzIDEwIDIxIDExLjU3IDIxIDEzLjVDMjEgMTUuNDMgMTkuNDMgMTcgMTcuNSAxN0MxNS41NyAxNyAxNCAxNS40MyAxNCAxMy41QzE0IDExLjU3IDE1LjU3IDEwIDE3LjUgMTBaIiBmaWxsPSIjQ0NDQ0NDIi8+CjxwYXRoIGQ9Ik0xMCAyMkMyMCAyMiAyMCAyMiAyMCAyMkgxMEMxMCAyMiAxMCAyMiAxMCAyMloiIGZpbGw9IiNDQ0NDQ0MiLz4KPC9zdmc+'; this.style.opacity='0.5';">
                       </a>
                     {% endfor %}
-                    <small class="text-muted w-100">({{ row.imagen_urls|length }} imágenes)</small>
+                    <small class="text-muted w-100">({{ row._imagenes|length }} imágenes)</small>
                   </div>
                 {% else %}
                   <span class="text-muted">Sin imágenes</span>
@@ -1227,7 +1227,7 @@
               {% if session.role == 'admin' or session.username == table.owner %}
                 <td style="white-space: nowrap; width: 200px; min-width: 200px; position: sticky !important; right: 0 !important; background: #f8f9fa !important; border-left: 2px solid #dee2e6 !important; z-index: 5 !important;">
                   <div class="d-flex gap-1">
-                    <a href="{{ url_for('main.editar_fila', tabla_id=table._id|string, fila_index=loop.index0) }}" class="btn btn-sm btn-warning">
+                    <a href="{{ url_for('catalogs.edit_row', catalog_id=table._id|string, row_index=loop.index0) }}" class="btn btn-sm btn-warning">
                       <i class="bi bi-pencil"></i> Editar
                     </a>
                     <form method="POST" action="{{ url_for('catalogs.delete_row', catalog_id=table._id|string, row_index=loop.index0) }}" style="display:inline;">
