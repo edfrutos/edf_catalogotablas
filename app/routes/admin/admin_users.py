@@ -195,8 +195,10 @@ def editar_usuario(user_id):
 
             if email_changed:
                 # Buscar si el email ya existe para otro usuario
+                import re
+                escaped_email = re.escape(email)
                 existing_user = users_col.find_one(
-                    {"email": {"$regex": f"^{email}$", "$options": "i"}}
+                    {"email": {"$regex": f"^{escaped_email}$", "$options": "i"}}
                 )
 
                 if existing_user and str(existing_user.get("_id")) != user_id:

@@ -17,7 +17,14 @@ from flask import request
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Permitir acceso sin verificar sesión
+        from flask import session, redirect, url_for, flash
+        from flask_login import current_user
+        
+        # Verificar si el usuario está autenticado
+        if not current_user.is_authenticated:
+            flash("Debes iniciar sesión para acceder a esta página.", "warning")
+            return redirect(url_for("auth.login"))
+        
         return f(*args, **kwargs)
 
     return decorated_function
@@ -26,7 +33,19 @@ def login_required(f):
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Permitir acceso sin verificar rol de administrador
+        from flask import abort, flash, redirect, url_for
+        from flask_login import current_user
+        
+        # Verificar si el usuario está autenticado
+        if not current_user.is_authenticated:
+            flash("Debes iniciar sesión para acceder a esta página.", "warning")
+            return redirect(url_for("auth.login"))
+        
+        # Verificar si el usuario tiene rol de administrador
+        if not hasattr(current_user, 'role') or current_user.role != 'admin':
+            flash("No tienes permisos para acceder a esta página.", "error")
+            abort(403)
+        
         return f(*args, **kwargs)
 
     return decorated_function
