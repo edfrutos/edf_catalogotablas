@@ -26,7 +26,6 @@ from flask import (
     current_app,
     flash,
     jsonify,
-    make_response,  # noqa: F401
     redirect,
     render_template,
     request,
@@ -905,7 +904,7 @@ def editar_usuario(user_id: str):
                 update_data["email"] = email
 
             # Realizar la actualización
-            users_col.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
+            _ = users_col.update_one({"_id": ObjectId(user_id)}, {"$set": update_data})
 
             flash("Usuario actualizado correctamente", "success")
             return redirect(url_for("admin.lista_usuarios"))
@@ -957,7 +956,7 @@ def crear_usuario():
             "locked_until": None,
         }
 
-        users_col.insert_one(user_data)
+        _ = users_col.insert_one(user_data)
         flash("Usuario creado exitosamente", "success")
         return redirect(url_for("admin.lista_usuarios"))
 
@@ -2408,7 +2407,7 @@ def editar_fila_admin(collection_source: str, catalog_id: str, row_index: int):
                         updated_row[header] = multimedia_url
                     elif multimedia_file and multimedia_file.filename:
                         # Procesar archivo multimedia
-                        import uuid
+                        import uuid  # noqa: I001
                         from werkzeug.utils import secure_filename
                         from app.routes.catalogs_routes import get_upload_dir
 
@@ -2432,7 +2431,7 @@ def editar_fila_admin(collection_source: str, catalog_id: str, row_index: int):
                         updated_row[header] = documento_url
                     elif documento_file and documento_file.filename:
                         # Procesar archivo documento
-                        import uuid
+                        import uuid  # noqa: I001
                         from werkzeug.utils import secure_filename
                         from app.routes.catalogs_routes import get_upload_dir
 
@@ -2453,13 +2452,16 @@ def editar_fila_admin(collection_source: str, catalog_id: str, row_index: int):
             # Manejo de imágenes (mantener compatibilidad)
             if "images" in request.files:
                 files = request.files.getlist("images")
-                from app.routes.catalogs_routes import get_upload_dir, allowed_image
+                from app.routes.catalogs_routes import (
+                    get_upload_dir,
+                    allowed_image,
+                )  # noqa: I001
 
                 upload_dir = get_upload_dir()
                 nuevas_imagenes = []
                 for file in files:
                     if file and file.filename and allowed_image(file.filename):
-                        import uuid
+                        import uuid  # noqa: I001
                         from werkzeug.utils import secure_filename
 
                         filename = secure_filename(
@@ -2471,9 +2473,9 @@ def editar_fila_admin(collection_source: str, catalog_id: str, row_index: int):
                 if nuevas_imagenes:
                     existing_images = updated_row.get("images", [])
                     if isinstance(existing_images, list):
-                        updated_row["images"] = existing_images + nuevas_imagenes
+                        updated_row["images"] = existing_images + nuevas_imagenes  # type: ignore
                     else:
-                        updated_row["images"] = nuevas_imagenes
+                        updated_row["images"] = nuevas_imagenes  # type: ignore
 
             # Eliminar imágenes seleccionadas
             delete_images = request.form.getlist("delete_images")
@@ -2482,15 +2484,15 @@ def editar_fila_admin(collection_source: str, catalog_id: str, row_index: int):
                 if isinstance(current_images, list):
                     updated_row["images"] = [
                         img for img in current_images if img not in delete_images
-                    ]
+                    ]  # type: ignore
                 else:
-                    updated_row["images"] = []
+                    updated_row["images"] = []  # type: ignore
 
             # Actualizar la fila en el catálogo
             catalog["rows"][row_index] = updated_row
 
             # Actualizar en la base de datos
-            collection.update_one(
+            _ = collection.update_one(
                 {"_id": ObjectId(catalog_id)}, {"$set": {"rows": catalog["rows"]}}
             )
 
