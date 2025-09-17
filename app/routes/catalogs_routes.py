@@ -1035,7 +1035,7 @@ def edit_row(catalog_id, row_index, catalog):
                 )
                 flash(f"Error al actualizar fila: {str(e)}", "danger")
         current_app.logger.info(f"[EDIT_ROW] Redirigiendo a catálogo {catalog['_id']}")
-        redirect_url = url_for("catalogs.view", catalog_id=str(catalog["_id"]))
+        redirect_url = url_for("catalogs.view", catalog_id=str(catalog["_id"]), _external=False, refresh=1)
         current_app.logger.info(f"[EDIT_ROW] URL de redirección: {redirect_url}")
         return redirect(redirect_url)
 

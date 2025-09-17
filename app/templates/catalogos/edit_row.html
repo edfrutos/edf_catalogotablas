@@ -588,9 +588,26 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', function() {
     const alerts = document.querySelectorAll('.alert-success');
     if (alerts.length > 0) {
-        setTimeout(function() {
-            window.location.href = window.location.origin + window.location.pathname.replace('/edit-row', '/view');
-        }, 800); // Redirige tras 0.8s
+        // Si estamos en la página de edición y hay mensaje de éxito,
+        // redirigir a la vista del catálogo
+        const currentPath = window.location.pathname;
+        if (currentPath.includes('/edit-row/')) {
+            setTimeout(function() {
+                // Construir URL de vista del catálogo
+                const catalogId = currentPath.split('/')[2]; // Extraer catalog_id de la URL
+                const viewUrl = `/catalogs/${catalogId}/view?refresh=${Date.now()}`;
+                window.location.href = viewUrl;
+            }, 1000); // Redirige tras 1s
+        }
+    }
+});
+
+// Manejar envío del formulario para añadir indicador de carga
+document.querySelector('form').addEventListener('submit', function(e) {
+    const submitButton = this.querySelector('button[type="submit"]');
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
     }
 });
 </script>
