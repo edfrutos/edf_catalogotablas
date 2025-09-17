@@ -609,9 +609,9 @@ async function cleanupBrokenImages() {
 function showImageModal(imageSrc, imageTitle) {
   log("[MODAL-UNIFIED] 🖼️ showImageModal llamado con:", { imageSrc, imageTitle });
   
-  const modalElement = document.getElementById('imageModal');
-  const modalImage = document.getElementById('modalImage');
-  const modalTitle = document.getElementById('imageModalLabel');
+  const modalElement = document.getElementById('imagenModalVerTabla');
+  const modalImage = document.getElementById('imagenModalVerTablaSrc');
+  const modalTitle = document.getElementById('imagenModalVerTablaLabel');
   
   if (!modalElement || !modalImage || !modalTitle) {
     console.error("[MODAL-UNIFIED] ❌ Elementos del modal de imagen no encontrados");
@@ -891,7 +891,7 @@ function handleImageError(img) {
 // Función para ocultar el spinner de carga de imagen
 function hideImageLoadingSpinner() {
   log("[MODAL-UNIFIED] 🔧 Ocultando spinner de carga de imagen");
-  const spinner = document.querySelector('.image-loading-spinner');
+  const spinner = document.getElementById('imagenVerTablaSpinner');
   if (spinner) {
     spinner.style.display = 'none';
   }
@@ -901,7 +901,7 @@ function hideImageLoadingSpinner() {
 function downloadImage() {
   log("[MODAL-UNIFIED] 🔧 downloadImage llamado");
   
-  const modalImage = document.getElementById('modalImage');
+  const modalImage = document.getElementById('imagenModalVerTablaSrc');
   if (!modalImage || !modalImage.src) {
     console.error("[MODAL-UNIFIED] ❌ No se encontró imagen para descargar");
     return;
