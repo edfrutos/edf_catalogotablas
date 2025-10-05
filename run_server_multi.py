@@ -18,13 +18,13 @@ def run_server(port, name):
 
 if __name__ == "__main__":
     print("🔧 Configuración para múltiples sesiones:")
-    print("   - Puerto 5001: Sesión principal")
+    print("   - Puerto 5002: Sesión principal")
     print("   - Puerto 5002: Sesión secundaria")
     print("   - Puerto 5003: Sesión de prueba")
     print()
 
     # Crear hilos para cada servidor
-    server1 = threading.Thread(target=run_server, args=(5001, "Principal"))
+    server1 = threading.Thread(target=run_server, args=(5002, "Principal"))
     server2 = threading.Thread(target=run_server, args=(5002, "Secundario"))
     server3 = threading.Thread(target=run_server, args=(5003, "Prueba"))
 
@@ -37,12 +37,12 @@ if __name__ == "__main__":
 
     print("✅ Todos los servidores iniciados")
     print("📋 URLs disponibles:")
-    print("   - http://localhost:5001 (Sesión 1)")
+    print("   - http://localhost:5002 (Sesión 1)")
     print("   - http://localhost:5002 (Sesión 2)")
     print("   - http://localhost:5003 (Sesión 3)")
     print()
     print("💡 Uso recomendado:")
-    print("   - Puerto 5001: Administrador")
+    print("   - Puerto 5002: Administrador")
     print("   - Puerto 5002: Usuario normal")
     print("   - Puerto 5003: Usuario de prueba")
 

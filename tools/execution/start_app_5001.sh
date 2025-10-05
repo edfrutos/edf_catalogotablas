@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ==============================================
-# 🚀 SCRIPT: Iniciar App en Puerto 5001
+# 🚀 SCRIPT: Iniciar App en Puerto 5002
 # ==============================================
 
 APP_NAME="EDF_CatalogoDeTablas"
-PORT=5001
+PORT=5002
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
@@ -44,7 +44,7 @@ fi
 
 # Ejecutar script de verificación de puerto
 echo "🔍 Verificando puerto $PORT..."
-if ! "$SCRIPT_DIR/check_and_free_port_5001.sh"; then
+if ! "$SCRIPT_DIR/check_and_free_port_5002.sh"; then
     echo "❌ Error: No se pudo verificar/liberar el puerto $PORT"
     exit 1
 fi

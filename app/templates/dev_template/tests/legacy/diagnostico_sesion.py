@@ -453,7 +453,7 @@ SECRET_KEY = 'desarrollo_clave_secreta_fija_12345'
 if __name__ == "__main__":
     app = create_diagnostic_app()
     print(
-        "\n\n✅ Herramienta de diagnóstico de sesión iniciada en http://localhost:5001/"
+        "\n\n✅ Herramienta de diagnóstico de sesión iniciada en http://localhost:5002/"
     )
     print(
         "📝 Usa esta herramienta para diagnosticar y solucionar problemas de sesión en tu aplicación Flask."
@@ -461,4 +461,4 @@ if __name__ == "__main__":
     print(
         "🔍 Accede a la herramienta desde tu navegador para ver información detallada.\n"
     )
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=True, host="0.0.0.0", port=5002)

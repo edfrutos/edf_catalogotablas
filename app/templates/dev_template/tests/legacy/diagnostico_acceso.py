@@ -310,7 +310,7 @@ def crear_app_diagnostico():
                                             <li>Email: admin@example.com</li>
                                             <li>Contraseña: admin123</li>
                                         </ul>
-                                        <a href="http://127.0.0.1:5001/login" class="btn btn-primary">Ir a la página de login</a>
+                                        <a href="http://127.0.0.1:5002/login" class="btn btn-primary">Ir a la página de login</a>
                                     </div>
                                 </div>
                             </div>
@@ -320,8 +320,8 @@ def crear_app_diagnostico():
                                         Herramientas de Diagnóstico
                                     </div>
                                     <div class="card-body">
-                                        <a href="http://127.0.0.1:5001/test_session" class="btn btn-secondary mb-2">Probar Sesión</a>
-                                        <a href="http://127.0.0.1:5001/ping" class="btn btn-secondary mb-2">Verificar Ping</a>
+                                        <a href="http://127.0.0.1:5002/test_session" class="btn btn-secondary mb-2">Probar Sesión</a>
+                                        <a href="http://127.0.0.1:5002/ping" class="btn btn-secondary mb-2">Verificar Ping</a>
                                         <a href="/" class="btn btn-secondary mb-2">Actualizar Diagnóstico</a>
                                     </div>
                                 </div>

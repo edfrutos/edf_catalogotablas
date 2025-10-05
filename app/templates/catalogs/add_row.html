@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Agregar Fila - {{ catalog.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Agregar Nueva Fila</h1>
+            <h2 class="text-muted">{{ catalog.name }}</h2>
+            
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% if catalog.headers %}
+                            {% for header in catalog.headers %}
+                            <div class="form-group mb-3">
+                                <label for="{{ header }}">{{ header }}</label>
+                                {% if header.lower() in ['imagen', 'image', 'foto', 'picture'] %}
+                                    <input type="file" class="form-control" id="{{ header }}" name="{{ header }}" accept="image/*">
+                                    <small class="form-text text-muted">
+                                        Formatos soportados: JPG, PNG, GIF
+                                    </small>
+                                {% elif header.lower() in ['archivo', 'file', 'documento', 'document'] %}
+                                    <input type="file" class="form-control" id="{{ header }}" name="{{ header }}">
+                                    <small class="form-text text-muted">
+                                        Subir archivo relacionado
+                                    </small>
+                                {% elif header.lower() in ['descripcion', 'description', 'comentario', 'comment'] %}
+                                    <textarea class="form-control" id="{{ header }}" name="{{ header }}" rows="3"></textarea>
+                                {% elif header.lower() in ['fecha', 'date'] %}
+                                    <input type="date" class="form-control" id="{{ header }}" name="{{ header }}">
+                                {% elif header.lower() in ['precio', 'price', 'costo', 'cost'] %}
+                                    <input type="number" step="0.01" class="form-control" id="{{ header }}" name="{{ header }}">
+                                {% else %}
+                                    <input type="text" class="form-control" id="{{ header }}" name="{{ header }}">
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <strong>Atención:</strong> Este catálogo no tiene encabezados definidos.
+                                Por favor, contacte al administrador para configurar las columnas.
+                            </div>
+                        {% endif %}
+                        
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-plus"></i> Agregar Fila
+                            </button>
+                            <a href="{{ url_for('catalogs.view_catalog', catalog_id=catalog._id|string) }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Cancelar
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -285,11 +285,11 @@ def ejecutar_diagnostico():
     app = crear_app_diagnostico()
 
     logging.info("✅ Diagnóstico completado. Iniciando servidor de prueba...")
-    logging.info("📌 Accede a http://localhost:5001 para ver los resultados")
+    logging.info("📌 Accede a http://localhost:5002 para ver los resultados")
 
     return app
 
 
 if __name__ == "__main__":
     app = ejecutar_diagnostico()
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=True, host="0.0.0.0", port=5002)

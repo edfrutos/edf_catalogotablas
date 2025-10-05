@@ -263,7 +263,7 @@ Soporte completo para:
 
 ```bash
 # Test de sesión
-curl http://localhost:5001/test_session
+curl http://localhost:5002/test_session
 
 # Test de conectividad S3
 python3 tools/local/aws_utils/diagnose_s3_permissions.py

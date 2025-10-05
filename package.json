@@ -21,7 +21,7 @@
     "lint:python": "npm run lint:python-ruff",
     "lint:all": "npm run lint:js && npm run lint:css && npm run lint:html && npm run lint:python && npm run spell:check-quiet",
     "audit:security": "npm audit",
-    "audit:accessibility": "lighthouse --chrome-flags=\"--headless\" http://localhost:5001 --output=json --output-path=./reports/accessibility-audit.json",
+    "audit:accessibility": "lighthouse --chrome-flags=\"--headless\" http://localhost:5002 --output=json --output-path=./reports/accessibility-audit.json",
     "analyze": "npm run lint:all && npm run audit:security"
   },
   "keywords": [],
