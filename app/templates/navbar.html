@@ -37,7 +37,7 @@
                 </li>
                 {% endif %}
             </ul>
-            <div class="d-flex">
+            <div class="d-flex"> <!-- este es el div que contiene el dropdown de usuario -->
                 {% if 'username' in session %}
                 <div class="dropdown">
                     <button class="btn btn-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -67,3 +67,36 @@
         </div>
     </div>
 </nav>
+
+<!-- Script de inicialización del dropdown -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar que Bootstrap esté cargado
+    if (typeof bootstrap === 'undefined') {
+        console.error('❌ Bootstrap no está cargado');
+        return;
+    }
+    
+    // Verificar que el dropdown exista
+    const dropdownElement = document.getElementById('userDropdown');
+    if (!dropdownElement) {
+        console.log('ℹ️ Dropdown de usuario no encontrado (usuario no autenticado)');
+        return;
+    }
+    
+    console.log('✅ Bootstrap cargado, inicializando dropdown de usuario');
+    
+    // Inicializar dropdown manualmente
+    const dropdown = new bootstrap.Dropdown(dropdownElement);
+    
+    // Añadir evento de clic manual por si acaso
+    dropdownElement.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropdown.toggle();
+        console.log('🔄 Dropdown toggle manual ejecutado');
+    });
+    
+    console.log('✅ Dropdown de usuario inicializado correctamente');
+});
+</script>
