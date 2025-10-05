@@ -61,7 +61,7 @@ Se ha creado exitosamente un **sistema completo de verificación de funcionalida
 ### Interfaz Web
 ```bash
 ./tools/launch_functionality_checker.sh web
-# Accede a: http://localhost:5001
+# Accede a: http://localhost:5002
 ```
 
 ### Ayuda
@@ -136,7 +136,7 @@ Se ha creado exitosamente un **sistema completo de verificación de funcionalida
 - **Python**: 3.10+
 - **Flask**: 3.0+
 - **MongoDB**: 4.0+
-- **Puerto Web**: 5001 (automático 5002 si ocupado)
+- **Puerto Web**: 5002 (automático 5002 si ocupado)
 - **Formato Resultados**: JSON estructurado
 
 ### Archivos Creados

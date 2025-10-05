@@ -5,9 +5,9 @@
     "purpose": "Verificación manual de unificación admin/usuario"
   },
   "urls_to_test": {
-    "admin_principal": "http://localhost:5001/admin/catalogo/spreadsheets/68bdbf6ece7fe626f3d9d4df",
-    "usuario_normal": "http://localhost:5001/ver_tabla/68bdbf6ece7fe626f3d9d4df",
-    "admin_alternativa": "http://localhost:5001/catalogs/68bdbf6ece7fe626f3d9d4df"
+    "admin_principal": "http://localhost:5002/admin/catalogo/spreadsheets/68bdbf6ece7fe626f3d9d4df",
+    "usuario_normal": "http://localhost:5002/ver_tabla/68bdbf6ece7fe626f3d9d4df",
+    "admin_alternativa": "http://localhost:5002/catalogs/68bdbf6ece7fe626f3d9d4df"
   },
   "test_categories": {
     "1_visual_consistency": {

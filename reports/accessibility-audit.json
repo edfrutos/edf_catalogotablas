@@ -1,13 +1,13 @@
 {
   "lighthouseVersion": "12.8.2",
-  "requestedUrl": "http://localhost:5001/",
-  "mainDocumentUrl": "http://localhost:5001/welcome",
-  "finalDisplayedUrl": "http://localhost:5001/welcome",
-  "finalUrl": "http://localhost:5001/welcome",
+  "requestedUrl": "http://localhost:5002/",
+  "mainDocumentUrl": "http://localhost:5002/welcome",
+  "finalDisplayedUrl": "http://localhost:5002/welcome",
+  "finalUrl": "http://localhost:5002/welcome",
   "fetchTime": "2025-10-02T09:19:01.683Z",
   "gatherMode": "navigation",
   "runWarnings": [
-    "The page may not be loading as expected because your test URL (http://localhost:5001/) was redirected to http://localhost:5001/welcome. Try testing the second URL directly."
+    "The page may not be loading as expected because your test URL (http://localhost:5002/) was redirected to http://localhost:5002/welcome. Try testing the second URL directly."
   ],
   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/141.0.0.0 Safari/537.36",
   "environment": {
@@ -283,7 +283,7 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "responseTime": 36.927
           }
         ],
@@ -349,7 +349,7 @@
         "chains": {
           "7FD643C4C14A7C6AA00E36516B7BBC17": {
             "request": {
-              "url": "http://localhost:5001/",
+              "url": "http://localhost:5002/",
               "startTime": 5513.16605,
               "endTime": 5513.171822,
               "responseReceivedTime": 5513.170623999999,
@@ -358,7 +358,7 @@
             "children": {
               "7FD643C4C14A7C6AA00E36516B7BBC17:redirect": {
                 "request": {
-                  "url": "http://localhost:5001/welcome",
+                  "url": "http://localhost:5002/welcome",
                   "startTime": 5513.172546,
                   "endTime": 5513.210762,
                   "responseReceivedTime": 5513.209814,
@@ -405,7 +405,7 @@
                   },
                   "49117.5": {
                     "request": {
-                      "url": "http://localhost:5001/static/css/styles.css",
+                      "url": "http://localhost:5002/static/css/styles.css",
                       "startTime": 5513.236307,
                       "endTime": 5513.251263,
                       "responseReceivedTime": 5513.247381,
@@ -414,7 +414,7 @@
                   },
                   "49117.6": {
                     "request": {
-                      "url": "http://localhost:5001/static/css/modal-debug.css",
+                      "url": "http://localhost:5002/static/css/modal-debug.css",
                       "startTime": 5513.237884,
                       "endTime": 5513.251645,
                       "responseReceivedTime": 5513.249738,
@@ -423,7 +423,7 @@
                   },
                   "49117.7": {
                     "request": {
-                      "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+                      "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
                       "startTime": 5513.23951,
                       "endTime": 5513.250872,
                       "responseReceivedTime": 5513.248719,
@@ -490,11 +490,11 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/",
+            "url": "http://localhost:5002/",
             "wastedMs": 605.5036
           },
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "wastedMs": 0
           }
         ],
@@ -725,7 +725,7 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "total": 919.804,
             "scripting": 3.4,
             "scriptParseCompile": 1.944
@@ -918,7 +918,7 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/",
+            "url": "http://localhost:5002/",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 0,
@@ -934,7 +934,7 @@
             "entity": "localhost"
           },
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 7.177000001072884,
@@ -1002,7 +1002,7 @@
             "entity": "Cloudflare CDN"
           },
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 63.864000000059605,
@@ -1019,7 +1019,7 @@
             "entity": "localhost"
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 64.01900000032037,
@@ -1036,7 +1036,7 @@
             "entity": "localhost"
           },
           {
-            "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+            "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 64.16500000003725,
@@ -1120,7 +1120,7 @@
             "entity": "Cloudflare CDN"
           },
           {
-            "url": "http://localhost:5001/static/favicon.ico",
+            "url": "http://localhost:5002/static/favicon.ico",
             "sessionTargetType": "page",
             "protocol": "http/1.1",
             "rendererStartTime": 535.0710000004619,
@@ -1143,49 +1143,49 @@
           "initiators": [
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 7,
               "columnNumber": 106
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 8,
               "columnNumber": 111
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 9,
               "columnNumber": 108
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 10,
               "columnNumber": 57
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 12,
               "columnNumber": 62
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 14,
               "columnNumber": 77
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 276,
               "columnNumber": 58
             },
             {
               "type": "parser",
-              "url": "http://localhost:5001/welcome",
+              "url": "http://localhost:5002/welcome",
               "lineNumber": 277,
               "columnNumber": 91
             },
@@ -1239,7 +1239,7 @@
             "rtt": 11.645000000000003
           },
           {
-            "origin": "http://localhost:5001",
+            "origin": "http://localhost:5002",
             "rtt": 0.0414
           }
         ],
@@ -1278,7 +1278,7 @@
             "serverResponseTime": 11.482500000000002
           },
           {
-            "origin": "http://localhost:5001",
+            "origin": "http://localhost:5002",
             "serverResponseTime": 5.5036
           },
           {
@@ -2664,7 +2664,7 @@
             ]
           },
           {
-            "name": "http://localhost:5001/welcome",
+            "name": "http://localhost:5002/welcome",
             "resourceBytes": 1742,
             "encodedBytes": 1742,
             "unusedBytes": 876,
@@ -3588,7 +3588,7 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "debugData": {
               "type": "debugdata",
               "public": true,
@@ -3600,7 +3600,7 @@
             "wastedBytes": 2741
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "debugData": {
               "type": "debugdata",
               "public": true,
@@ -3612,7 +3612,7 @@
             "wastedBytes": 2516.5
           },
           {
-            "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+            "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
             "debugData": {
               "type": "debugdata",
               "public": true,
@@ -3665,7 +3665,7 @@
             "totalBytes": 150767
           },
           {
-            "url": "http://localhost:5001/static/favicon.ico",
+            "url": "http://localhost:5002/static/favicon.ico",
             "totalBytes": 109820
           },
           {
@@ -3681,7 +3681,7 @@
             "totalBytes": 24601
           },
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "totalBytes": 19525
           },
           {
@@ -3693,11 +3693,11 @@
             "totalBytes": 13732
           },
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "totalBytes": 5482
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "totalBytes": 5033
           }
         ],
@@ -3799,17 +3799,17 @@
             "wastedMs": 1143
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "totalBytes": 5033,
             "wastedMs": 306
           },
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "totalBytes": 5482,
             "wastedMs": 156
           },
           {
-            "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+            "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
             "totalBytes": 2396,
             "wastedMs": 306
           }
@@ -4115,17 +4115,17 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/welcome",
+            "url": "http://localhost:5002/welcome",
             "totalBytes": 19175,
             "wastedBytes": 14721
           },
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "totalBytes": 4893,
             "wastedBytes": 3463
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "totalBytes": 4439,
             "wastedBytes": 3055
           }
@@ -4768,19 +4768,19 @@
         ],
         "items": [
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "cacheLifetimeMs": 43200000,
             "totalBytes": 5482,
             "wastedBytes": 2741
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "cacheLifetimeMs": 43200000,
             "totalBytes": 5033,
             "wastedBytes": 2516.5
           },
           {
-            "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+            "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
             "cacheLifetimeMs": 43200000,
             "totalBytes": 2396,
             "wastedBytes": 1198
@@ -5298,13 +5298,13 @@
               "type": "network-tree",
               "chains": {
                 "7FD643C4C14A7C6AA00E36516B7BBC17": {
-                  "url": "http://localhost:5001/welcome",
+                  "url": "http://localhost:5002/welcome",
                   "navStartToEndTime": 75,
                   "transferSize": 19525,
                   "isLongest": true,
                   "children": {
                     "7FD643C4C14A7C6AA00E36516B7BBC17": {
-                      "url": "http://localhost:5001/welcome",
+                      "url": "http://localhost:5002/welcome",
                       "navStartToEndTime": 75,
                       "transferSize": 19525,
                       "isLongest": true,
@@ -5349,19 +5349,19 @@
                           "children": {}
                         },
                         "49117.6": {
-                          "url": "http://localhost:5001/static/css/modal-debug.css",
+                          "url": "http://localhost:5002/static/css/modal-debug.css",
                           "navStartToEndTime": 89,
                           "transferSize": 5033,
                           "children": {}
                         },
                         "49117.5": {
-                          "url": "http://localhost:5001/static/css/styles.css",
+                          "url": "http://localhost:5002/static/css/styles.css",
                           "navStartToEndTime": 88,
                           "transferSize": 5482,
                           "children": {}
                         },
                         "49117.7": {
-                          "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+                          "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
                           "navStartToEndTime": 87,
                           "transferSize": 2396,
                           "children": {}
@@ -5476,17 +5476,17 @@
             "wastedMs": 1138
           },
           {
-            "url": "http://localhost:5001/static/css/modal-debug.css",
+            "url": "http://localhost:5002/static/css/modal-debug.css",
             "totalBytes": 5033,
             "wastedMs": 305
           },
           {
-            "url": "http://localhost:5001/static/css/styles.css",
+            "url": "http://localhost:5002/static/css/styles.css",
             "totalBytes": 5482,
             "wastedMs": 155
           },
           {
-            "url": "http://localhost:5001/static/css/modal-emergency-fix.css?v=2105",
+            "url": "http://localhost:5002/static/css/modal-emergency-fix.css?v=2105",
             "totalBytes": 2396,
             "wastedMs": 305
           }
@@ -6721,7 +6721,7 @@
     {
       "name": "localhost",
       "origins": [
-        "http://localhost:5001"
+        "http://localhost:5002"
       ],
       "isFirstParty": true,
       "isUnrecognized": true
@@ -9197,8 +9197,8 @@
       "core/gather/driver/navigation.js | warningRedirected": [
         {
           "values": {
-            "requested": "http://localhost:5001/",
-            "final": "http://localhost:5001/welcome"
+            "requested": "http://localhost:5002/",
+            "final": "http://localhost:5002/welcome"
           },
           "path": "runWarnings[0]"
         }

@@ -5,8 +5,8 @@
   "status": "🎉 UNIFICACIÓN COMPLETAMENTE EXITOSA",
   "conclusion": "Las interfaces están perfectamente unificadas",
   "evidence": {
-    "admin_url": "http://localhost:5001/admin/catalogo/spreadsheets/68bdbf6ece7fe626f3d9d4df",
-    "user_url": "http://localhost:5001/ver_tabla/68bdbf6ece7fe626f3d9d4df",
+    "admin_url": "http://localhost:5002/admin/catalogo/spreadsheets/68bdbf6ece7fe626f3d9d4df",
+    "user_url": "http://localhost:5002/ver_tabla/68bdbf6ece7fe626f3d9d4df",
     "visual_comparison": {
       "catalog_name": {
         "admin": "Documentos y tutoriales de bricolaje",

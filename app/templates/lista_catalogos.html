@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Catálogos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Lista de Catálogos</h1>
+
+    <!-- Formulario de búsqueda -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="mb-0">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <input type="text" name="search" class="form-control" 
+                               placeholder="Buscar..." value="{{ search_query }}">
+                    </div>
+                    <div class="col-md-4">
+                        <select name="search_type" class="form-control">
+                            <option value="name" {% if search_type == 'name' %}selected{% endif %}>
+                                Por nombre
+                            </option>
+                            <option value="user" {% if search_type == 'user' %}selected{% endif %}>
+                                Por usuario
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                        {% if search_query %}
+                            <a href="{{ url_for('catalogs.list_catalogs') }}" class="btn btn-secondary">
+                                <i class="fas fa-times"></i> Limpiar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lista de catálogos -->
+    {% if catalogs %}
+        <div class="row">
+            {% for catalog in catalogs %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        {% if catalog.miniatura %}
+                        <div class="card-header text-center" style="background-color: #f8f9fa;">
+                            <img src="{{ catalog.miniatura }}" alt="Miniatura" class="img-fluid" style="max-height: 100px; max-width: 100%;">
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ catalog.name }}</h5>
+                            
+                            <!-- Descripción si existe -->
+                            {% if catalog.description %}
+                            <p class="card-text text-muted mb-2">{{ catalog.description[:100] }}{% if catalog.description|length > 100 %}...{% endif %}</p>
+                            {% endif %}
+                            
+                            <!-- Estadísticas del catálogo -->
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 mb-0 text-primary">
+                                            {% if catalog.data %}{{ catalog.data|length }}
+                                            {% elif catalog.rows %}{{ catalog.rows|length }}
+                                            {% else %}0{% endif %}
+                                        </div>
+                                        <small class="text-muted">Filas</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="text-center">
+                                        <div class="h4 mb-0 text-info">
+                                            {% if catalog.headers %}{{ catalog.headers|length }}
+                                            {% else %}0{% endif %}
+                                        </div>
+                                        <small class="text-muted">Columnas</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> Creado por: <strong>{{ catalog.created_by }}</strong><br>
+                                    {% if catalog.created_at %}
+                                    <i class="fas fa-calendar-plus"></i> Creado: {{ catalog.created_at.strftime('%d/%m/%Y %H:%M') if catalog.created_at.strftime else catalog.created_at }}<br>
+                                    {% endif %}
+                                    {% if catalog.modified_at %}
+                                    <i class="fas fa-edit"></i> Modificado: {{ catalog.modified_at.strftime('%d/%m/%Y %H:%M') if catalog.modified_at.strftime else catalog.modified_at }}
+                                    {% endif %}
+                                    {% if catalog.status %}
+                                    <br><i class="fas fa-info-circle"></i> Estado: 
+                                    <span class="badge badge-{% if catalog.status == 'active' %}success{% else %}secondary{% endif %}">
+                                        {{ catalog.status|capitalize }}
+                                    </span>
+                                    {% endif %}
+                                </small>
+                            </p>
+
+                            <div class="mt-auto">
+                                <a href="{{ url_for('catalogs.view_catalog', catalog_id=catalog._id|string) }}" 
+                                   class="btn btn-primary btn-sm">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                {% if session.get('role') == 'admin' or session.get('username') == catalog.created_by %}
+                                    <a href="{{ url_for('catalogs.edit', catalog_id=catalog._id|string) }}" 
+                                       class="btn btn-warning btn-sm">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <a href="{{ url_for('catalogs.add_row', catalog_id=catalog._id|string) }}" 
+                                       class="btn btn-success btn-sm">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            {% if search_query %}
+                No se encontraron catálogos que coincidan con la búsqueda.
+            {% else %}
+                No hay catálogos disponibles.
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

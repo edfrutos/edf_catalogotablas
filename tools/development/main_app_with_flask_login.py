@@ -337,10 +337,10 @@ def create_app():
 app = create_app()
 
 if __name__ == "__main__":
-    port = 5001
+    port = 5002
     if len(sys.argv) > 1 and sys.argv[1] == "--port" and len(sys.argv) > 2:
         try:
             port = int(sys.argv[2])
         except ValueError:
-            port = 5001
+            port = 5002
     app.run(debug=False, host="0.0.0.0", port=port)
