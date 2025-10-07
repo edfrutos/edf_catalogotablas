@@ -34,10 +34,16 @@ log("[MODAL-UNIFIED] 🔍 Verificando funciones disponibles...");
 // DETECCIÓN DE ENTORNO
 // ============================================================================
 
-// Usar la variable global establecida por pywebview_compatibility.js (evitar redeclaración)
-// isPyWebView es declarada por pywebview_compatibility.js, la usamos directamente
-// eslint-disable-next-line no-unused-vars
-const isWebApp = !window.isPyWebView;
+// Función para detectar entorno (evita declaración de variables globales)
+function getEnvironmentType() {
+  // isPyWebView es declarada por pywebview_compatibility.js, la usamos directamente
+  if (typeof window.isPyWebView !== 'undefined') {
+    return !window.isPyWebView;
+  } else {
+    // Fallback si pywebview_compatibility.js no se ha cargado aún
+    return true;
+  }
+}
 
 log("[MODAL-UNIFIED] 🔍 Entorno detectado:", {
     isPyWebView: window.isPyWebView || false,
