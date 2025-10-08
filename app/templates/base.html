@@ -64,6 +64,8 @@
     </style>
 </head>
 <body>
+<!-- Configuración de depuración - Cargar lo antes posible para optimizar rendimiento -->
+<script src="{{ url_for('static', filename='js/debug-config.js') }}?v={{ range(1, 10000) | random }}"></script>
 {% include 'navbar.html' %}
 <div class="container">
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -127,7 +129,6 @@ function clearAllMessages() {
 // Función para auto-limpiar mensajes implementada de manera controlada
 function setupAutoClear() {
     // Esta función puede activarse cuando sea necesario
-    console.log('Auto-limpieza desactivada actualmente');
 }
 </script>
 
@@ -274,7 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const hasVisibleModal = document.querySelector('.modal.show') !== null;
         
         if ((isOverflowHidden || hasModalOpenClass) && !hasVisibleModal) {
-            console.log('🔄 [OVERFLOW-CHECK] Corrigiendo estado de scroll al cargar la página');
             document.body.style.overflow = '';
             document.body.style.paddingRight = '';
             document.body.classList.remove('modal-open');

@@ -12,7 +12,6 @@
         const value = localStorage.getItem(key);
         if (value && PROBLEMATIC_FILES.some(file => value.includes(file))) {
             localStorage.removeItem(key);
-            console.log('Removed from localStorage:', key);
         }
     });
     
@@ -21,7 +20,6 @@
         const value = sessionStorage.getItem(key);
         if (value && PROBLEMATIC_FILES.some(file => value.includes(file))) {
             sessionStorage.removeItem(key);
-            console.log('Removed from sessionStorage:', key);
         }
     });
     
@@ -31,12 +29,11 @@
             Object.keys(row).forEach(key => {
                 if (typeof row[key] === 'string' && PROBLEMATIC_FILES.some(file => row[key].includes(file))) {
                     row[key] = '';
-                    console.log(`Cleaned row ${index + 1}, field ${key}`);
                 }
             });
         });
     }
     
-    console.log('✅ Problema MP4 solucionado. Recarga la página.');
+    // Problema MP4 solucionado
     alert('Cache limpiado. Recarga la página.');
 })();
