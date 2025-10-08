@@ -1,16 +1,22 @@
 /**
  * MULTIMEDIA MODAL FIX - SOLUCIÓN PARA MODALES MULTIMEDIA
  * Script para solucionar problemas con la apertura de modales multimedia
- * Versión: 1.0 (2025-10-07)
+ * Versión: 1.1 (2025-10-08)
  */
 
 // Verificar si ya existe una función showMultimediaModal
 if (typeof window.showMultimediaModal !== 'function') {
-  console.warn('⚠️ [MULTIMEDIA-FIX] showMultimediaModal no está definido, creando función de emergencia...');
+  // Usar el logger centralizado si está disponible
+  if (window.APP_CONFIG) {
+    window.APP_CONFIG.error('⚠️ [MULTIMEDIA-FIX] showMultimediaModal no está definido, creando función de emergencia...');
+  }
   
   // Función de emergencia para mostrar multimedia en modal
   window.showMultimediaModal = function(multimediaSrc, multimediaTitle, e) {
-    console.log('🔧 [MULTIMEDIA-FIX] showMultimediaModal (EMERGENCY VERSION) llamado con:', { multimediaSrc, multimediaTitle });
+    // Usar el logger centralizado si está disponible
+    if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+      window.APP_CONFIG.log('🔧 [MULTIMEDIA-FIX] showMultimediaModal (EMERGENCY VERSION) llamado con:', { multimediaSrc, multimediaTitle });
+    }
     
     // Prevenir comportamiento predeterminado si hay evento
     if (e) {
@@ -23,7 +29,12 @@ if (typeof window.showMultimediaModal !== 'function') {
     const modalTitle = document.getElementById('multimediaModalLabel');
     
     if (!modalElement || !modalContent || !modalTitle) {
-      console.error('❌ [MULTIMEDIA-FIX] Elementos del modal multimedia no encontrados');
+      // Siempre mostrar este error (incluso en producción)
+      if (window.APP_CONFIG) {
+        window.APP_CONFIG.error('✕ [MULTIMEDIA-FIX] Elementos del modal multimedia no encontrados');
+      } else {
+        console.error('✕ [MULTIMEDIA-FIX] Elementos del modal multimedia no encontrados');
+      }
       alert('Error: Modal multimedia no disponible. Contacte al administrador.');
       return;
     }
@@ -125,38 +136,50 @@ if (typeof window.showMultimediaModal !== 'function') {
     const modal = new bootstrap.Modal(modalElement);
     modal.show();
     
-    console.log('✅ [MULTIMEDIA-FIX] Modal multimedia mostrado');
+    if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+      window.APP_CONFIG.log('✅ [MULTIMEDIA-FIX] Modal multimedia mostrado');
+    }
   };
 } else {
   // Si ya existe la función, verificamos si necesitamos mejorarla
   // pero sin crear un wrapper que cause recursión infinita
   
-  console.log('ℹ️ [MULTIMEDIA-FIX] showMultimediaModal ya está definido');
+  if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    window.APP_CONFIG.log('ℹ️ [MULTIMEDIA-FIX] showMultimediaModal ya está definido');
+  }
   
   // Comprobamos si la función original ya maneja eventos
   // En lugar de crear un wrapper, asumimos que la función original ya es correcta
   
   // Esto evita recursión infinita entre el wrapper y la función original
-  console.log('✅ [MULTIMEDIA-FIX] Función multimedia ya existente detectada');
+  if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    window.APP_CONFIG.log('✅ [MULTIMEDIA-FIX] Función multimedia ya existente detectada');
+  }
 }
 
 // Función auxiliar para verificar elementos multimedia en la página
 function checkMultimediaElements() {
   const multimediaElements = document.querySelectorAll('[data-action="show-multimedia-modal"]');
-  console.log(`🔍 [MULTIMEDIA-FIX] Elementos multimedia encontrados: ${multimediaElements.length}`);
   
-  multimediaElements.forEach((element, index) => {
-    const url = element.dataset.mediaUrl;
-    const name = element.dataset.mediaName; 
-    
-    if (!url) {
-      console.warn(`⚠️ [MULTIMEDIA-FIX] Elemento #${index + 1} no tiene URL`);
-    }
-    
-    if (!name) {
-      console.warn(`⚠️ [MULTIMEDIA-FIX] Elemento #${index + 1} no tiene nombre`);
-    }
-  });
+  if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    window.APP_CONFIG.log(`🔍 [MULTIMEDIA-FIX] Elementos multimedia encontrados: ${multimediaElements.length}`);
+  }
+  
+  // Verificar solo en modo depuración
+  if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    multimediaElements.forEach((element, index) => {
+      const url = element.dataset.mediaUrl;
+      const name = element.dataset.mediaName; 
+      
+      if (!url) {
+        window.APP_CONFIG.warn(`⚠️ [MULTIMEDIA-FIX] Elemento #${index + 1} no tiene URL`);
+      }
+      
+      if (!name) {
+        window.APP_CONFIG.warn(`⚠️ [MULTIMEDIA-FIX] Elemento #${index + 1} no tiene nombre`);
+      }
+    });
+  }
   
   return multimediaElements.length;
 }
@@ -193,16 +216,22 @@ function setupMultimediaEventHandlers() {
 
 // Ejecutar verificación cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 [MULTIMEDIA-FIX] Iniciando solución para modales multimedia...');
+  if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    window.APP_CONFIG.log('🚀 [MULTIMEDIA-FIX] Iniciando solución para modales multimedia...');
+  }
   
   const count = checkMultimediaElements();
   if (count > 0) {
     setupMultimediaEventHandlers();
-    console.log(`✅ [MULTIMEDIA-FIX] Configuración completada para ${count} elementos multimedia`);
-  } else {
-    console.log('ℹ️ [MULTIMEDIA-FIX] No se encontraron elementos multimedia en la página');
+    if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+      window.APP_CONFIG.log(`✅ [MULTIMEDIA-FIX] Configuración completada para ${count} elementos multimedia`);
+    }
+  } else if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+    window.APP_CONFIG.log('ℹ️ [MULTIMEDIA-FIX] No se encontraron elementos multimedia en la página');
   }
 });
 
-// Informar en la consola que el script de solución está listo
-console.log('✅ [MULTIMEDIA-FIX] Script de solución multimedia cargado correctamente');
+// Solo mostrar mensaje de carga en modo depuración
+if (window.APP_CONFIG && window.APP_CONFIG.DEBUG_MODE) {
+  window.APP_CONFIG.log('✅ [MULTIMEDIA-FIX] Script de solución multimedia cargado correctamente');
+}
