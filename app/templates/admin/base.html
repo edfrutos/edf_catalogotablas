@@ -124,16 +124,16 @@
 
             <!-- Gestión de Contenido -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle {% if request.endpoint == 'admin.lista_usuarios' or 'catalogo' in request.endpoint or 'ver_catalogos_usuario' in request.endpoint %}active{% endif %}"
-                href="#"
+                type="button"
                 id="contentDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-people"></i> Gestión
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="contentDropdown">
                 <li>
                   <a
@@ -166,16 +166,16 @@
 
             <!-- Base de Datos -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle {% if 'db_' in request.endpoint %}active{% endif %}"
-                href="#"
+                type="button"
                 id="dbDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-database"></i> Base de Datos
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="dbDropdown">
                 <li>
                   <a
@@ -217,16 +217,16 @@
 
             <!-- Herramientas y Scripts -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle"
-                href="#"
+                type="button"
                 id="toolsDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-gear"></i> Herramientas
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
                 <li>
                   <a class="dropdown-item" href="/admin/tools/"
@@ -246,16 +246,16 @@
 
             <!-- Backups -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle {% if 'backup' in request.endpoint %}active{% endif %}"
-                href="#"
+                type="button"
                 id="backupDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-archive"></i> Backups
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="backupDropdown">
                 <li>
                   <a
@@ -276,16 +276,16 @@
 
             <!-- Sistema y Monitoreo -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle"
-                href="#"
+                type="button"
                 id="systemDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-cpu"></i> Sistema
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="systemDropdown">
                 <li>
                   <a
@@ -313,18 +313,18 @@
 
             <!-- Desarrollo -->
             <li class="nav-item dropdown">
-              <a
+              <button
                 class="nav-link dropdown-toggle"
-                href="#"
+                type="button"
                 id="devTemplateDropdown"
-                role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
+                onKeyDown="(event.key === 'Enter' || event.key === ' ') && this.click()"
               >
                 <i class="bi bi-lightbulb"></i>
                 <span class="d-lg-none">Desarrollo</span
                 ><span class="d-none d-lg-inline">Dev</span>
-              </a>
+              </button>
               <ul class="dropdown-menu" aria-labelledby="devTemplateDropdown">
                 <li>
                   <a
@@ -476,13 +476,13 @@
       // Mostrar botón Ir Arriba al hacer scroll
       window.addEventListener("scroll", function () {
         const btn = document.getElementById("goTopBtn");
-        if (btn && btn.parentNode) { // Verificar que el botón existe y está en el DOM
-          if (window.scrollY > 200) {
+          if (btn && btn.parentNode) { // Verificar que el botón existe y está en el DOM
+            if (window.scrollY > 200) {
             btn.style.display = "block";
-          } else {
-            btn.style.display = "none";
+            } else {
+              btn.style.display = "none";
+            }
           }
-        }
       });
       
       // Configurar el botón cuando el DOM esté listo
@@ -501,13 +501,14 @@
           
           // Verificar periódicamente si debe mostrarse
           setInterval(() => {
-            if (btn && btn.parentNode) { // Verificar que el botón aún existe
-              const currentTableRows = document.querySelectorAll('tbody tr');
-              if (currentTableRows.length > 10 || window.scrollY > 200) {
-                btn.style.display = "block";
-              } else if (window.scrollY <= 200) {
-                btn.style.display = "none";
-              }
+            // Evitar errores si el botón ya no existe en el DOM
+            if (!document.getElementById("goTopBtn")) return;
+            
+            const currentTableRows = document.querySelectorAll('tbody tr');
+            if (currentTableRows.length > 10 || window.scrollY > 200) {
+              btn.style.display = "block";
+            } else if (window.scrollY <= 200) {
+              btn.style.display = "none";
             }
           }, 1000);
         }

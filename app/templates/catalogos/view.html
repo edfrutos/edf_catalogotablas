@@ -2,7 +2,7 @@
 
 {% block extra_head %}
     <!-- modal-functions-UNIFIED.js ya está cargado en base.html -->
-    <script src="{{ url_for('static', filename='js/modal-img-display-fix.js') }}?v={{ range(1, 10000) | random }}"></script>
+    <script src="{{ url_for('static', filename='js/modal-img-display-fix.js') }}?v={{ range(1, 10000) | random }}&fix=20251007modal"></script>
     <!-- Scripts MP4 ya cargados en base.html -->
 {% endblock %}
 
@@ -47,6 +47,113 @@
     
     .documentos-container {
         max-width: 200px;
+    }
+    
+    /* Estilos mejorados para modales */
+    .modal-content {
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        height: auto !important;
+        max-height: 80vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    
+    .modal-footer {
+        border-top: 1px solid #e9ecef;
+        padding: 1rem 1.5rem;
+    }
+    
+    /* Mejores estilos para contenido multimedia */
+    #multimediaContent iframe,
+    #multimediaContent video {
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    #documentContent iframe {
+        border-radius: 8px;
+        border: 1px solid #dee2e6;
+    }
+    
+    /* Modales de tamaño moderado - más estrechos pero con altura suficiente */
+    .modal-dialog {
+        margin: 2rem auto !important;
+        max-width: 60% !important;
+        width: 60% !important;
+    }
+    
+    #documentModal .modal-dialog {
+        max-width: 800px !important;
+        width: 65% !important;
+        margin: 2rem auto !important;
+    }
+    
+    #multimediaModal .modal-dialog {
+        max-width: 700px !important;
+        width: 60% !important;
+        margin: 2rem auto !important;
+    }
+    
+    #imageModal .modal-dialog {
+        max-width: 600px !important;
+        width: 55% !important;
+        margin: 2rem auto !important;
+    }
+    
+    
+    #documentModal .modal-content {
+        max-height: 80vh !important;
+        height: 600px !important;
+    }
+    
+    #multimediaModal .modal-content {
+        max-height: 75vh !important;
+        height: 500px !important;
+    }
+    
+    #imageModal .modal-content {
+        max-height: 70vh !important;
+        height: 450px !important;
+    }
+    
+    /* Evitar overflow en el contenido del modal */
+    .modal-body {
+        overflow-y: auto !important;
+        max-height: 65vh !important;
+    }
+    
+    /* Forzar márgenes visibles en todos los modales */
+    .modal-dialog.modal-dialog-centered {
+        margin: 3rem auto !important;
+    }
+    
+    /* Asegurar que no ocupen toda la pantalla */
+    #documentModal .modal-dialog,
+    #multimediaModal .modal-dialog,
+    #imageModal .modal-dialog {
+        margin: 3rem auto !important;
+    }
+    
+    /* Responsive mejoras */
+    @media (max-width: 768px) {
+        .modal-dialog {
+            margin: 1rem !important;
+            max-width: calc(100% - 2rem) !important;
+            width: calc(100% - 2rem) !important;
+        }
+        
+        .modal-content {
+            max-height: 80vh !important;
+            height: auto !important;
+            min-height: 300px !important;
+        }
+        
+        .modal-body {
+            max-height: 50vh !important;
+            overflow-y: auto !important;
+        }
     }
     
     .documento-item {
@@ -134,9 +241,9 @@
             </a>
             
             <!-- Botones de DEBUG -->
-            <div class="btn-group ms-2" role="group">
+            <div class="btn-group ms-2">
                 <button type="button" class="btn btn-outline-info btn-sm dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="fas fa-bug"></i> Debug
+                    <i class="fas fa-bug" aria-hidden="true"></i> Debug
                 </button>
                 <ul class="dropdown-menu">
                     <li><button class="dropdown-item" onclick="debugRow(5)">Debug Fila #5</button></li>
@@ -489,20 +596,20 @@
 
 <!-- Modal para Documentos -->
 <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 800px; width: 65%;">
+        <div class="modal-content" style="max-height: 90vh; height: 750px;">
+            <div class="modal-header" style="flex-shrink: 0;">
                 <h5 class="modal-title" id="documentModalLabel">
                     <i class="fas fa-file"></i> <span id="documentTitle">Documento</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                <div id="documentContent">
+            <div class="modal-body" style="overflow: hidden; flex: 1; padding: 0; max-height: 85vh;">
+                <div id="documentContent" style="height: 100%; overflow: auto; max-height: 85vh;">
                     <!-- El contenido del documento se cargará aquí -->
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="flex-shrink: 0; padding: 0.75rem;">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
             </div>
         </div>
@@ -511,20 +618,20 @@
 
 <!-- Modal para Multimedia -->
 <div class="modal fade" id="multimediaModal" tabindex="-1" aria-labelledby="multimediaModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 700px; width: 60%;">
+    <div class="modal-content" style="max-height: 70vh; height: 480px;">
+      <div class="modal-header" style="flex-shrink: 0; padding: 0.75rem 1rem;">
         <h5 class="modal-title" id="multimediaModalLabel">
-          <i class="fas fa-video"></i> Vista Previa de Multimedia
+          <i class="fas fa-video"></i> Multimedia
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <div id="multimediaContent">
+      <div class="modal-body text-center" style="overflow: hidden; flex: 1; padding: 1rem;">
+        <div id="multimediaContent" style="height: 100%; display: flex; align-items: center; justify-content: center;">
           <!-- El contenido multimedia se cargará aquí -->
         </div>
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="flex-shrink: 0; padding: 0.75rem;">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
@@ -533,18 +640,18 @@
 
 <!-- Modal para Imágenes -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 600px; width: 55%;">
+    <div class="modal-content" style="max-height: 65vh; height: 420px;">
+      <div class="modal-header" style="flex-shrink: 0; padding: 0.75rem 1rem;">
         <h5 class="modal-title" id="imageModalLabel">
-          <i class="fas fa-image"></i> Vista Previa de Imagen
+          <i class="fas fa-image"></i> Imagen
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body text-center">
-        <img id="modalImage" src="" alt="Imagen" class="img-fluid" style="max-height: 70vh;">
+      <div class="modal-body text-center" style="overflow: hidden; flex: 1; padding: 0.5rem; display: flex; align-items: center; justify-content: center;">
+        <img id="modalImage" src="" alt="Imagen" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
       </div>
-      <div class="modal-footer">
+      <div class="modal-footer" style="flex-shrink: 0; padding: 0.75rem;">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>

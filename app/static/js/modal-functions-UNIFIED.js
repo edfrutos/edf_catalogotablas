@@ -23,8 +23,8 @@ if (!window.modalUnifiedLog) {
 if (!window.modalUnifiedLogError) {
   window.modalUnifiedLogError = console.error;
 }
-var log = window.modalUnifiedLog;
-var logError = window.modalUnifiedLogError;
+const log = window.modalUnifiedLog;
+const logError = window.modalUnifiedLogError;
 
 log("[MODAL-UNIFIED] 🚀 Iniciando sistema unificado de modales...");
 log("[MODAL-UNIFIED] 📁 Archivo cargado:", window.location.href);
@@ -56,6 +56,117 @@ log("[MODAL-UNIFIED] 🔍 Entorno detectado:", {
 // ============================================================================
 
 // Función para mostrar documentos en modal (PDF, Markdown, Texto)
+// Función auxiliar para determinar el título según la extensión del archivo
+function getDocumentTitle(fileExtension) {
+  if (fileExtension === 'pdf') {
+    return 'Ver PDF';
+  } else if (fileExtension === 'md') {
+    return 'Ver Markdown';
+  } else if (['doc', 'docx'].includes(fileExtension)) {
+    return 'Ver Documento';
+  } else if (['xls', 'xlsx'].includes(fileExtension)) {
+    return 'Ver Hoja de Cálculo';
+  } else if (['ppt', 'pptx'].includes(fileExtension)) {
+    return 'Ver Presentación';
+  }
+  return 'Documento';
+}
+
+// Función auxiliar para limpiar URLs malformadas
+function cleanDocumentUrl(documentSrc) {
+  let cleanDocumentSrc = documentSrc;
+  if (documentSrc.includes('/static/uploads//admin/s3/')) {
+    cleanDocumentSrc = documentSrc.replace('/static/uploads//admin/s3/', '/admin/s3/');
+    log("[MODAL-UNIFIED] 🔧 URL limpiada:", cleanDocumentSrc);
+  } else if (documentSrc.includes('/imagenes_subidas//admin/s3/')) {
+    cleanDocumentSrc = documentSrc.replace('/imagenes_subidas//admin/s3/', '/admin/s3/');
+    log("[MODAL-UNIFIED] 🔧 URL limpiada:", cleanDocumentSrc);
+  }
+  return cleanDocumentSrc;
+}
+
+// Función auxiliar para detectar si un archivo está en S3
+function isS3Document(documentSrc) {
+  return documentSrc.includes('s3.amazonaws.com') || 
+         documentSrc.includes('edf-catalogo-tablas.s3') || 
+         documentSrc.includes('/admin/s3/') || 
+         documentSrc.includes('/s3/');
+}
+
+// Función para mostrar contenido PDF desde S3
+function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
+      <h5>Documento PDF</h5>
+      <p class="text-muted mb-4">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> PDF<br>
+        <strong>Ubicación:</strong> S3
+      </p>
+      
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        <strong>Visualizando PDF desde S3...</strong>
+      </div>
+      
+      <div class="pdf-viewer-container mt-4">
+        <iframe 
+          src="${proxyUrl}" 
+          width="100%" 
+          height="600" 
+          style="border: 1px solid #dee2e6; border-radius: 8px;"
+          onload="console.log('[MODAL-UNIFIED] ✅ PDF cargado en iframe')"
+          onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF en iframe')">
+        </iframe>
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 's3');
+}
+
+// Función para mostrar otros tipos de contenido desde S3
+function showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension) {
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <i class="fas fa-file fa-4x text-primary mb-3"></i>
+      <h5>Documento S3</h5>
+      <p class="text-muted mb-4">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> ${fileExtension?.toUpperCase() || 'Desconocido'}<br>
+        <strong>Ubicación:</strong> S3
+      </p>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 's3');
+}
+
+// Función para configurar botones del modal de documento
+function setupDocumentButtons(documentSrc, documentTitle, sourceType) {
+  const modalFooter = document.querySelector('#documentModal .modal-footer');
+  if (!modalFooter) return;
+  
+  const actionType = sourceType === 's3' ? 'download-s3-file' : 'download-local-file';
+  
+  modalFooter.innerHTML = `
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <div class="d-flex gap-2">
+        <a href="${documentSrc}" target="_blank" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+        </a>
+        <button type="button" class="btn btn-outline-primary" data-action="${actionType}" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+          <i class="fas fa-download"></i> Descargar
+        </button>
+      </div>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    </div>
+  `;
+}
+
 function showDocumentModal(documentSrc, documentTitle) {
   log("[MODAL-UNIFIED] 📄 showDocumentModal llamado con:", { documentSrc, documentTitle });
   
@@ -72,21 +183,7 @@ function showDocumentModal(documentSrc, documentTitle) {
   
   // Configurar título genérico basado en el tipo de archivo
   const fileExtension = documentSrc.split('.').pop()?.toLowerCase();
-  let genericTitle = 'Documento';
-  if (fileExtension === 'pdf') {
-    genericTitle = 'Ver PDF';
-  } else if (fileExtension === 'md') {
-    genericTitle = 'Ver Markdown';
-  } else if (['doc', 'docx'].includes(fileExtension)) {
-    genericTitle = 'Ver Documento';
-  } else if (['xls', 'xlsx'].includes(fileExtension)) {
-    genericTitle = 'Ver Hoja de Cálculo';
-  } else if (['ppt', 'pptx'].includes(fileExtension)) {
-    genericTitle = 'Ver Presentación';
-  } else {
-    genericTitle = 'Ver Documento';
-  }
-  modalTitle.textContent = genericTitle;
+  modalTitle.textContent = getDocumentTitle(fileExtension);
   
   // Log de la extensión detectada
   log("[MODAL-UNIFIED] 🔍 Extensión detectada:", fileExtension);
@@ -96,28 +193,13 @@ function showDocumentModal(documentSrc, documentTitle) {
   modal.show();
   
   // Mostrar loading
-  modalContent.innerHTML = `
-    <div class="text-center p-4">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Cargando...</span>
-      </div>
-      <h5>Cargando Documento</h5>
-      <p class="text-muted">Preparando visualización...</p>
-    </div>
-  `;
+  showLoadingInModal(modalContent);
   
   // Limpiar URL si contiene rutas malformadas ANTES de detectar el tipo
-  let cleanDocumentSrc = documentSrc;
-  if (documentSrc.includes('/static/uploads//admin/s3/')) {
-    cleanDocumentSrc = documentSrc.replace('/static/uploads//admin/s3/', '/admin/s3/');
-    log("[MODAL-UNIFIED] 🔧 URL limpiada:", cleanDocumentSrc);
-  } else if (documentSrc.includes('/imagenes_subidas//admin/s3/')) {
-    cleanDocumentSrc = documentSrc.replace('/imagenes_subidas//admin/s3/', '/admin/s3/');
-    log("[MODAL-UNIFIED] 🔧 URL limpiada:", cleanDocumentSrc);
-  }
+  const cleanDocumentSrc = cleanDocumentUrl(documentSrc);
   
-  // DETECCIÓN HÍBRIDA S3/LOCAL (después de limpiar la URL)
-  const isS3File = cleanDocumentSrc.includes('s3.amazonaws.com') || cleanDocumentSrc.includes('edf-catalogo-tablas.s3') || cleanDocumentSrc.includes('/admin/s3/') || cleanDocumentSrc.includes('/s3/');
+  // DETECCIÓN HÍBRIDA S3/LOCAL
+  const isS3File = isS3Document(cleanDocumentSrc);
   log("[MODAL-UNIFIED] 🔍 URL del documento:", documentSrc);
   log("[MODAL-UNIFIED] 🔍 URL limpia:", cleanDocumentSrc);
   log("[MODAL-UNIFIED] 🔍 ¿Es archivo S3?:", isS3File);
@@ -132,51 +214,8 @@ function showDocumentModal(documentSrc, documentTitle) {
         '/admin/s3/'
       );
       
-      modalContent.innerHTML = `
-        <div class="text-center p-4">
-          <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
-          <h5>Documento PDF</h5>
-          <p class="text-muted mb-4">
-            <strong>Archivo:</strong> ${documentTitle}<br>
-            <strong>Tipo:</strong> PDF<br>
-            <strong>Ubicación:</strong> S3
-          </p>
-          
-          <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            <strong>Visualizando PDF desde S3...</strong>
-          </div>
-          
-          <div class="pdf-viewer-container mt-4">
-            <iframe 
-              src="${proxyUrl}" 
-              width="100%" 
-              height="600" 
-              style="border: 1px solid #dee2e6; border-radius: 8px;"
-              onload="console.log('[MODAL-UNIFIED] ✅ PDF cargado en iframe')"
-              onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF en iframe')">
-            </iframe>
-          </div>
-        </div>
-      `;
-      
-      // Insertar botones en el modal-footer
-      const modalFooter = document.querySelector('#documentModal .modal-footer');
-      if (modalFooter) {
-        modalFooter.innerHTML = `
-          <div class="d-flex gap-2 w-100 justify-content-between">
-            <div class="d-flex gap-2">
-              <a href="${documentSrc}" target="_blank" class="btn btn-primary">
-                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-              </a>
-              <button type="button" class="btn btn-outline-primary" data-action="download-s3-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
-                <i class="fas fa-download"></i> Descargar
-              </button>
-            </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        `;
-      }
+      // Mostrar PDF S3
+      showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
       
     } else if (fileExtension === 'md') {
       // Markdown S3
@@ -188,35 +227,7 @@ function showDocumentModal(documentSrc, documentTitle) {
       
     } else {
       // Otros tipos S3
-      modalContent.innerHTML = `
-        <div class="text-center p-4">
-          <i class="fas fa-file fa-4x text-primary mb-3"></i>
-          <h5>Documento S3</h5>
-          <p class="text-muted mb-4">
-            <strong>Archivo:</strong> ${documentTitle}<br>
-            <strong>Tipo:</strong> ${fileExtension?.toUpperCase() || 'Desconocido'}<br>
-            <strong>Ubicación:</strong> S3
-          </p>
-        </div>
-      `;
-      
-      // Insertar botones en el modal-footer
-      const modalFooter = document.querySelector('#documentModal .modal-footer');
-      if (modalFooter) {
-        modalFooter.innerHTML = `
-          <div class="d-flex gap-2 w-100 justify-content-between">
-            <div class="d-flex gap-2">
-              <a href="${documentSrc}" target="_blank" class="btn btn-primary">
-                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-              </a>
-              <button type="button" class="btn btn-outline-primary" data-action="download-s3-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
-                <i class="fas fa-download"></i> Descargar
-              </button>
-            </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        `;
-      }
+      showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension);
     }
     
   } else {
@@ -225,45 +236,7 @@ function showDocumentModal(documentSrc, documentTitle) {
     
     if (fileExtension === 'pdf') {
       // PDF local - iframe directo
-      modalContent.innerHTML = `
-        <div class="text-center p-4">
-          <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
-          <h5>Documento PDF</h5>
-          <p class="text-muted mb-4">
-            <strong>Archivo:</strong> ${documentTitle}<br>
-            <strong>Tipo:</strong> PDF<br>
-            <strong>Ubicación:</strong> S3
-          </p>
-          
-          <div class="pdf-viewer-container mt-4">
-            <iframe 
-              src="${documentSrc}" 
-              width="100%" 
-              height="600" 
-              style="border: 1px solid #dee2e6; border-radius: 8px;"
-              onload="console.log('[MODAL-UNIFIED] ✅ PDF local cargado en iframe')">
-            </iframe>
-          </div>
-        </div>
-      `;
-      
-      // Insertar botones en el modal-footer
-      const modalFooter = document.querySelector('#documentModal .modal-footer');
-      if (modalFooter) {
-        modalFooter.innerHTML = `
-          <div class="d-flex gap-2 w-100 justify-content-between">
-            <div class="d-flex gap-2">
-              <a href="${documentSrc}" target="_blank" class="btn btn-primary">
-                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-              </a>
-              <button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
-                <i class="fas fa-download"></i> Descargar
-              </button>
-            </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        `;
-      }
+      showPdfLocalContent(modalContent, documentSrc, documentTitle);
       
     } else if (fileExtension === 'md') {
       // Markdown local
@@ -275,35 +248,7 @@ function showDocumentModal(documentSrc, documentTitle) {
       
     } else {
       // Otros tipos locales
-      modalContent.innerHTML = `
-        <div class="text-center p-4">
-          <i class="fas fa-file fa-4x text-primary mb-3"></i>
-          <h5>Documento Local</h5>
-          <p class="text-muted mb-4">
-            <strong>Archivo:</strong> ${documentTitle}<br>
-            <strong>Tipo:</strong> ${fileExtension?.toUpperCase() || 'Desconocido'}<br>
-            <strong>Ubicación:</strong> S3
-          </p>
-        </div>
-      `;
-      
-      // Insertar botones en el modal-footer
-      const modalFooter = document.querySelector('#documentModal .modal-footer');
-      if (modalFooter) {
-        modalFooter.innerHTML = `
-          <div class="d-flex gap-2 w-100 justify-content-between">
-            <div class="d-flex gap-2">
-              <a href="${documentSrc}" target="_blank" class="btn btn-primary">
-                <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-              </a>
-              <button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
-                <i class="fas fa-download"></i> Descargar
-              </button>
-            </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-          </div>
-        `;
-      }
+      showOtherLocalContent(modalContent, documentSrc, documentTitle, fileExtension);
     }
   }
   
@@ -375,7 +320,7 @@ function showMarkdownInModal(markdownUrl, markdownTitle) {
             <strong>Ubicación:</strong> ${isS3File ? 'S3' : 'Local'}
           </p>
           
-          <div class="markdown-content-wrapper" style="max-height: 60vh; overflow-y: auto; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: left; margin-bottom: 20px;">
+          <div class="markdown-content-wrapper" style="max-height: 35vh; overflow-y: auto; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left; margin-bottom: 15px;"
             <div class="markdown-rendered">
               ${htmlContent}
             </div>
@@ -433,6 +378,104 @@ function showMarkdownInModal(markdownUrl, markdownTitle) {
     });
 }
 
+// Función para mostrar los botones del modal de texto
+function setupTextModalButtons(modalFooter, fileUrl, fileTitle) {
+  if (!modalFooter) return;
+  
+  modalFooter.innerHTML = `
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <div class="d-flex gap-2">
+        <a href="${fileUrl}" target="_blank" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+        </a>
+        <button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${fileUrl}" data-document-title="${fileTitle}">
+          <i class="fas fa-download"></i> Descargar
+        </button>
+      </div>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    </div>
+  `;
+}
+
+// Función para mostrar el contenido del texto
+function displayTextContent(modalContent, content, location, finalUrl, textTitle) {
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <i class="fas fa-file-alt fa-4x text-primary mb-3"></i>
+      <h5>Documento de Texto</h5>
+      <p class="text-muted mb-4">
+        <strong>Archivo:</strong> ${textTitle}<br>
+        <strong>Tipo:</strong> Texto<br>
+        <strong>Ubicación:</strong> ${location}
+      </p>
+      
+      <div class="text-content-wrapper" style="max-height: 35vh; overflow-y: auto; padding: 15px; background: #f8f9fa; border-radius: 8px; text-align: left; margin-bottom: 15px;"
+        <pre style="white-space: pre-wrap; font-family: 'Courier New', monospace;">${content}</pre>
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  const modalFooter = document.querySelector('#documentModal .modal-footer');
+  setupTextModalButtons(modalFooter, finalUrl, textTitle);
+}
+
+// Función para mostrar error al cargar texto
+function showTextLoadError(modalContent, textTitle, isS3Failure = false) {
+  const errorMessage = isS3Failure ?
+    "No se pudo cargar el archivo desde S3 ni desde almacenamiento local." :
+    "No se pudo cargar el archivo.";
+    
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
+      <h5>Error al cargar texto</h5>
+      <p class="text-muted">${errorMessage}</p>
+      <p class="text-muted"><strong>Archivo:</strong> ${textTitle}</p>
+    </div>
+  `;
+}
+
+// Función para intentar cargar desde una URL
+function loadTextFromUrl(url, location, modalContent, textTitle) {
+  return fetch(url)
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      return response.text();
+    })
+    .then(textContent => {
+      displayTextContent(modalContent, textContent, location, url, textTitle);
+      return true; // Éxito - devuelve boolean
+    })
+    .catch(error => {
+      log(`[MODAL-UNIFIED] ❌ Error cargando desde ${location}:`, error);
+      return false; // Fallo - devuelve boolean
+    });
+}
+
+// Función para cargar texto desde S3 y hacer fallback a local si es necesario
+function loadTextFromS3(textUrl, textTitle, modalContent) {
+  log("[MODAL-UNIFIED] 🔄 Intentando cargar desde S3...");
+  return loadTextFromUrl(textUrl, "S3", modalContent, textTitle)
+    .then(success => {
+      if (!success) {
+        // Fallback a local
+        const filename = textUrl.split('/').pop();
+        const localUrl = `/imagenes_subidas/${filename}`;
+        log("[MODAL-UNIFIED] 🔄 Fallback a local:", localUrl);
+        return loadTextFromUrl(localUrl, "Local", modalContent, textTitle);
+      }
+      return Promise.resolve(true);
+    });
+}
+
+// Función para cargar texto desde fuente local
+function loadTextFromLocal(textUrl, textTitle, modalContent) {
+  return loadTextFromUrl(textUrl, "Local", modalContent, textTitle);
+}
+
 // Función para mostrar texto en modal
 function showTextInModal(textUrl, textTitle) {
   log("[MODAL-UNIFIED] 📄 showTextInModal llamado con:", { textUrl, textTitle });
@@ -440,105 +483,18 @@ function showTextInModal(textUrl, textTitle) {
   const modalContent = document.getElementById('documentContent');
   if (!modalContent) return;
   
-  // Función para mostrar el contenido del texto
-  function displayTextContent(content, location, finalUrl) {
-    modalContent.innerHTML = `
-      <div class="text-center p-4">
-        <i class="fas fa-file-alt fa-4x text-primary mb-3"></i>
-        <h5>Documento de Texto</h5>
-        <p class="text-muted mb-4">
-          <strong>Archivo:</strong> ${textTitle}<br>
-          <strong>Tipo:</strong> Texto<br>
-          <strong>Ubicación:</strong> ${location}
-        </p>
-        
-        <div class="text-content-wrapper" style="max-height: 60vh; overflow-y: auto; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: left; margin-bottom: 20px;">
-          <pre style="white-space: pre-wrap; font-family: 'Courier New', monospace;">${content}</pre>
-        </div>
-      </div>
-    `;
-    
-    // Insertar botones en el modal-footer
-    const modalFooter = document.querySelector('#documentModal .modal-footer');
-    if (modalFooter) {
-      modalFooter.innerHTML = `
-        <div class="d-flex gap-2 w-100 justify-content-between">
-          <div class="d-flex gap-2">
-            <a href="${finalUrl}" target="_blank" class="btn btn-primary">
-              <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-            </a>
-            <button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${finalUrl}" data-document-title="${textTitle}">
-              <i class="fas fa-download"></i> Descargar
-            </button>
-          </div>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-        </div>
-      `;
+  // Determinar estrategia de carga basada en la URL
+  const loadStrategy = textUrl.includes('/admin/s3/') 
+    ? loadTextFromS3(textUrl, textTitle, modalContent) 
+    : loadTextFromLocal(textUrl, textTitle, modalContent);
+  
+  // Manejo de errores común
+  loadStrategy.then(success => {
+    if (!success) {
+      // El parámetro isS3Failure será true si estamos en la ruta S3
+      showTextLoadError(modalContent, textTitle, textUrl.includes('/admin/s3/'));
     }
-  }
-  
-  // Función para intentar cargar desde una URL
-  function tryLoadFromUrl(url, location) {
-    return fetch(url)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        return response.text();
-      })
-      .then(textContent => {
-        displayTextContent(textContent, location, url);
-        return true; // Éxito
-      })
-      .catch(error => {
-        log(`[MODAL-UNIFIED] ❌ Error cargando desde ${location}:`, error);
-        return false; // Fallo
-      });
-  }
-  
-  // Intentar cargar desde S3 primero
-  if (textUrl.includes('/admin/s3/')) {
-    log("[MODAL-UNIFIED] 🔄 Intentando cargar desde S3...");
-    tryLoadFromUrl(textUrl, "S3")
-      .then(success => {
-        if (!success) {
-          // Fallback a local
-          const filename = textUrl.split('/').pop();
-          const localUrl = `/imagenes_subidas/${filename}`;
-          log("[MODAL-UNIFIED] 🔄 Fallback a local:", localUrl);
-          return tryLoadFromUrl(localUrl, "Local");
-        }
-        return true;
-      })
-      .then(success => {
-        if (!success) {
-          // Mostrar error final
-          modalContent.innerHTML = `
-            <div class="text-center p-4">
-              <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
-              <h5>Error al cargar texto</h5>
-              <p class="text-muted">No se pudo cargar el archivo desde S3 ni desde almacenamiento local.</p>
-              <p class="text-muted"><strong>Archivo:</strong> ${textTitle}</p>
-            </div>
-          `;
-        }
-      });
-  } else {
-    // URL no es S3, intentar directamente
-    tryLoadFromUrl(textUrl, "Local")
-      .then(success => {
-        if (!success) {
-          modalContent.innerHTML = `
-            <div class="text-center p-4">
-              <i class="fas fa-exclamation-triangle fa-4x text-danger mb-3"></i>
-              <h5>Error al cargar texto</h5>
-              <p class="text-muted">No se pudo cargar el archivo.</p>
-              <p class="text-muted"><strong>Archivo:</strong> ${textTitle}</p>
-            </div>
-          `;
-        }
-      });
-  }
+  });
 }
 
 // Función para verificar si una imagen existe
@@ -660,107 +616,137 @@ function showImageModal(imageSrc, imageTitle) {
   log("[MODAL-UNIFIED] ✅ Modal de imagen mostrado");
 }
 
-// Función para mostrar multimedia en modal
-function showMultimediaModal(multimediaSrc, multimediaTitle) {
-  log("[MODAL-UNIFIED] 🎬 showMultimediaModal llamado con:", { multimediaSrc, multimediaTitle });
+// Función auxiliar para mostrar el spinner de carga en el modal
+function showLoadingInModal(modalContent) {
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <h5>Cargando Documento</h5>
+      <p class="text-muted">Preparando visualización...</p>
+    </div>
+  `;
+}
+
+// Función para limpiar URLs de multimedia
+function cleanMultimediaUrl(multimediaSrc) {
+  let cleanSrc = multimediaSrc;
   
-  const modalElement = document.getElementById('multimediaModal');
-  const modalContent = document.getElementById('multimediaContent');
-  const modalTitle = document.getElementById('multimediaModalLabel');
-  
-  if (!modalElement || !modalContent || !modalTitle) {
-    console.error("[MODAL-UNIFIED] ❌ Elementos del modal multimedia no encontrados");
-    return;
-  }
-  
-  // Configurar título (sin mostrar ruta completa)
-  modalTitle.textContent = 'Reproduciendo Video';
-  
-  // Determinar tipo de archivo y URL
-  const fileExtension = multimediaSrc.split('.').pop()?.toLowerCase();
-  const isYouTube = multimediaSrc.includes('youtube.com') || multimediaSrc.includes('youtu.be');
-  const isExternalVideo = multimediaSrc.startsWith('http') && (isYouTube || multimediaSrc.includes('vimeo.com') || multimediaSrc.includes('.mp4') || multimediaSrc.includes('.webm'));
-  let mediaHTML = '';
-  
-  // Limpiar URL si contiene rutas incorrectas
-  let cleanMultimediaSrc = multimediaSrc;
   if (multimediaSrc.includes('/static/uploads//admin/s3/')) {
-    cleanMultimediaSrc = multimediaSrc.replace('/static/uploads//admin/s3/', '/admin/s3/');
-    log("[MODAL-UNIFIED] 🔧 URL de multimedia limpiada:", cleanMultimediaSrc);
+    cleanSrc = multimediaSrc.replace('/static/uploads//admin/s3/', '/admin/s3/');
+    log("[MODAL-UNIFIED] 🔧 URL de multimedia limpiada:", cleanSrc);
   } else if (multimediaSrc.includes('/imagenes_subidas//admin/s3/')) {
-    cleanMultimediaSrc = multimediaSrc.replace('/imagenes_subidas//admin/s3/', '/admin/s3/');
-    log("[MODAL-UNIFIED] 🔧 URL de multimedia limpiada:", cleanMultimediaSrc);
+    cleanSrc = multimediaSrc.replace('/imagenes_subidas//admin/s3/', '/admin/s3/');
+    log("[MODAL-UNIFIED] 🔧 URL de multimedia limpiada:", cleanSrc);
   }
   
-  // DETECCIÓN HÍBRIDA S3/LOCAL
-  const isS3File = cleanMultimediaSrc.includes('s3.amazonaws.com') || cleanMultimediaSrc.includes('edf-catalogo-tablas.s3') || cleanMultimediaSrc.includes('/admin/s3/') || cleanMultimediaSrc.includes('/s3/');
-  
-  // Convertir YouTube URLs a embed
+  return cleanSrc;
+}
+
+// Función para determinar el tipo de contenido multimedia y devolver el HTML apropiado
+function determineMultimediaContent(cleanMultimediaSrc, fileExtension, isYouTube, isExternalVideo) {
   if (isYouTube) {
-    let videoId = '';
-    if (cleanMultimediaSrc.includes('youtube.com/watch?v=')) {
-      videoId = cleanMultimediaSrc.split('v=')[1]?.split('&')[0];
-    } else if (cleanMultimediaSrc.includes('youtu.be/')) {
-      videoId = cleanMultimediaSrc.split('youtu.be/')[1]?.split('?')[0];
-    }
-    
-    if (videoId) {
-      mediaHTML = `
-        <div class="text-center mb-3">
-          <h5><i class="fab fa-youtube text-danger"></i> Video de YouTube</h5>
-        </div>
-        <div class="d-flex justify-content-center">
-          <iframe width="100%" height="400" src="https://www.youtube.com/embed/${videoId}" 
-                  frameborder="0" allowfullscreen 
-                  style="max-width: 100%; max-height: 70vh;"></iframe>
-        </div>
-      `;
-    }
+    return getYouTubeEmbedHTML(cleanMultimediaSrc);
   } else if (['mp4', 'webm', 'avi', 'mov'].includes(fileExtension) || isExternalVideo) {
-    // Video (archivos locales y URLs externas de video)
-    mediaHTML = `
-      <div class="text-center mb-3">
-        <h5><i class="fas fa-video text-primary"></i> Reproduciendo Video</h5>
-      </div>
-      <div class="d-flex justify-content-center">
-        <video controls preload="metadata" class="img-fluid" style="max-width: 100%; height: auto; max-height: 70vh;">
-          <source src="${cleanMultimediaSrc}" type="video/${fileExtension || 'mp4'}">
-          Tu navegador no soporta el elemento de video.
-        </video>
-      </div>
-    `;
+    return getVideoPlayerHTML(cleanMultimediaSrc, fileExtension);
   } else if (['mp3', 'wav', 'ogg', 'aac'].includes(fileExtension)) {
-    // Audio
-    mediaHTML = `
-      <div class="text-center mb-3">
-        <h5><i class="fas fa-music text-success"></i> Reproduciendo Audio</h5>
-      </div>
-      <div class="d-flex justify-content-center">
-        <audio controls class="img-fluid" style="width: 100%; max-width: 500px;">
-          <source src="${cleanMultimediaSrc}" type="audio/${fileExtension}">
-          Tu navegador no soporta el elemento de audio.
-        </audio>
-      </div>
-    `;
+    return getAudioPlayerHTML(cleanMultimediaSrc, fileExtension);
   } else {
-    // Otros tipos
-    mediaHTML = `
-      <div class="text-center">
-        <i class="fas fa-file-video fa-4x text-primary mb-3"></i>
-        <h5>Archivo Multimedia</h5>
-        <p class="text-muted">Tipo: ${fileExtension || 'Desconocido'}</p>
-        <p class="text-muted">${multimediaTitle}</p>
-        <a href="${cleanMultimediaSrc}" target="_blank" class="btn btn-primary">
-          <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-        </a>
-      </div>
-    `;
+    return getExternalResourceHTML(cleanMultimediaSrc, fileExtension);
+  }
+}
+
+// Función para determinar si una URL es de S3
+function isS3Url(url) {
+  return url.includes('s3.amazonaws.com') || 
+         url.includes('edf-catalogo-tablas.s3') || 
+         url.includes('/admin/s3/') || 
+         url.includes('/s3/');
+}
+
+// Función para generar HTML de YouTube embed
+function getYouTubeEmbedHTML(url) {
+  let videoId = '';
+  if (url.includes('youtube.com/watch?v=')) {
+    videoId = url.split('v=')[1]?.split('&')[0];
+  } else if (url.includes('youtu.be/')) {
+    videoId = url.split('youtu.be/')[1]?.split('?')[0];
   }
   
-  // Configurar contenido y mostrar modal
-  modalContent.innerHTML = mediaHTML;
+  if (!videoId) return '';
   
-  // Agregar manejo de errores para elementos multimedia
+  return `
+    <div class="text-center mb-3">
+      <h5><i class="fab fa-youtube text-danger"></i> Video de YouTube</h5>
+    </div>
+    <div class="d-flex justify-content-center">
+      <iframe width="100%" height="380" src="https://www.youtube.com/embed/${videoId}" 
+      frameborder="0" allowfullscreen 
+      style="max-width: 100%; max-height: 380px; aspect-ratio: 16/9;"></iframe>
+    </div>
+  `;
+}
+
+// Función para generar HTML de reproductor de video
+function getVideoPlayerHTML(url, fileExtension) {
+  return `
+    <div class="text-center mb-3">
+      <h5><i class="fas fa-video text-primary"></i> Reproduciendo Video</h5>
+    </div>
+    <div class="d-flex justify-content-center">
+      <video controls preload="metadata" class="img-fluid" style="max-width: 100%; height: auto; max-height: 45vh; width: auto;">
+        <source src="${url}" type="video/${fileExtension || 'mp4'}">
+        Tu navegador no soporta el elemento de video.
+      </video>
+    </div>
+  `;
+}
+
+// Función para generar HTML de reproductor de audio
+function getAudioPlayerHTML(url, fileExtension) {
+  return `
+    <div class="text-center mb-3">
+      <h5><i class="fas fa-music text-success"></i> Reproduciendo Audio</h5>
+    </div>
+    <div class="d-flex justify-content-center">
+      <audio controls class="img-fluid" style="width: 100%; max-width: 500px;">
+        <source src="${url}" type="audio/${fileExtension}">
+        Tu navegador no soporta el elemento de audio.
+      </audio>
+    </div>
+  `;
+}
+
+// Función para generar HTML de recurso externo
+function getExternalResourceHTML(url, fileExtension) {
+  const isExternalUrl = url.startsWith('http');
+  const urlDomain = isExternalUrl ? new URL(url).hostname : '';
+  
+  return `
+    <div class="text-center p-4">
+      <i class="fas fa-external-link-alt fa-4x text-info mb-3"></i>
+      <h5>Recurso Multimedia Externo</h5>
+      ${isExternalUrl ? `<p class="text-muted"><strong>Sitio:</strong> ${urlDomain}</p>` : ''}
+      <p class="text-muted"><strong>Tipo:</strong> ${fileExtension?.toUpperCase() || 'Enlace externo'}</p>
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Este contenido se abrirá en una nueva pestaña del navegador.
+      </div>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <a href="${url}" target="_blank" class="btn btn-primary btn-lg">
+          <i class="fas fa-external-link-alt"></i> Abrir Recurso
+        </a>
+        <button type="button" class="btn btn-outline-secondary" onclick="navigator.clipboard.writeText('${url}').then(() => alert('URL copiada al portapapeles'))">
+          <i class="fas fa-copy"></i> Copiar URL
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Función para configurar el manejo de errores de elementos multimedia
+function setupMultimediaErrorHandling(modalContent, cleanMultimediaSrc) {
   const videoElements = modalContent.querySelectorAll('video');
   const audioElements = modalContent.querySelectorAll('audio');
   
@@ -781,29 +767,71 @@ function showMultimediaModal(multimediaSrc, multimediaTitle) {
       log("[MODAL-UNIFIED] ✅ Multimedia cargado correctamente:", cleanMultimediaSrc);
     };
   });
+}
+
+// Función para configurar botones del modal multimedia
+function setupMultimediaModalButtons(modalFooter, cleanMultimediaSrc, multimediaTitle, isS3File) {
+  if (!modalFooter) return;
+  
+  modalFooter.innerHTML = `
+    <div class="d-flex gap-2 w-100 justify-content-between">
+      <div class="d-flex gap-2">
+        <a href="${cleanMultimediaSrc}" target="_blank" class="btn btn-primary">
+          <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+        </a>
+        ${isS3File ? 
+          `<button type="button" class="btn btn-outline-primary" data-action="download-s3-file" data-document-src="${cleanMultimediaSrc}" data-document-title="${multimediaTitle}">
+            <i class="fas fa-download"></i> Descargar
+          </button>` : 
+          `<button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${cleanMultimediaSrc}" data-document-title="${multimediaTitle}">
+            <i class="fas fa-download"></i> Descargar
+          </button>`
+        }
+      </div>
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+    </div>
+  `;
+}
+
+// Función para mostrar multimedia en modal
+function showMultimediaModal(multimediaSrc, multimediaTitle) {
+  log("[MODAL-UNIFIED] 🎬 showMultimediaModal llamado con:", { multimediaSrc, multimediaTitle });
+  
+  const modalElement = document.getElementById('multimediaModal');
+  const modalContent = document.getElementById('multimediaContent');
+  const modalTitle = document.getElementById('multimediaModalLabel');
+  
+  if (!modalElement || !modalContent || !modalTitle) {
+    console.error("[MODAL-UNIFIED] ❌ Elementos del modal multimedia no encontrados");
+    return;
+  }
+  
+  // Configurar título (sin mostrar ruta completa)
+  modalTitle.textContent = 'Reproduciendo Video';
+  
+  // Determinar tipo de archivo y URL
+  const fileExtension = multimediaSrc.split('.').pop()?.toLowerCase();
+  const isYouTube = multimediaSrc.includes('youtube.com') || multimediaSrc.includes('youtu.be');
+  const isExternalVideo = multimediaSrc.startsWith('http') && (isYouTube || multimediaSrc.includes('vimeo.com') || multimediaSrc.includes('.mp4') || multimediaSrc.includes('.webm'));
+  
+  // Limpiar URL si contiene rutas incorrectas
+  const cleanMultimediaSrc = cleanMultimediaUrl(multimediaSrc);
+  
+  // DETECCIÓN HÍBRIDA S3/LOCAL
+  const isS3File = isS3Url(cleanMultimediaSrc);
+  
+  // Generar HTML según el tipo de contenido
+  const mediaHTML = determineMultimediaContent(cleanMultimediaSrc, fileExtension, isYouTube, isExternalVideo);
+  
+  // Configurar contenido y mostrar modal
+  modalContent.innerHTML = mediaHTML;
+  
+  // Agregar manejo de errores para elementos multimedia
+  setupMultimediaErrorHandling(modalContent, cleanMultimediaSrc);
   
   // Insertar botones en el modal-footer
   const modalFooter = document.querySelector('#multimediaModal .modal-footer');
-  if (modalFooter) {
-    modalFooter.innerHTML = `
-      <div class="d-flex gap-2 w-100 justify-content-between">
-        <div class="d-flex gap-2">
-          <a href="${cleanMultimediaSrc}" target="_blank" class="btn btn-primary">
-            <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
-          </a>
-          ${isS3File ? 
-            `<button type="button" class="btn btn-outline-primary" data-action="download-s3-file" data-document-src="${cleanMultimediaSrc}" data-document-title="${multimediaTitle}">
-              <i class="fas fa-download"></i> Descargar
-            </button>` : 
-            `<button type="button" class="btn btn-outline-primary" data-action="download-local-file" data-document-src="${cleanMultimediaSrc}" data-document-title="${multimediaTitle}">
-              <i class="fas fa-download"></i> Descargar
-            </button>`
-          }
-        </div>
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-      </div>
-    `;
-  }
+  setupMultimediaModalButtons(modalFooter, cleanMultimediaSrc, multimediaTitle, isS3File);
   const modal = new bootstrap.Modal(modalElement);
   modal.show();
   
@@ -921,7 +949,7 @@ function openPDFInNewTab(pdfUrl) {
 // Función para manejar errores de imagen
 function handleImageError(img) {
   log("[MODAL-UNIFIED] ⚠️ Error en imagen:", img);
-  if (img && img.src && !img.src.includes('image-error-placeholder.png')) {
+  if (img?.src && !img.src.includes('image-error-placeholder.png')) {
     // Evitar bucles infinitos estableciendo el placeholder solo una vez
     img.src = '/static/img/image-error-placeholder.png';
     img.alt = 'Error cargando imagen';
@@ -943,7 +971,7 @@ function downloadImage() {
   log("[MODAL-UNIFIED] 🔧 downloadImage llamado");
   
   const modalImage = document.getElementById('modalImage');
-  if (!modalImage || !modalImage.src) {
+  if (!modalImage?.src) {
     console.error("[MODAL-UNIFIED] ❌ No se encontró imagen para descargar");
     return;
   }
