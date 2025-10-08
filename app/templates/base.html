@@ -9,10 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- TEMPORAL: CSS de debug para modales -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-debug.css') }}">
-    <!-- EMERGENCIA: CSS para forzar visibilidad de modales -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/modal-emergency-fix.css') }}?v={{ range(1, 10000) | random }}">
+
+
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body { background: #f8f9fa; }
@@ -37,11 +35,11 @@
             {% endif %}
           {% endfor %}
           <div class="alert alert-info alert-dismissible fade show mt-2" role="alert">
-            <small>Se han omitido {{ message_count - 3 }} mensajes anteriores. <a href="#" onclick="clearAllMessages()" class="alert-link">Limpiar todos</a></small>
+            <small>Se han omitido {{ message_count - 3 }} mensajes anteriores. <button type="button" class="btn-link p-0 border-0 bg-transparent" onclick="clearAllMessages()">Limpiar todos</button></small>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
           </div>
         {% else %}
-          <!-- Mostrar todos los mensajes si son 3 o menos -->
+          <!-- Mensajes limitados (3 o menos) -->
           {% for category, message in messages %}
             <div class="alert alert-{{ 'warning' if category=='error' else category }} alert-dismissible fade show mt-2" role="alert">
               {{ message }}
@@ -80,24 +78,13 @@ function clearAllMessages() {
       });
 }
 
-// Auto-limpiar mensajes después de 5 segundos (TEMPORALMENTE DESHABILITADO PARA DEBUG)
-/*
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        // Solo cerrar alertas que están en contenedores de mensajes flash
-        document.querySelectorAll('.container .alert:not(.alert-info):not(.alert-success)').forEach(alert => {
-            // Verificar que no esté dentro de un preview de documento o multimedia
-            if (!alert.closest('.documento-preview') && !alert.closest('.multimedia-preview')) {
-                const bsAlert = new bootstrap.Alert(alert);
-                bsAlert.close();
-            }
-        });
-    }, 5000);
-});
-*/
+// Función para auto-limpiar mensajes implementada de manera controlada
+function setupAutoClear() {
+    // Esta función puede activarse cuando sea necesario
+    console.log('Auto-limpieza desactivada actualmente');
+}
 </script>
-<!-- TEMPORAL: Deshabilitado para evitar conflictos con modales -->
-<!-- <script src="{{ url_for('static', filename='js/pywebview_compatibility.js') }}"></script> -->
+
 {% block scripts %}{% endblock %}
 <!-- Botón Ir Arriba -->
 <button type="button" id="goTopBtn" class="btn btn-primary btn-lg rounded-circle" style="position:fixed;bottom:32px;right:32px;z-index:1050;display:none;"><i class="bi bi-arrow-up"></i></button>
@@ -113,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
             <div class="modal-body text-center">
-                <img id="modalImage" src="" class="img-fluid" alt="Imagen">
+                <img id="modalImage" src="" class="img-fluid" alt="">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="downloadImage()">
@@ -206,7 +193,7 @@ document.getElementById('goTopBtn').onclick = function() {
 <!-- Scripts de Bootstrap y funcionalidades básicas -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Script unificado de modales (cargado una sola vez globalmente) -->
-<script src="{{ url_for('static', filename='js/modal-functions-UNIFIED.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&force={{ range(1000000, 9999999) | random }}&fix=20251007"></script>
+<script src="{{ url_for('static', filename='js/modal-functions-UNIFIED.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&force={{ range(1000000, 9999999) | random }}&fix=20251007modal"></script>
 <!-- Scripts de solución de problemas MP4 (cargados globalmente para evitar duplicaciones) -->
 <script>
 // Verificar si los scripts ya fueron cargados para evitar duplicaciones

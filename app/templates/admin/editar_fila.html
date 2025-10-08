@@ -22,20 +22,20 @@
                     <div class="mb-3">
                         {% if header == 'Multimedia' %}
                             <!-- Campo especial para Multimedia -->
-                            <label class="form-label fw-bold">
+                            <div class="fw-bold mb-2" id="multimedia_section_{{ loop.index0 }}">
                                 <i class="fas fa-video"></i> {{ header }}
-                            </label>
+                            </div>
                             <div class="row">
                                 <div class="col-md-6">
-                                    <label class="form-label">URL de Multimedia (opcional)</label>
-                                    <input type="url" class="form-control" name="{{ header }}_url" 
+                                    <label class="form-label" for="{{ header }}_url">URL de Multimedia (opcional)</label>
+                                    <input type="url" class="form-control" id="{{ header }}_url" name="{{ header }}_url" 
                                            value="{{ row[header] if row[header] and row[header] is string and row[header].startswith('http') else '' }}"
                                            placeholder="https://ejemplo.com/video.mp4">
                                     <div class="form-text">Enlaza a un video, audio o imagen externa</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">Subir Archivo Multimedia</label>
-                                    <input type="file" class="form-control" name="{{ header }}_file" 
+                                    <label class="form-label" for="{{ header }}_file">Subir Archivo Multimedia</label>
+                                    <input type="file" class="form-control" id="{{ header }}_file" name="{{ header }}_file" 
                                            accept="video/*,audio/*,image/*">
                                     <div class="form-text">Videos, Audio, Imágenes | Máximo: 100MB</div>
                                 </div>
@@ -44,8 +44,8 @@
                             <!-- Mostrar multimedia actual -->
                             {% if row[header] %}
                                 <div class="mt-3">
-                                    <label class="form-label">Multimedia Actual:</label>
-                                    <div class="multimedia-preview">
+                                    <div class="form-label fw-bold mb-2" id="multimedia_actual_{{ loop.index0 }}">Multimedia Actual:</div>
+                                    <div class="multimedia-preview" aria-labelledby="multimedia_actual_{{ loop.index0 }}">
                                         {% if row[header] is string and row[header].startswith('http') %}
                                             <div class="alert alert-info d-flex justify-content-between align-items-center">
                                                 <div>
@@ -78,15 +78,16 @@
                             
                         {% elif header in ['Documentos', 'Documentación'] or header.startswith('Documentación') %}
                             <!-- Campo especial para Documentos/Documentación - MÚLTIPLES DOCUMENTOS -->
-                            <label class="form-label fw-bold">
+                            <div class="fw-bold mb-2" id="documentos_section_{{ loop.index0 }}">
                                 <i class="fas fa-file-alt"></i> {{ header }}
                                 <span class="badge bg-success ms-2">Múltiples</span>
-                            </label>
+                            </div>
                             
                             <!-- URLs de Documentos -->
                             <div class="mb-3">
-                                <label class="form-label">URLs de Documentos (opcional)</label>
-                                <div id="urls-container-{{ loop.index0 }}">
+                                <fieldset>
+                                    <legend class="form-label">URLs de Documentos (opcional)</legend>
+                                    <div id="urls-container-{{ loop.index0 }}">
                                     {% if row[header] and row[header] is iterable and row[header] is not string %}
                                         <!-- Mostrar URLs existentes -->
                                         {% for doc in row[header] %}
@@ -120,13 +121,14 @@
                                         </div>
                                     {% endif %}
                                 </div>
+                                </fieldset>
                                 <div class="form-text">Puedes agregar múltiples URLs de documentos externos</div>
                             </div>
                             
                             <!-- Archivos de Documentos -->
                             <div class="mb-3">
-                                <label class="form-label">Subir Documentos</label>
-                                    <input type="file" class="form-control" name="{{ header }}_file_{{ loop.index0 }}" 
+                                <label class="form-label" for="{{ header }}_file_{{ loop.index0 }}">Subir Documentos</label>
+                                    <input type="file" class="form-control" id="{{ header }}_file_{{ loop.index0 }}" name="{{ header }}_file_{{ loop.index0 }}" 
                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.md" multiple>
                                 <div class="form-text">PDF, Word, Excel, Texto, RTF, Markdown | Máximo: 50MB cada uno | Puedes seleccionar múltiples archivos</div>
                             </div>
@@ -134,7 +136,7 @@
                             <!-- Mostrar documentos actuales -->
                             {% if row[header] %}
                                 <div class="mt-3">
-                                    <label class="form-label">Documentos Actuales:</label>
+                                    <div class="form-label fw-bold mb-2">Documentos Actuales:</div>
                                     <div class="documentos-preview">
                                         {% if row[header] is iterable and row[header] is not string %}
                                             <!-- Múltiples documentos (formato nuevo) -->
@@ -217,7 +219,7 @@
                             </div>
                         {% else %}
                             <!-- Campo normal -->
-                            <label class="form-label fw-bold">{{ header }}</label>
+                            <label class="form-label fw-bold" for="campo_{{ header|lower|replace(' ', '_') }}">{{ header }}</label>
                             <input type="text" class="form-control" name="{{ header }}" 
                                    value="{{ row[header] or '' }}" placeholder="Ingrese {{ header.lower() }}">
                         {% endif %}
@@ -226,10 +228,10 @@
                 
                 <!-- Campo de imágenes -->
                 <div class="mb-3">
-                    <label class="form-label fw-bold">
+                    <label class="form-label fw-bold" for="form_images">
                         <i class="fas fa-images"></i> Imágenes
                     </label>
-                    <input type="file" class="form-control" name="images" multiple accept="image/*">
+                    <input type="file" class="form-control" id="form_images" name="images" multiple accept="image/*">
                     <div class="form-text">Puedes seleccionar múltiples imágenes | Máximo: 10MB por imagen</div>
                     
                     <!-- Mostrar imágenes actuales -->
@@ -242,18 +244,20 @@
                                         <div class="position-relative">
                                             {% if img is string and (img.startswith('http') or img.startswith('/admin/s3/') or img.startswith('/s3/') or '/admin/s3/' in img or '/s3/' in img) %}
                                                 <!-- URL externa o S3 -->
-                                                <img src="{{ img }}" 
-                                                     alt="Imagen {{ loop.index }}" 
-                                                     class="img-thumbnail" 
-                                                     style="width: 100px; height: 100px; object-fit: cover;"
-                                                     onerror="this.src='{{ url_for('static', filename='uploads/' + img.split('/')[-1]) }}'; this.onerror=function(){this.src='/static/img/image-error.svg'};">
+                                                <button type="button" class="p-0 border-0 bg-transparent" onclick="previewImage('{{ img }}')">
+                                                    <img src="{{ img }}" 
+                                                         alt="{{ loop.index }}" 
+                                                         class="img-thumbnail" 
+                                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                                </button>
                                             {% else %}
                                                 <!-- Archivo local -->
-                                                <img src="{{ url_for('uploaded_images.uploaded_images', filename=img) }}" 
-                                                     alt="Imagen {{ loop.index }}" 
-                                                     class="img-thumbnail" 
-                                                     style="width: 100px; height: 100px; object-fit: cover;"
-                                                     onerror="this.src='/static/img/image-error.svg';">
+                                                <button type="button" class="p-0 border-0 bg-transparent" onclick="previewImage('{{ url_for('uploaded_images.uploaded_images', filename=img) }}')">
+                                                    <img src="{{ url_for('uploaded_images.uploaded_images', filename=img) }}" 
+                                                         alt="{{ loop.index }}" 
+                                                         class="img-thumbnail" 
+                                                         style="width: 100px; height: 100px; object-fit: cover;">
+                                                </button>
                                             {% endif %}
                                             <div class="form-check position-absolute top-0 start-0">
                                                 <input class="form-check-input" type="checkbox" 
