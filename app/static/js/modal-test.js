@@ -26,19 +26,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Comprobar que no hay wrappers recursivos
   console.log('🧪 [MODAL-TEST] Probando llamada a showMultimediaModal...');
   
-  // Simular un evento
-  const mockEvent = {
-    preventDefault: function() {
-      console.log('🧪 [MODAL-TEST] preventDefault llamado correctamente');
-    }
-  };
-  
   try {
-    // Llamar a la función con todos los parámetros (incluyendo evento)
+    // Llamar a la función con todos los parámetros
     if (typeof window.showMultimediaModal === 'function') {
-      console.log('🧪 [MODAL-TEST] Llamando a showMultimediaModal con evento...');
+      console.log('🧪 [MODAL-TEST] Llamando a showMultimediaModal...');
       // Solo para test - no ejecutar realmente para evitar abrir modal
-      // window.showMultimediaModal('https://example.com/video.mp4', 'Video de prueba', mockEvent);
+      // window.showMultimediaModal('https://example.com/video.mp4', 'Video de prueba');
       console.log('✅ [MODAL-TEST] showMultimediaModal debería funcionar correctamente');
     }
   } catch (error) {

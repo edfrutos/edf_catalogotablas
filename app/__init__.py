@@ -280,6 +280,22 @@ def create_app(testing=False):
                 app.logger.info(
                     "test_session_routes no encontrado - omitiendo registro"
                 )
+
+            # Registrar blueprint para test de modales PDF
+            try:
+                from app.routes.test_pdf_modal_routes import test_pdf_modal_bp
+                app.register_blueprint(test_pdf_modal_bp)
+                app.logger.info("Blueprint test_pdf_modal_bp registrado para pruebas de modales PDF")
+            except Exception as e:
+                app.logger.error(f"Error al registrar blueprint de test de modales PDF: {e}")
+            
+            # Registrar blueprint para test de modales unificados
+            try:
+                from app.routes.modal_test_routes import modal_test_bp
+                app.register_blueprint(modal_test_bp)
+                app.logger.info("Blueprint modal_test_bp registrado para pruebas de modales unificados")
+            except Exception as e:
+                app.logger.error(f"Error al registrar blueprint de test de modales unificados: {e}")
         except Exception as e:
             app.logger.error(f"No se pudo registrar test_session_bp: {e}")
 

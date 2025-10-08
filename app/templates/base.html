@@ -247,6 +247,10 @@ document.getElementById('goTopBtn').onclick = function() {
 <script src="{{ url_for('static', filename='js/multimedia-modal-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&fix=20251007multimedia"></script>
 <!-- Script de solución para problemas de overflow -->
 <script src="{{ url_for('static', filename='js/overflow-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008overflow"></script>
+<!-- Script de solución específica para problemas de contenido de modales -->
+<script src="{{ url_for('static', filename='js/modal-content-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008modal"></script>
+<!-- Script de solución específica para modales PDF -->
+<script src="{{ url_for('static', filename='js/pdf-modal-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008pdf"></script>
 <!-- Scripts de solución de problemas MP4 (cargados globalmente para evitar duplicaciones) -->
 <script>
 // Verificar si los scripts ya fueron cargados para evitar duplicaciones
@@ -285,6 +289,23 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     }, 500);
+    
+    // Cargar herramientas de diagnóstico y prueba para modales (solo en modo depuración)
+    try {
+        if (typeof getDebugMode === 'function' && getDebugMode()) {
+            // Cargar herramienta de prueba de modales
+            const modalTestScript = document.createElement('script');
+            modalTestScript.src = "{{ url_for('static', filename='js/modal-test-tool.js') }}?v={{ range(1, 10000) | random }}";
+            document.body.appendChild(modalTestScript);
+            
+            // Cargar herramienta de diagnóstico de modales
+            const modalDebugScript = document.createElement('script');
+            modalDebugScript.src = "{{ url_for('static', filename='js/modal-debug.js') }}?v={{ range(1, 10000) | random }}";
+            document.body.appendChild(modalDebugScript);
+        }
+    } catch (error) {
+        console.warn('Error al cargar herramientas de diagnóstico:', error);
+    }
 });
 </script>
 
