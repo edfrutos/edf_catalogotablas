@@ -151,7 +151,11 @@
                                         </div>
                                     {% else %}
                                         <!-- URL externa -->
-                                        <a href="{{ multimedia_data }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="javascript:void(0)" 
+                                           data-action="show-multimedia-modal" 
+                                           data-media-url="{{ multimedia_data }}" 
+                                           data-media-name="{{ multimedia_title|default('Multimedia Externa') }}" 
+                                           class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-external-link-alt"></i> Ver Multimedia
                                         </a>
                                     {% endif %}

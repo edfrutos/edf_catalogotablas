@@ -95,26 +95,22 @@ function isS3Document(documentSrc) {
 
 // Función para mostrar contenido PDF desde S3
 function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
+  // Aumentar la altura del iframe para aprovechar mejor el espacio del modal
   modalContent.innerHTML = `
-    <div class="text-center p-4">
-      <i class="fas fa-file-pdf fa-4x text-danger mb-3"></i>
+    <div class="text-center p-3">
+      <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
       <h5>Documento PDF</h5>
-      <p class="text-muted mb-4">
+      <p class="text-muted mb-3">
         <strong>Archivo:</strong> ${documentTitle}<br>
         <strong>Tipo:</strong> PDF<br>
         <strong>Ubicación:</strong> S3
       </p>
       
-      <div class="alert alert-info">
-        <i class="fas fa-info-circle"></i>
-        <strong>Visualizando PDF desde S3...</strong>
-      </div>
-      
-      <div class="pdf-viewer-container mt-4">
+      <div class="pdf-viewer-container">
         <iframe 
           src="${proxyUrl}" 
           width="100%" 
-          height="600" 
+          height="650" 
           style="border: 1px solid #dee2e6; border-radius: 8px;"
           onload="console.log('[MODAL-UNIFIED] ✅ PDF cargado en iframe')"
           onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF en iframe')">
@@ -125,6 +121,19 @@ function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
   
   // Insertar botones en el modal-footer
   setupDocumentButtons(documentSrc, documentTitle, 's3');
+  
+  // Ajustar el tamaño del modal para PDFs
+  const modalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (modalDialog) {
+    modalDialog.style.maxWidth = '900px';
+    modalDialog.style.width = '85%';
+  }
+  
+  const modalContentElement = document.querySelector('#documentModal .modal-content');
+  if (modalContentElement) {
+    modalContentElement.style.height = '850px';
+    modalContentElement.style.maxHeight = '90vh';
+  }
 }
 
 // Función para mostrar otros tipos de contenido desde S3
@@ -143,6 +152,71 @@ function showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtens
   
   // Insertar botones en el modal-footer
   setupDocumentButtons(documentSrc, documentTitle, 's3');
+}
+
+// Función para mostrar contenido PDF local
+function showPdfLocalContent(modalContent, documentSrc, documentTitle) {
+  // Aumentar la altura del iframe para aprovechar mejor el espacio del modal
+  modalContent.innerHTML = `
+    <div class="text-center p-3">
+      <i class="fas fa-file-pdf fa-3x text-danger mb-2"></i>
+      <h5>Documento PDF</h5>
+      <p class="text-muted mb-3">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> PDF<br>
+        <strong>Ubicación:</strong> Local
+      </p>
+      
+      <div class="pdf-viewer-container">
+        <iframe 
+          src="${documentSrc}" 
+          width="100%" 
+          height="650" 
+          style="border: 1px solid #dee2e6; border-radius: 8px;"
+          onload="console.log('[MODAL-UNIFIED] ✅ PDF local cargado en iframe')"
+          onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF local en iframe')">
+        </iframe>
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 'local');
+  
+  // Ajustar el tamaño del modal para PDFs
+  const modalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (modalDialog) {
+    modalDialog.style.maxWidth = '900px';
+    modalDialog.style.width = '85%';
+  }
+  
+  const modalContentElement = document.querySelector('#documentModal .modal-content');
+  if (modalContentElement) {
+    modalContentElement.style.height = '850px';
+    modalContentElement.style.maxHeight = '90vh';
+  }
+}
+
+// Función para mostrar otros tipos de contenido local
+function showOtherLocalContent(modalContent, documentSrc, documentTitle, fileExtension) {
+  modalContent.innerHTML = `
+    <div class="text-center p-4">
+      <i class="fas fa-file fa-4x text-primary mb-3"></i>
+      <h5>Documento Local</h5>
+      <p class="text-muted mb-4">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> ${fileExtension?.toUpperCase() || 'Desconocido'}<br>
+        <strong>Ubicación:</strong> Local
+      </p>
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Para visualizar este tipo de archivo, use el botón para abrirlo en una nueva pestaña.
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 'local');
 }
 
 // Función para configurar botones del modal de documento
@@ -607,6 +681,35 @@ function showImageModal(imageSrc, imageTitle) {
   
   modalImage.onload = function() {
     log("[MODAL-UNIFIED] ✅ Imagen cargada correctamente:", imageSrc);
+    
+    // Ajustar el tamaño del modal basado en el tamaño de la imagen
+    setTimeout(() => {
+      const imgWidth = modalImage.naturalWidth;
+      const imgHeight = modalImage.naturalHeight;
+      
+      // Ajustar el tamaño del modal para imágenes más grandes
+      const modalDialog = document.querySelector('#imageModal .modal-dialog');
+      if (modalDialog) {
+        if (imgWidth > 800 || imgHeight > 600) {
+          modalDialog.style.maxWidth = '850px';
+          modalDialog.style.width = '80%';
+        } else {
+          modalDialog.style.maxWidth = '700px';
+          modalDialog.style.width = '70%';
+        }
+      }
+      
+      const modalContentElement = document.querySelector('#imageModal .modal-content');
+      if (modalContentElement) {
+        if (imgHeight > 600) {
+          modalContentElement.style.height = '700px';
+          modalContentElement.style.maxHeight = '85vh';
+        } else {
+          modalContentElement.style.height = '550px';
+          modalContentElement.style.maxHeight = '70vh';
+        }
+      }
+    }, 100);
   };
   
   // Mostrar modal
@@ -690,12 +793,27 @@ function getYouTubeEmbedHTML(url) {
 
 // Función para generar HTML de reproductor de video
 function getVideoPlayerHTML(url, fileExtension) {
+  // Ajustar el tamaño del modal para videos
+  setTimeout(() => {
+    const modalDialog = document.querySelector('#multimediaModal .modal-dialog');
+    if (modalDialog) {
+      modalDialog.style.maxWidth = '850px';
+      modalDialog.style.width = '85%';
+    }
+    
+    const modalContentElement = document.querySelector('#multimediaModal .modal-content');
+    if (modalContentElement) {
+      modalContentElement.style.height = '650px';
+      modalContentElement.style.maxHeight = '85vh';
+    }
+  }, 100);
+  
   return `
     <div class="text-center mb-3">
       <h5><i class="fas fa-video text-primary"></i> Reproduciendo Video</h5>
     </div>
-    <div class="d-flex justify-content-center">
-      <video controls preload="metadata" class="img-fluid" style="max-width: 100%; height: auto; max-height: 45vh; width: auto;">
+    <div class="d-flex justify-content-center" style="width: 100%; max-height: 75vh;">
+      <video controls preload="metadata" class="img-fluid" style="max-width: 100%; height: auto; max-height: 65vh; width: auto;">
         <source src="${url}" type="video/${fileExtension || 'mp4'}">
         Tu navegador no soporta el elemento de video.
       </video>
@@ -794,7 +912,7 @@ function setupMultimediaModalButtons(modalFooter, cleanMultimediaSrc, multimedia
 }
 
 // Función para mostrar multimedia en modal
-function showMultimediaModal(multimediaSrc, multimediaTitle) {
+function showMultimediaModal(multimediaSrc, multimediaTitle, e) {
   log("[MODAL-UNIFIED] 🎬 showMultimediaModal llamado con:", { multimediaSrc, multimediaTitle });
   
   const modalElement = document.getElementById('multimediaModal');
@@ -806,11 +924,24 @@ function showMultimediaModal(multimediaSrc, multimediaTitle) {
     return;
   }
   
-  // Configurar título (sin mostrar ruta completa)
-  modalTitle.textContent = 'Reproduciendo Video';
+  // Prevenir que URLs se abran en navegador directamente
+  if (e) {
+    e.preventDefault();
+  }
+  
+  // Configurar título según el tipo de contenido
+  const fileExtension = multimediaSrc.split('.').pop()?.toLowerCase();
+  if (['mp4', 'webm', 'avi', 'mov'].includes(fileExtension)) {
+    modalTitle.textContent = 'Reproduciendo Video';
+  } else if (['mp3', 'wav', 'ogg', 'aac'].includes(fileExtension)) {
+    modalTitle.textContent = 'Reproduciendo Audio';
+  } else if (multimediaSrc.includes('youtube.com') || multimediaSrc.includes('youtu.be')) {
+    modalTitle.textContent = 'Video de YouTube';
+  } else {
+    modalTitle.textContent = multimediaTitle || 'Contenido Multimedia';
+  }
   
   // Determinar tipo de archivo y URL
-  const fileExtension = multimediaSrc.split('.').pop()?.toLowerCase();
   const isYouTube = multimediaSrc.includes('youtube.com') || multimediaSrc.includes('youtu.be');
   const isExternalVideo = multimediaSrc.startsWith('http') && (isYouTube || multimediaSrc.includes('vimeo.com') || multimediaSrc.includes('.mp4') || multimediaSrc.includes('.webm'));
   
@@ -832,6 +963,8 @@ function showMultimediaModal(multimediaSrc, multimediaTitle) {
   // Insertar botones en el modal-footer
   const modalFooter = document.querySelector('#multimediaModal .modal-footer');
   setupMultimediaModalButtons(modalFooter, cleanMultimediaSrc, multimediaTitle, isS3File);
+  
+  // Mostrar modal
   const modal = new bootstrap.Modal(modalElement);
   modal.show();
   
@@ -1007,6 +1140,8 @@ window.showDocumentModal = showDocumentModal;
 window.showMarkdownInModal = showMarkdownInModal;
 window.showTextInModal = showTextInModal;
 window.showImageModal = showImageModal;
+// Exportar directamente la implementación original de showMultimediaModal
+// sin crear un wrapper adicional que podría causar recursión
 window.showMultimediaModal = showMultimediaModal;
 
 // Exportar funciones de descarga
@@ -1067,4 +1202,40 @@ document.addEventListener('click', function(e) {
             downloadLocalFile(documentSrc, documentTitle);
         }
     }
+});
+
+// ============================================================================
+// CORRECCIÓN DEL PROBLEMA DE OVERFLOW DESPUÉS DE CERRAR MODALES
+// ============================================================================
+
+// Añadir eventos para todos los modales conocidos para restaurar el overflow
+document.addEventListener('DOMContentLoaded', function() {
+    // Modales conocidos en la aplicación
+    const modalIds = ['imageModal', 'documentModal', 'multimediaModal', 'confirmDeleteModal', 'exportModal'];
+    
+    // Añadir manejador para restaurar overflow después de cerrar modal
+    modalIds.forEach(function(modalId) {
+        const modalElement = document.getElementById(modalId);
+        if (modalElement) {
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                // Pequeño retraso para asegurar que otras operaciones de cierre terminen primero
+                setTimeout(function() {
+                    document.body.style.overflow = '';
+                    document.body.classList.remove('modal-open');
+                    document.body.style.paddingRight = '';
+                    
+                    // Eliminar cualquier backdrop residual
+                    const backdrops = document.querySelectorAll('.modal-backdrop');
+                    backdrops.forEach(function(backdrop) {
+                        backdrop.remove();
+                    });
+                    
+                    log("[MODAL-UNIFIED] 🔄 Overflow restaurado después de cerrar modal");
+                }, 100);
+            });
+            log(`[MODAL-UNIFIED] ✅ Evento de restauración de overflow añadido a ${modalId}`);
+        }
+    });
+    
+    log("[MODAL-UNIFIED] ✅ Corrección de overflow instalada");
 });
