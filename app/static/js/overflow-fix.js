@@ -9,9 +9,16 @@
 
 // Auto-ejecutable para aislar variables
 (function() {
-    // Configuración y logging - Solo para desarrollo
-    const DEBUG = false; // Deshabilitar logs para producción
-    const log = DEBUG ? console.log : () => {};
+    // Verificar disponibilidad del sistema de logging
+    const hasLogger = window.APP_CONFIG !== undefined;
+    const isDebug = hasLogger && window.APP_CONFIG.DEBUG_MODE;
+    
+    // Función para logging optimizada
+    const log = function(message, data) {
+        if (isDebug) {
+            window.APP_CONFIG.log(message, data);
+        }
+    };
     
     // Función principal para restaurar el estado de desplazamiento
     function fixOverflow() {
@@ -24,10 +31,11 @@
         
         // Eliminar backdrops de modal residuales
         const backdrops = document.querySelectorAll('.modal-backdrop');
-        backdrops.forEach(function(backdrop) {
+        for (const backdrop of backdrops) {
             backdrop.remove();
-        });
+        }
         
+        // Solo log si está en modo debug
         log("✅ [OVERFLOW-FIX] Desplazamiento restaurado");
         return true;
     }
@@ -40,7 +48,6 @@
         const hasVisibleModal = document.querySelector('.modal.show') !== null;
         
         if ((isOverflowHidden || hasModalOpenClass) && !hasVisibleModal) {
-            log("🔍 [OVERFLOW-FIX] Detectado bloqueo de desplazamiento sin modal visible");
             return fixOverflow();
         }
         return false;
@@ -48,7 +55,7 @@
     
     // Añadir botón de restauración de emergencia en modo desarrollo
     function addEmergencyButton() {
-        if (DEBUG) {
+        if (isDebug || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             // Verificar si el botón ya existe
             if (document.querySelector('.restore-scroll-button')) {
                 return;
@@ -112,8 +119,6 @@
             childList: true,
             subtree: true
         });
-        
-        log("✅ [OVERFLOW-FIX] Observador de cambios en modales inicializado");
     }
     
     // Configurar listener para un elemento modal
@@ -126,8 +131,6 @@
         modalElement.addEventListener('hidden.bs.modal', function() {
             setTimeout(fixOverflow, 100);
         });
-        
-        log("✅ [OVERFLOW-FIX] Listener añadido a modal: " + (modalElement.id || 'sin ID'));
     }
     
     // Configurar todos los modales existentes
@@ -154,8 +157,6 @@
         
         // Exportar función para uso global
         window.fixPageOverflow = fixOverflow;
-        
-        log("✅ [OVERFLOW-FIX] Sistema de corrección de overflow inicializado");
     }
     
     // Inicializar cuando el DOM esté listo
