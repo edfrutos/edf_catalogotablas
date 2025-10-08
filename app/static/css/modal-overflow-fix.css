@@ -1,0 +1,42 @@
+/**
+ * MODAL OVERFLOW CSS FIX
+ * Estilos CSS para garantizar que la página siempre tenga desplazamiento
+ * Versión: 1.0 (2025-10-08)
+ */
+
+/* Regla para evitar que el body quede con overflow hidden */
+body.modal-fix {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}
+
+/* Reglas para corregir el estilo de los modales cuando forzamos overflow auto */
+.modal.modal-fix-active {
+    overflow-y: hidden !important;
+}
+
+.modal.modal-fix-active .modal-dialog {
+    margin-right: 17px; /* Compensar el ancho del scrollbar */
+}
+
+/* Botón de emergencia para restaurar scroll */
+.restore-scroll-button {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 9999;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.restore-scroll-button:hover {
+    opacity: 1;
+}
+
+/* Forzar estilos cuando se detecta que la página está bloqueada */
+html.scroll-blocked,
+body.scroll-blocked {
+    overflow: auto !important;
+    height: auto !important;
+    position: static !important;
+}

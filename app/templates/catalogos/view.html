@@ -354,7 +354,11 @@
                                         </div>
                                     {% else %}
                                         <!-- URL externa -->
-                                        <a href="{{ multimedia_data }}" target="_blank" class="btn btn-sm btn-outline-primary">
+                                        <a href="javascript:void(0)" 
+                                           data-action="show-multimedia-modal" 
+                                           data-media-url="{{ multimedia_data }}" 
+                                           data-media-name="{{ multimedia_title|default('Multimedia Externa') }}" 
+                                           class="btn btn-sm btn-outline-primary">
                                             <i class="fas fa-external-link-alt"></i> Ver Multimedia
                                         </a>
                                     {% endif %}
@@ -596,8 +600,8 @@
 
 <!-- Modal para Documentos -->
 <div class="modal fade" id="documentModal" tabindex="-1" aria-labelledby="documentModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 800px; width: 65%;">
-        <div class="modal-content" style="max-height: 90vh; height: 750px;">
+    <div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 900px; width: 85%;">
+        <div class="modal-content" style="max-height: 90vh; height: 850px;">
             <div class="modal-header" style="flex-shrink: 0;">
                 <h5 class="modal-title" id="documentModalLabel">
                     <i class="fas fa-file"></i> <span id="documentTitle">Documento</span>
@@ -618,13 +622,13 @@
 
 <!-- Modal para Multimedia -->
 <div class="modal fade" id="multimediaModal" tabindex="-1" aria-labelledby="multimediaModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 700px; width: 60%;">
-    <div class="modal-content" style="max-height: 70vh; height: 480px;">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 850px; width: 85%;">
+    <div class="modal-content" style="max-height: 85vh; height: 650px;">
       <div class="modal-header" style="flex-shrink: 0; padding: 0.75rem 1rem;">
         <h5 class="modal-title" id="multimediaModalLabel">
           <i class="fas fa-video"></i> Multimedia
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body text-center" style="overflow: hidden; flex: 1; padding: 1rem;">
         <div id="multimediaContent" style="height: 100%; display: flex; align-items: center; justify-content: center;">
@@ -640,13 +644,13 @@
 
 <!-- Modal para Imágenes -->
 <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" style="max-width: 600px; width: 55%;">
-    <div class="modal-content" style="max-height: 65vh; height: 420px;">
+  <div class="modal-dialog modal-dialog-centered modal-lg" style="max-width: 800px; width: 75%;">
+    <div class="modal-content" style="max-height: 85vh; height: 650px;">
       <div class="modal-header" style="flex-shrink: 0; padding: 0.75rem 1rem;">
         <h5 class="modal-title" id="imageModalLabel">
           <i class="fas fa-image"></i> Imagen
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body text-center" style="overflow: hidden; flex: 1; padding: 0.5rem; display: flex; align-items: center; justify-content: center;">
         <img id="modalImage" src="" alt="Imagen" class="img-fluid" style="max-height: 100%; max-width: 100%; object-fit: contain;">
@@ -754,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const mediaName = multimediaElement.dataset.mediaName;
             
             if (mediaUrl && mediaName && typeof showMultimediaModal === 'function') {
-                showMultimediaModal(mediaUrl, mediaName);
+                showMultimediaModal(mediaUrl, mediaName, e);
             } else {
                 console.error('[MULTIMEDIA] showMultimediaModal no disponible o datos faltantes');
             }

@@ -1,0 +1,56 @@
+/**
+ * OVERFLOW-FIX CSS
+ * Estilos para corregir problemas de desplazamiento después de cerrar modales
+ * 
+ * Versión: 1.0 (8 de Octubre de 2025)
+ */
+
+/* Asegurar que el cuerpo de la página siempre puede desplazarse cuando no tiene clase modal-open */
+body:not(.modal-open) {
+  overflow: auto !important;
+  padding-right: 0 !important;
+}
+
+/* Estilo para el botón de emergencia */
+.restore-scroll-button {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 9999;
+  opacity: 0.8;
+  border-radius: 4px;
+  padding: 5px 10px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  font-size: 12px;
+}
+
+.restore-scroll-button:hover {
+  opacity: 1;
+}
+
+/* Prevenir que los modales Bootstrap bloqueen el desplazamiento de forma permanente */
+.modal-open {
+  overflow: hidden;
+  padding-right: 0 !important; /* Evitar desplazamiento de la página */
+}
+
+/* Asegurar que los modales no afecten el desplazamiento global cuando están cerrados */
+.modal:not(.show) {
+  display: none !important;
+}
+
+/* Eliminar cualquier backdrop de modal residual */
+.modal-backdrop:not(.show) {
+  display: none !important;
+}
+
+/* Estilos específicos para iOS */
+@supports (-webkit-overflow-scrolling: touch) {
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  body:not(.modal-open) {
+    position: static !important;
+  }
+}

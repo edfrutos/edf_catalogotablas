@@ -9,12 +9,58 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/overflow-fix.css') }}?v={{ range(1, 10000) | random }}">
 
 
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <style>
         body { background: #f8f9fa; }
         .navbar { margin-bottom: 2rem; }
+        
+        /* Estilos para corregir problemas de desplazamiento después de cerrar modales */
+        body:not(.modal-open) {
+          overflow: auto !important;
+          padding-right: 0 !important;
+        }
+        
+        /* Estilos para el botón de emergencia */
+        .restore-scroll-button {
+          opacity: 0.8;
+          border-radius: 4px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+          font-size: 12px;
+        }
+        
+        .restore-scroll-button:hover {
+          opacity: 1;
+        }
+        
+        /* Prevenir que los modales Bootstrap bloqueen el desplazamiento de forma permanente */
+        .modal-open {
+          overflow: hidden;
+          padding-right: 0 !important; /* Evitar desplazamiento de la página */
+        }
+        
+        /* Asegurar que los modales no afecten el desplazamiento global cuando están cerrados */
+        .modal:not(.show) {
+          display: none !important;
+        }
+        
+        /* Eliminar cualquier backdrop de modal residual */
+        .modal-backdrop:not(.show) {
+          display: none !important;
+        }
+        
+        /* Estilos específicos para iOS */
+        @supports (-webkit-overflow-scrolling: touch) {
+          body {
+            -webkit-overflow-scrolling: touch;
+          }
+          
+          body:not(.modal-open) {
+            position: static !important;
+          }
+        }
     </style>
 </head>
 <body>
@@ -194,6 +240,12 @@ document.getElementById('goTopBtn').onclick = function() {
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Script unificado de modales (cargado una sola vez globalmente) -->
 <script src="{{ url_for('static', filename='js/modal-functions-UNIFIED.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&force={{ range(1000000, 9999999) | random }}&fix=20251007modal"></script>
+<!-- Script de respaldo para funciones de modal (en caso de error) -->
+<script src="{{ url_for('static', filename='js/modal-fixes.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&emergency=true"></script>
+<!-- Script de solución específica para modales multimedia -->
+<script src="{{ url_for('static', filename='js/multimedia-modal-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&fix=20251007multimedia"></script>
+<!-- Script de solución para problemas de overflow -->
+<script src="{{ url_for('static', filename='js/overflow-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008overflow"></script>
 <!-- Scripts de solución de problemas MP4 (cargados globalmente para evitar duplicaciones) -->
 <script>
 // Verificar si los scripts ya fueron cargados para evitar duplicaciones
@@ -208,6 +260,32 @@ if (!window.mp4ProblemSolverLoaded) {
     script2.src = "{{ url_for('static', filename='js/mp4-debug-fila5.js') }}?v={{ range(1, 10000) | random }}";
     document.head.appendChild(script2);
 }
+</script>
+
+<!-- Script de inicialización temprana para corrección de overflow -->
+<script>
+// Verificación inicial de overflow para casos donde la página se carga con un modal oculto
+document.addEventListener('DOMContentLoaded', function() {
+    // Verificar si ya hay un modal que se quedó abierto incorrectamente
+    setTimeout(function() {
+        const bodyStyle = window.getComputedStyle(document.body);
+        const isOverflowHidden = bodyStyle.overflow === 'hidden';
+        const hasModalOpenClass = document.body.classList.contains('modal-open');
+        const hasVisibleModal = document.querySelector('.modal.show') !== null;
+        
+        if ((isOverflowHidden || hasModalOpenClass) && !hasVisibleModal) {
+            console.log('🔄 [OVERFLOW-CHECK] Corrigiendo estado de scroll al cargar la página');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            document.body.classList.remove('modal-open');
+            
+            // Eliminar backdrops residuales
+            document.querySelectorAll('.modal-backdrop').forEach(function(el) {
+                el.remove();
+            });
+        }
+    }, 500);
+});
 </script>
 
 </body>

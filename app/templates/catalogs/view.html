@@ -44,7 +44,7 @@
                                 {% if header == 'Imagen' and row[header] %}
                                     <img src="{{ row[header] }}" alt="Imagen" class="img-thumbnail" style="max-width: 100px;">
                                 {% elif header == 'Multimedia' and row[header] %}
-                                    <a href="{{ row[header] }}" target="_blank">Ver multimedia</a>
+                                    <a href="javascript:void(0)" data-action="show-multimedia-modal" data-media-url="{{ row[header] }}" data-media-name="Multimedia {{ loop.index }}">Ver multimedia</a>
                                 {% else %}
                                     {{ row[header] }}
                                 {% endif %}
