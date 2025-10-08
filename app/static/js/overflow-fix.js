@@ -9,11 +9,9 @@
 
 // Auto-ejecutable para aislar variables
 (function() {
-    // Configuración y logging
-    const DEBUG = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    // Configuración y logging - Solo para desarrollo
+    const DEBUG = false; // Deshabilitar logs para producción
     const log = DEBUG ? console.log : () => {};
-    
-    log("🚀 [OVERFLOW-FIX] Inicializando sistema mejorado de corrección de overflow");
     
     // Función principal para restaurar el estado de desplazamiento
     function fixOverflow() {
@@ -168,5 +166,3 @@
         init();
     }
 })();
-
-console.log('✅ [OVERFLOW-FIX] Sistema de corrección de overflow cargado correctamente');

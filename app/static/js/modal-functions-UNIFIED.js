@@ -5,12 +5,12 @@
  * Estado: ✅ FUNCIONAL COMPLETAMENTE
  */
 
-// Sistema de logging condicional
+// Sistema de logging optimizado para producción
 if (typeof window.DEBUG_MODE === 'undefined') {
-  window.DEBUG_MODE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  window.DEBUG_MODE = false; // Desactivado en producción
 }
 if (typeof window.modalLog === 'undefined') {
-  window.modalLog = window.DEBUG_MODE ? console.log : () => {};
+  window.modalLog = () => {}; // No generar logs en producción
 }
 if (typeof window.modalLogError === 'undefined') {
   window.modalLogError = console.error; // Siempre mostrar errores
@@ -18,17 +18,13 @@ if (typeof window.modalLogError === 'undefined') {
 
 // Evitar redeclaración usando namespace único
 if (!window.modalUnifiedLog) {
-  window.modalUnifiedLog = window.DEBUG_MODE ? console.log : () => {};
+  window.modalUnifiedLog = () => {}; // No generar logs en producción
 }
 if (!window.modalUnifiedLogError) {
   window.modalUnifiedLogError = console.error;
 }
 const log = window.modalUnifiedLog;
 const logError = window.modalUnifiedLogError;
-
-log("[MODAL-UNIFIED] 🚀 Iniciando sistema unificado de modales...");
-log("[MODAL-UNIFIED] 📁 Archivo cargado:", window.location.href);
-log("[MODAL-UNIFIED] 🔍 Verificando funciones disponibles...");
 
 // ============================================================================
 // DETECCIÓN DE ENTORNO
@@ -45,11 +41,7 @@ function getEnvironmentType() {
   }
 }
 
-log("[MODAL-UNIFIED] 🔍 Entorno detectado:", {
-    isPyWebView: window.isPyWebView || false,
-    hasBootstrap: typeof bootstrap !== 'undefined',
-    inIframe: window !== window.top
-});
+
 
 // ============================================================================
 // FUNCIONES DE MODAL UNIFICADAS
@@ -112,7 +104,7 @@ function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
           width="100%" 
           height="650" 
           style="border: 1px solid #dee2e6; border-radius: 8px;"
-          onload="console.log('[MODAL-UNIFIED] ✅ PDF cargado en iframe')"
+
           onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF en iframe')">
         </iframe>
       </div>
@@ -173,7 +165,7 @@ function showPdfLocalContent(modalContent, documentSrc, documentTitle) {
           width="100%" 
           height="650" 
           style="border: 1px solid #dee2e6; border-radius: 8px;"
-          onload="console.log('[MODAL-UNIFIED] ✅ PDF local cargado en iframe')"
+
           onerror="console.error('[MODAL-UNIFIED] ❌ Error cargando PDF local en iframe')">
         </iframe>
       </div>
@@ -1208,34 +1200,42 @@ document.addEventListener('click', function(e) {
 // CORRECCIÓN DEL PROBLEMA DE OVERFLOW DESPUÉS DE CERRAR MODALES
 // ============================================================================
 
+// Función para restaurar el overflow después de cerrar un modal
+function restoreOverflow() {
+    document.body.style.overflow = '';
+    document.body.classList.remove('modal-open');
+    document.body.style.paddingRight = '';
+    
+    // Eliminar cualquier backdrop residual
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    for (const backdrop of backdrops) {
+        backdrop.remove();
+    }
+    
+    log("[MODAL-UNIFIED] 🔄 Overflow restaurado después de cerrar modal");
+}
+
+// Función para añadir listener a un modal
+function addOverflowListenerToModal(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        modalElement.addEventListener('hidden.bs.modal', function() {
+            // Pequeño retraso para asegurar que otras operaciones de cierre terminen primero
+            setTimeout(restoreOverflow, 100);
+        });
+        log(`[MODAL-UNIFIED] ✅ Evento de restauración de overflow añadido a ${modalId}`);
+    }
+}
+
 // Añadir eventos para todos los modales conocidos para restaurar el overflow
 document.addEventListener('DOMContentLoaded', function() {
     // Modales conocidos en la aplicación
     const modalIds = ['imageModal', 'documentModal', 'multimediaModal', 'confirmDeleteModal', 'exportModal'];
     
     // Añadir manejador para restaurar overflow después de cerrar modal
-    modalIds.forEach(function(modalId) {
-        const modalElement = document.getElementById(modalId);
-        if (modalElement) {
-            modalElement.addEventListener('hidden.bs.modal', function() {
-                // Pequeño retraso para asegurar que otras operaciones de cierre terminen primero
-                setTimeout(function() {
-                    document.body.style.overflow = '';
-                    document.body.classList.remove('modal-open');
-                    document.body.style.paddingRight = '';
-                    
-                    // Eliminar cualquier backdrop residual
-                    const backdrops = document.querySelectorAll('.modal-backdrop');
-                    backdrops.forEach(function(backdrop) {
-                        backdrop.remove();
-                    });
-                    
-                    log("[MODAL-UNIFIED] 🔄 Overflow restaurado después de cerrar modal");
-                }, 100);
-            });
-            log(`[MODAL-UNIFIED] ✅ Evento de restauración de overflow añadido a ${modalId}`);
-        }
-    });
+    for (const modalId of modalIds) {
+        addOverflowListenerToModal(modalId);
+    }
     
     log("[MODAL-UNIFIED] ✅ Corrección de overflow instalada");
 });
