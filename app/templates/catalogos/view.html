@@ -1,9 +1,8 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-    <!-- modal-functions-UNIFIED.js ya está cargado en base.html -->
-    <script src="{{ url_for('static', filename='js/modal-img-display-fix.js') }}?v={{ range(1, 10000) | random }}&fix=20251007modal"></script>
-    <!-- Scripts MP4 ya cargados en base.html -->
+    {# modal-functions-ALL.js está cargado en base.html y maneja todos los scripts de modal #}
+    {# Scripts MP4 también están cargados en base.html #}
 {% endblock %}
 
 {% block head %}

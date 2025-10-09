@@ -16,7 +16,8 @@
             DEBUG_MODE = window.APP_CONFIG.DEBUG_MODE;
         }
     } catch (error) {
-        console.warn('No se pudo cargar la configuración de depuración para modal-test-tool.js');
+        console.warn('No se pudo cargar la configuración de depuración para modal-test-tool.js', error);
+        DEBUG_MODE = false; // Establecer un valor por defecto en caso de error
     }
     
     // Función para logging condicional
@@ -198,6 +199,123 @@
         }
     }
     
+    // Crear un modal para mostrar resultados de prueba
+    function showModalResults(results) {
+        let modalContent = `
+            <h5>Resultados de la prueba</h5>
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Modal</th>
+                        <th>Resultado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Imagen</td>
+                        <td>${results.image ? '✅ OK' : '❌ Error'}</td>
+                    </tr>
+                    <tr>
+                        <td>Documento</td>
+                        <td>${results.document ? '✅ OK' : '❌ Error'}</td>
+                    </tr>
+                    <tr>
+                        <td>Video</td>
+                        <td>${results.video ? '✅ OK' : '❌ Error'}</td>
+                    </tr>
+                    <tr>
+                        <td>Audio</td>
+                        <td>${results.audio ? '✅ OK' : '❌ Error'}</td>
+                    </tr>
+                </tbody>
+            </table>
+        `;
+        
+        const modalElement = document.getElementById('scriptResultModal');
+        const modalContentElement = document.getElementById('scriptResultContent');
+        
+        if (modalElement && modalContentElement) {
+            const modalTitleElement = document.getElementById('scriptResultModalLabel');
+            if (modalTitleElement) {
+                modalTitleElement.textContent = 'Resultados de Prueba de Modales';
+            }
+            
+            modalContentElement.innerHTML = modalContent;
+            
+            if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            } else {
+                alert('No se pudo mostrar el modal de resultados: Bootstrap no está disponible');
+            }
+        } else {
+            alert('No se pudo mostrar el modal de resultados: Elementos no encontrados');
+        }
+    }
+    
+    // Ejecutar prueba de audio y continuar con los resultados
+    function runAudioTest(results) {
+        try {
+            results.audio = testAudioModal();
+            
+            const multimediaModal = document.getElementById('multimediaModal');
+            if (multimediaModal) {
+                multimediaModal.addEventListener('hidden.bs.modal', function onHidden() {
+                    multimediaModal.removeEventListener('hidden.bs.modal', onHidden);
+                    showModalResults(results);
+                });
+            } else {
+                showModalResults(results);
+            }
+        } catch (error) {
+            log('Error en prueba de audio: ' + error.message);
+            results.audio = false;
+            showModalResults(results);
+        }
+    }
+    
+    // Ejecutar prueba de video y continuar con audio
+    function runVideoTest(results) {
+        try {
+            results.video = testVideoModal();
+            
+            const multimediaModal = document.getElementById('multimediaModal');
+            if (multimediaModal) {
+                multimediaModal.addEventListener('hidden.bs.modal', function onHidden() {
+                    multimediaModal.removeEventListener('hidden.bs.modal', onHidden);
+                    runAudioTest(results);
+                });
+            } else {
+                runAudioTest(results);
+            }
+        } catch (error) {
+            log('Error en prueba de video: ' + error.message);
+            results.video = false;
+            runAudioTest(results);
+        }
+    }
+    
+    // Ejecutar prueba de documento y continuar con video
+    function runDocumentTest(results) {
+        try {
+            results.document = testDocumentModal();
+            
+            const documentModal = document.getElementById('documentModal');
+            if (documentModal) {
+                documentModal.addEventListener('hidden.bs.modal', function onHidden() {
+                    documentModal.removeEventListener('hidden.bs.modal', onHidden);
+                    runVideoTest(results);
+                });
+            } else {
+                runVideoTest(results);
+            }
+        } catch (error) {
+            log('Error en prueba de documento: ' + error.message);
+            results.document = false;
+            runVideoTest(results);
+        }
+    }
+    
     // Probar todos los tipos de modal en secuencia
     function testAllModals() {
         log('Iniciando prueba de todos los modales');
@@ -209,121 +327,23 @@
             audio: false
         };
         
-        // Crear un modal para mostrar resultados
-        function showResults() {
-            let modalContent = `
-                <h5>Resultados de la prueba</h5>
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Modal</th>
-                            <th>Resultado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Imagen</td>
-                            <td>${results.image ? '✅ OK' : '❌ Error'}</td>
-                        </tr>
-                        <tr>
-                            <td>Documento</td>
-                            <td>${results.document ? '✅ OK' : '❌ Error'}</td>
-                        </tr>
-                        <tr>
-                            <td>Video</td>
-                            <td>${results.video ? '✅ OK' : '❌ Error'}</td>
-                        </tr>
-                        <tr>
-                            <td>Audio</td>
-                            <td>${results.audio ? '✅ OK' : '❌ Error'}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            `;
-            
-            const modalElement = document.getElementById('scriptResultModal');
-            const modalContentElement = document.getElementById('scriptResultContent');
-            
-            if (modalElement && modalContentElement) {
-                const modalTitleElement = document.getElementById('scriptResultModalLabel');
-                if (modalTitleElement) {
-                    modalTitleElement.textContent = 'Resultados de Prueba de Modales';
-                }
-                
-                modalContentElement.innerHTML = modalContent;
-                
-                if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal !== 'undefined') {
-                    const modal = new bootstrap.Modal(modalElement);
-                    modal.show();
-                } else {
-                    alert('No se pudo mostrar el modal de resultados: Bootstrap no está disponible');
-                }
-            } else {
-                alert('No se pudo mostrar el modal de resultados: Elementos no encontrados');
-            }
-        }
-        
-        // Probar modal de imagen
+        // Iniciar la cadena de pruebas con el modal de imagen
         try {
             results.image = testImageModal();
             
-            // Esperar a que se cierre para probar el siguiente
             const imageModal = document.getElementById('imageModal');
             if (imageModal) {
                 imageModal.addEventListener('hidden.bs.modal', function onHidden() {
                     imageModal.removeEventListener('hidden.bs.modal', onHidden);
-                    
-                    // Probar modal de documento
-                    try {
-                        results.document = testDocumentModal();
-                        
-                        const documentModal = document.getElementById('documentModal');
-                        if (documentModal) {
-                            documentModal.addEventListener('hidden.bs.modal', function onHidden2() {
-                                documentModal.removeEventListener('hidden.bs.modal', onHidden2);
-                                
-                                // Probar modal de video
-                                try {
-                                    results.video = testVideoModal();
-                                    
-                                    const multimediaModal = document.getElementById('multimediaModal');
-                                    if (multimediaModal) {
-                                        multimediaModal.addEventListener('hidden.bs.modal', function onHidden3() {
-                                            multimediaModal.removeEventListener('hidden.bs.modal', onHidden3);
-                                            
-                                            // Probar modal de audio
-                                            try {
-                                                results.audio = testAudioModal();
-                                                
-                                                multimediaModal.addEventListener('hidden.bs.modal', function onHidden4() {
-                                                    multimediaModal.removeEventListener('hidden.bs.modal', onHidden4);
-                                                    showResults();
-                                                });
-                                            } catch (error) {
-                                                log('Error en prueba de audio: ' + error.message);
-                                                results.audio = false;
-                                                showResults();
-                                            }
-                                        });
-                                    }
-                                } catch (error) {
-                                    log('Error en prueba de video: ' + error.message);
-                                    results.video = false;
-                                    showResults();
-                                }
-                            });
-                        }
-                    } catch (error) {
-                        log('Error en prueba de documento: ' + error.message);
-                        results.document = false;
-                        showResults();
-                    }
+                    runDocumentTest(results);
                 });
+            } else {
+                runDocumentTest(results);
             }
         } catch (error) {
             log('Error en prueba de imagen: ' + error.message);
             results.image = false;
-            showResults();
+            runDocumentTest(results);
         }
     }
     

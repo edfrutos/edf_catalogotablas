@@ -73,6 +73,69 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // Función para extraer URL de YouTube de un texto
+    function extractYoutubeUrl(text) {
+        let youtubeUrl = '';
+        
+        if (text.includes('youtube.com/watch?v=')) {
+            const start = text.indexOf('youtube.com/watch?v=');
+            const end = text.indexOf(' ', start);
+            youtubeUrl = text.substring(start - 8, end > 0 ? end : text.length);
+        } else if (text.includes('youtu.be/')) {
+            const start = text.indexOf('youtu.be/');
+            const end = text.indexOf(' ', start);
+            youtubeUrl = text.substring(start - 8, end > 0 ? end : text.length);
+        }
+        
+        return youtubeUrl;
+    }
+    
+    // Función para configurar un botón existente con los atributos para el modal de YouTube
+    function configureExistingButton(button, youtubeUrl) {
+        button.setAttribute('data-action', 'show-multimedia-modal');
+        button.setAttribute('data-media-url', youtubeUrl);
+        button.setAttribute('data-media-name', 'Video de YouTube');
+        button.setAttribute('href', 'javascript:void(0)');
+        console.log('✅ [YOUTUBE-FIX] Botón existente configurado para modal');
+    }
+    
+    // Función para crear un nuevo botón para YouTube
+    function createYoutubeButton(youtubeUrl) {
+        const newButton = document.createElement('a');
+        newButton.setAttribute('data-action', 'show-multimedia-modal');
+        newButton.setAttribute('data-media-url', youtubeUrl);
+        newButton.setAttribute('data-media-name', 'Video de YouTube');
+        newButton.setAttribute('href', 'javascript:void(0)');
+        newButton.className = 'btn btn-sm btn-outline-primary mt-2';
+        newButton.innerHTML = '<i class="fab fa-youtube text-danger"></i> Ver en Modal';
+        return newButton;
+    }
+    
+    // Función para procesar una celda de tabla que contiene URL de YouTube
+    function processYoutubeCell(cell) {
+        const youtubeUrl = extractYoutubeUrl(cell.textContent);
+        
+        if (youtubeUrl) {
+            console.log(`🔍 [YOUTUBE-FIX] URL de YouTube encontrada en texto: ${youtubeUrl}`);
+            
+            // Si ya hay un botón "Ver Multimedia" en la celda, configúralo
+            const existingButtons = cell.querySelectorAll('a.btn, button.btn');
+            if (existingButtons.length > 0) {
+                existingButtons.forEach(btn => {
+                    configureExistingButton(btn, youtubeUrl);
+                });
+            } else {
+                // Crear un nuevo botón
+                const newButton = createYoutubeButton(youtubeUrl);
+                
+                // Añadir al final de la celda
+                cell.appendChild(document.createElement('br'));
+                cell.appendChild(newButton);
+                console.log('✅ [YOUTUBE-FIX] Nuevo botón creado para YouTube');
+            }
+        }
+    }
+    
     // Buscar específicamente el enlace de la tabla como el de la captura
     function fixCapturedYoutubeLink() {
         // Buscar elementos específicamente como los mostrados en la captura
@@ -84,51 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
             allCells.forEach(cell => {
                 if (cell.textContent.includes('youtube.com/watch?v=') || 
                     cell.textContent.includes('youtu.be/')) {
-                    
-                    // Extraer URL de YouTube del texto
-                    let youtubeUrl = '';
-                    const text = cell.textContent;
-                    
-                    // Buscar URLs de YouTube en el texto
-                    if (text.includes('youtube.com/watch?v=')) {
-                        const start = text.indexOf('youtube.com/watch?v=');
-                        const end = text.indexOf(' ', start);
-                        youtubeUrl = text.substring(start - 8, end > 0 ? end : text.length);
-                    } else if (text.includes('youtu.be/')) {
-                        const start = text.indexOf('youtu.be/');
-                        const end = text.indexOf(' ', start);
-                        youtubeUrl = text.substring(start - 8, end > 0 ? end : text.length);
-                    }
-                    
-                    if (youtubeUrl) {
-                        console.log(`🔍 [YOUTUBE-FIX] URL de YouTube encontrada en texto: ${youtubeUrl}`);
-                        
-                        // Si ya hay un botón "Ver Multimedia" en la celda, configúralo
-                        const existingButtons = cell.querySelectorAll('a.btn, button.btn');
-                        if (existingButtons.length > 0) {
-                            existingButtons.forEach(btn => {
-                                btn.setAttribute('data-action', 'show-multimedia-modal');
-                                btn.setAttribute('data-media-url', youtubeUrl);
-                                btn.setAttribute('data-media-name', 'Video de YouTube');
-                                btn.setAttribute('href', 'javascript:void(0)');
-                                console.log('✅ [YOUTUBE-FIX] Botón existente configurado para modal');
-                            });
-                        } else {
-                            // Crear un nuevo botón
-                            const newButton = document.createElement('a');
-                            newButton.setAttribute('data-action', 'show-multimedia-modal');
-                            newButton.setAttribute('data-media-url', youtubeUrl);
-                            newButton.setAttribute('data-media-name', 'Video de YouTube');
-                            newButton.setAttribute('href', 'javascript:void(0)');
-                            newButton.className = 'btn btn-sm btn-outline-primary mt-2';
-                            newButton.innerHTML = '<i class="fab fa-youtube text-danger"></i> Ver en Modal';
-                            
-                            // Añadir al final de la celda
-                            cell.appendChild(document.createElement('br'));
-                            cell.appendChild(newButton);
-                            console.log('✅ [YOUTUBE-FIX] Nuevo botón creado para YouTube');
-                        }
-                    }
+                    processYoutubeCell(cell);
                 }
             });
         }

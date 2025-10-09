@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (modalElement) {
             try {
                 // Intentar inicializar el modal con Bootstrap
-                const modalInstance = new bootstrap.Modal(modalElement);
+                new bootstrap.Modal(modalElement);
                 initializedModals++;
                 
                 // Corregir eventos para el problema de overflow
