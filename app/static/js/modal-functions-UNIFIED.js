@@ -128,6 +128,122 @@ function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
   }
 }
 
+// Función para mostrar archivos Excel desde S3
+function showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
+  // Obtener la URL pública para archivos de S3
+  let publicViewUrl = documentSrc;
+  if (documentSrc.includes('/admin/s3/')) {
+    // Convertir URL interna a URL pública para visualización externa
+    const fileName = documentSrc.split('/').pop();
+    publicViewUrl = `https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/${fileName}`;
+  }
+  
+  // Preparar el contenido
+  modalContent.innerHTML = `
+    <div class="text-center p-3">
+      <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
+      <h5>Documento Excel</h5>
+      <p class="text-muted mb-3">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> XLSX<br>
+        <strong>Ubicación:</strong> S3
+      </p>
+      
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Para visualizar este tipo de archivo correctamente, use el botón para abrirlo en una nueva pestaña o descargarlo.
+      </div>
+      
+      <div class="excel-viewer-container">
+        <div class="text-center mt-4">
+          <i class="fas fa-file-excel fa-5x text-success mb-3"></i>
+          <h4>Archivo Excel</h4>
+          <p>Puede utilizar los botones a continuación para abrir o descargar este archivo.</p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <a href="${proxyUrl}" target="_blank" class="btn btn-success btn-lg">
+              <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+            </a>
+            <button type="button" class="btn btn-outline-success btn-lg" data-action="download-s3-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+              <i class="fas fa-download"></i> Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 's3');
+  
+  // Ajustar el tamaño del modal para archivos Excel
+  const modalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (modalDialog) {
+    modalDialog.style.maxWidth = '900px';
+    modalDialog.style.width = '85%';
+  }
+  
+  const modalContentElement = document.querySelector('#documentModal .modal-content');
+  if (modalContentElement) {
+    modalContentElement.style.height = '850px';
+    modalContentElement.style.maxHeight = '90vh';
+  }
+}
+
+// Función para mostrar archivos Excel locales
+function showExcelLocalContent(modalContent, documentSrc, documentTitle) {
+  // Convertir ruta local a URL absoluta para Office Online Viewer
+  const absoluteUrl = new URL(documentSrc, window.location.origin).href;
+  
+  modalContent.innerHTML = `
+    <div class="text-center p-3">
+      <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
+      <h5>Documento Excel</h5>
+      <p class="text-muted mb-3">
+        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Tipo:</strong> XLSX<br>
+        <strong>Ubicación:</strong> Local
+      </p>
+      
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Para visualizar este tipo de archivo correctamente, use el botón para abrirlo en una nueva pestaña o descargarlo.
+      </div>
+      
+      <div class="excel-viewer-container">
+        <div class="text-center mt-4">
+          <i class="fas fa-file-excel fa-5x text-success mb-3"></i>
+          <h4>Archivo Excel</h4>
+          <p>Puede utilizar los botones a continuación para abrir o descargar este archivo.</p>
+          <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+            <a href="${documentSrc}" target="_blank" class="btn btn-success btn-lg">
+              <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+            </a>
+            <button type="button" class="btn btn-outline-success btn-lg" data-action="download-local-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+              <i class="fas fa-download"></i> Descargar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Insertar botones en el modal-footer
+  setupDocumentButtons(documentSrc, documentTitle, 'local');
+  
+  // Ajustar el tamaño del modal para archivos Excel
+  const modalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (modalDialog) {
+    modalDialog.style.maxWidth = '900px';
+    modalDialog.style.width = '85%';
+  }
+  
+  const modalContentElement = document.querySelector('#documentModal .modal-content');
+  if (modalContentElement) {
+    modalContentElement.style.height = '850px';
+    modalContentElement.style.maxHeight = '90vh';
+  }
+}
+
 // Función para mostrar otros tipos de contenido desde S3
 function showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension) {
   modalContent.innerHTML = `
@@ -254,6 +370,11 @@ function showDocumentModal(documentSrc, documentTitle) {
   // Log de la extensión detectada
   log("[MODAL-UNIFIED] 🔍 Extensión detectada:", fileExtension);
   
+  // Log adicional para ayudar en la depuración de archivos Excel
+  if (['xls', 'xlsx'].includes(fileExtension)) {
+    log("[MODAL-UNIFIED] 📊 Archivo Excel detectado:", documentSrc);
+  }
+  
   // Mostrar modal primero
   const modal = new bootstrap.Modal(modalElement);
   modal.show();
@@ -283,6 +404,20 @@ function showDocumentModal(documentSrc, documentTitle) {
       // Mostrar PDF S3
       showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
       
+    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+      // Excel S3 - usar Office Online Viewer
+      const proxyUrl = cleanDocumentSrc.replace(
+        'https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/',
+        '/admin/s3/'
+      );
+      
+      // Log mejorado para depuración
+      log("[MODAL-UNIFIED] 📊 Mostrando archivo Excel S3:", documentSrc);
+      log("[MODAL-UNIFIED] 🔗 URL de proxy:", proxyUrl);
+      
+      // Mostrar Excel S3
+      showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
+      
     } else if (fileExtension === 'md') {
       // Markdown S3
       showMarkdownInModal(documentSrc, documentTitle);
@@ -303,6 +438,11 @@ function showDocumentModal(documentSrc, documentTitle) {
     if (fileExtension === 'pdf') {
       // PDF local - iframe directo
       showPdfLocalContent(modalContent, documentSrc, documentTitle);
+      
+    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+      // Excel local - usar Office Online Viewer
+      log("[MODAL-UNIFIED] 📊 Mostrando archivo Excel local:", documentSrc);
+      showExcelLocalContent(modalContent, documentSrc, documentTitle);
       
     } else if (fileExtension === 'md') {
       // Markdown local
@@ -1155,7 +1295,7 @@ window.downloadImage = downloadImage;
 
 log("[MODAL-UNIFIED] ✅ Todas las funciones exportadas correctamente");
 log("[MODAL-UNIFIED] 🎯 Sistema de modales unificado listo");
-log("[MODAL-UNIFIED] 📅 VERSIÓN: 2025-01-04-09:20 - UNIFICADA + FUNCIONES COMPLETAS + DOWNLOAD IMAGE");
+log("[MODAL-UNIFIED] 📅 VERSIÓN: 2025-10-09-12:45 - UNIFICADA + FUNCIONES COMPLETAS + DOWNLOAD IMAGE + EXCEL VIEWER + XLSX FIX");
 
 // Verificación final de funciones disponibles
 log("[MODAL-UNIFIED] 🔍 VERIFICACIÓN FINAL:");
@@ -1237,5 +1377,54 @@ document.addEventListener('DOMContentLoaded', function() {
         addOverflowListenerToModal(modalId);
     }
     
+    // Evento para manejar la descarga de archivos Excel locales
+    document.body.addEventListener('click', function(event) {
+        if (event.target.closest('[data-action="download-local-file"]')) {
+            const button = event.target.closest('[data-action="download-local-file"]');
+            const fileSrc = button.getAttribute('data-document-src');
+            const fileName = button.getAttribute('data-document-title');
+            
+            if (fileSrc) {
+                log(`[MODAL-UNIFIED] 📥 Iniciando descarga de archivo Excel local: ${fileName}`);
+                
+                // Crear un enlace temporal para la descarga
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileSrc;
+                downloadLink.download = fileName || 'documento_excel.xlsx';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                log(`[MODAL-UNIFIED] ✅ Descarga de archivo Excel iniciada: ${fileName}`);
+            }
+        }
+    });
+    
+    // Evento para manejar la descarga de archivos Excel desde S3
+    document.body.addEventListener('click', function(event) {
+        if (event.target.closest('[data-action="download-s3-file"]')) {
+            const button = event.target.closest('[data-action="download-s3-file"]');
+            const fileSrc = button.getAttribute('data-document-src');
+            const fileName = button.getAttribute('data-document-title');
+            
+            if (fileSrc) {
+                log(`[MODAL-UNIFIED] 📥 Iniciando descarga de archivo Excel desde S3: ${fileName}`);
+                
+                // Crear un enlace temporal para la descarga
+                const downloadLink = document.createElement('a');
+                downloadLink.href = fileSrc;
+                downloadLink.download = fileName || 'documento_excel.xlsx';
+                downloadLink.style.display = 'none';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                log(`[MODAL-UNIFIED] ✅ Descarga de archivo Excel iniciada desde S3: ${fileName}`);
+            }
+        }
+    });
+    
     log("[MODAL-UNIFIED] ✅ Corrección de overflow instalada");
+    log("[MODAL-UNIFIED] ✅ Soporte para Excel instalado correctamente");
 });
