@@ -239,18 +239,26 @@ document.getElementById('goTopBtn').onclick = function() {
 
 <!-- Scripts de Bootstrap y funcionalidades básicas -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-<!-- Script unificado de modales (cargado una sola vez globalmente) -->
-<script src="{{ url_for('static', filename='js/modal-functions-UNIFIED.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&force={{ range(1000000, 9999999) | random }}&fix=20251007modal"></script>
-<!-- Script de respaldo para funciones de modal (en caso de error) -->
-<script src="{{ url_for('static', filename='js/modal-fixes.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&emergency=true"></script>
-<!-- Script de solución específica para modales multimedia -->
-<script src="{{ url_for('static', filename='js/multimedia-modal-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&fix=20251007multimedia"></script>
+<!-- Sistema completo de modales unificados - reemplaza todos los scripts anteriores -->
+<script src="{{ url_for('static', filename='js/modal-functions-ALL.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&ts={{ range(1, 999999) | random }}&unified=true"></script>
 <!-- Script de solución para problemas de overflow -->
 <script src="{{ url_for('static', filename='js/overflow-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008overflow"></script>
-<!-- Script de solución específica para problemas de contenido de modales -->
-<script src="{{ url_for('static', filename='js/modal-content-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008modal"></script>
-<!-- Script de solución específica para modales PDF -->
-<script src="{{ url_for('static', filename='js/pdf-modal-fix.js') }}?v={{ range(1, 10000) | random }}&t={{ range(1, 100000) | random }}&fix=20251008pdf"></script>
+<!-- Script de compatibilidad para mantener referencias anteriores -->
+<script>
+  console.log('[MODALES] Inicializando sistema unificado de modales v1.0 (8 octubre 2025)');
+  // Verificar compatibilidad con versiones anteriores
+  if (typeof window.showDocumentModal === 'function' && 
+      typeof window.showImageModal === 'function' && 
+      typeof window.showMultimediaModal === 'function') {
+    console.log('[MODALES] ✅ Sistema de modales unificados cargado correctamente');
+  } else {
+    console.error('[MODALES] ❌ Error al cargar sistema de modales unificados');
+    // Cargar scripts antiguos como fallback solo si es necesario
+    const fallbackScript = document.createElement('script');
+    fallbackScript.src = "{{ url_for('static', filename='js/modal-fixes.js') }}?v={{ range(1, 10000) | random }}&emergency=true";
+    document.head.appendChild(fallbackScript);
+  }
+</script>
 <!-- Scripts de solución de problemas MP4 (cargados globalmente para evitar duplicaciones) -->
 <script>
 // Verificar si los scripts ya fueron cargados para evitar duplicaciones

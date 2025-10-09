@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 
 {% block extra_head %}
-    <!-- modal-functions-UNIFIED.js ya está cargado en base.html -->
-    <script src="{{ url_for('static', filename='js/modal-img-display-fix.js') }}?v={{ range(1, 10000) | random }}"></script>
-    <!-- Scripts MP4 ya cargados en base.html -->
+    <!-- Scripts de modal y MP4 ya están cargados en base.html -->
 {% endblock %}
 
 {% block content %}
@@ -20,20 +18,20 @@
                         <div class="mb-3">
                             {% if header == 'Multimedia' %}
                                 <!-- Campo especial para Multimedia -->
-                                <label class="form-label fw-bold">
+                                <p class="form-label fw-bold">
                                     <i class="fas fa-video"></i> {{ header }}
-                                </label>
+                                </p>
                                 <div class="row">
                                     <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label">URL de Multimedia (opcional)</label>
-                                        <input type="url" class="form-control" name="{{ header }}_url" 
+                                        <label class="form-label" for="{{ header }}_url">URL de Multimedia (opcional)</label>
+                                        <input type="url" class="form-control" name="{{ header }}_url" id="{{ header }}_url" 
                                                value="{{ row[header] if row[header] and row[header] is string and row[header].startswith('http') else '' }}"
                                                placeholder="https://ejemplo.com/video.mp4">
                                         <div class="form-text">Enlaza a un archivo multimedia externo</div>
                                     </div>
                                     <div class="col-12 col-md-6 mb-3">
-                                        <label class="form-label">Subir Archivo Multimedia</label>
-                                        <input type="file" class="form-control" name="{{ header }}_file" 
+                                        <label class="form-label" for="{{ header }}_file">Subir Archivo Multimedia</label>
+                                        <input type="file" class="form-control" name="{{ header }}_file" id="{{ header }}_file" 
                                                accept="video/*,audio/*,image/*">
                                         <div class="form-text">Videos: MP4, AVI, MOV | Audio: MP3, WAV | Imágenes: JPG, PNG, GIF | Máximo: 300MB</div>
                                     </div>
@@ -47,7 +45,7 @@
                                 <!-- Mostrar multimedia actual -->
                                 {% if row[header] %}
                                     <div class="mt-3">
-                                        <label class="form-label">Multimedia Actual:</label>
+                                        <p class="form-label fw-bold">Multimedia Actual:</p>
                                         <div class="multimedia-preview">
                                             {% if row[header] is string and row[header].startswith('http') %}
                                                 <div class="alert alert-info d-flex justify-content-between align-items-center">
@@ -85,14 +83,14 @@
                                 
                             {% elif header in ['Documentos', 'Documentación'] or header.startswith('Documentación') %}
                                 <!-- Campo especial para Documentos/Documentación - MÚLTIPLES DOCUMENTOS -->
-                                <label class="form-label fw-bold">
+                                <p class="form-label fw-bold">
                                     <i class="fas fa-file-alt"></i> {{ header }}
                                     <span class="badge bg-success ms-2">Múltiples</span>
-                                </label>
+                                </p>
                                 
                                 <!-- URLs de Documentos -->
                                 <div class="mb-3">
-                                    <label class="form-label">URLs de Documentos (opcional)</label>
+                                    <p class="form-label fw-bold">URLs de Documentos (opcional)</p>
                                     <div id="urls-container-{{ loop.index0 }}">
                                         {% if row[header] and row[header] is iterable and row[header] is not string %}
                                             <!-- Mostrar URLs existentes -->
@@ -135,8 +133,8 @@
                                 
                                 <!-- Archivos de Documentos -->
                                 <div class="mb-3">
-                                    <label class="form-label">Subir Documentos</label>
-                                    <input type="file" class="form-control" name="{{ header }}_file_{{ loop.index0 }}" 
+                                    <label class="form-label" for="{{ header }}_file_{{ loop.index0 }}">Subir Documentos</label>
+                                    <input type="file" class="form-control" name="{{ header }}_file_{{ loop.index0 }}" id="{{ header }}_file_{{ loop.index0 }}"
                                            accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.md" multiple>
                                     <div class="form-text">PDF, Word, Excel, Texto, RTF, Markdown | Máximo: 50MB cada uno | Puedes seleccionar múltiples archivos</div>
                                 </div>
@@ -144,7 +142,7 @@
                                 <!-- Mostrar documentos actuales -->
                                 {% if row[header] %}
                                     <div class="mt-3">
-                                        <label class="form-label">Documentos Actuales:</label>
+                                        <p class="form-label fw-bold">Documentos Actuales:</p>
                                         <div class="documentos-preview">
                                             {% if row[header] is iterable and row[header] is not string %}
                                                 <!-- Múltiples documentos (formato nuevo) -->
@@ -222,11 +220,11 @@
                                 
                             {% elif header == 'Fecha' %}
                                 <!-- Campo especial para Fecha (columna inteligente) -->
-                                <label class="form-label">
+                                <label class="form-label" for="{{ header }}_date">
                                     <i class="fas fa-calendar-alt"></i> {{ header }}
                                     <span class="badge bg-info ms-2">Auto</span>
                                 </label>
-                                <input type="date" class="form-control" name="{{ header }}" 
+                                <input type="date" class="form-control" name="{{ header }}" id="{{ header }}_date"
                                        value="{{ row[header] if row[header] else '' }}">
                                 <div class="form-text">
                                     <i class="fas fa-magic"></i> <strong>Columna Inteligente:</strong> 
@@ -235,8 +233,8 @@
                                 
                             {% else %}
                                 <!-- Campo normal -->
-                                <label class="form-label">{{ header }}</label>
-                                <input type="text" class="form-control" name="{{ header }}" value="{{ row[header] or '' }}">
+                                <label class="form-label" for="{{ header }}_text">{{ header }}</label>
+                                <input type="text" class="form-control" name="{{ header }}" id="{{ header }}_text" value="{{ row[header] or '' }}">
                             {% endif %}
                         </div>
                         {% endfor %}
@@ -247,23 +245,23 @@
 
                         <!-- Sección de imágenes (mantener compatibilidad) -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">
+                            <label class="form-label fw-bold" for="images_upload">
                                 <i class="fas fa-images"></i> Imágenes Adicionales (máx. 3)
                             </label>
-                            <input type="file" class="form-control" name="images" accept="image/*" multiple>
+                            <input type="file" class="form-control" name="images" id="images_upload" accept="image/*" multiple>
                             <div class="form-text">Estas imágenes se mostrarán en la columna de imágenes del catálogo</div>
                         </div>
                         
                         <!-- Mostrar imagen URL externa si existe -->
                         {% if row is mapping and row.get('Imagen') and row.Imagen is string and row.Imagen.startswith('http') %}
                         <div class="mb-3">
-                            <label class="form-label">Imagen URL (Externa)</label>
-                            <input type="url" class="form-control" name="imagen_url" value="{{ row.Imagen }}" placeholder="https://ejemplo.com/imagen.jpg">
+                            <label class="form-label" for="imagen_url">Imagen URL (Externa)</label>
+                            <input type="url" class="form-control" name="imagen_url" id="imagen_url" value="{{ row.Imagen }}" placeholder="https://ejemplo.com/imagen.jpg">
                             <div class="mt-2">
-                                <img src="{{ row.Imagen }}" alt="Imagen externa" class="img-thumbnail" style="height:100px; cursor: pointer;"
-                                     data-image-url="{{ row.Imagen }}"
-                                     data-image-title="Imagen externa"
-                                     onclick="showImageModal(this.dataset.imageUrl, this.dataset.imageTitle)">
+                                <button type="button" class="btn p-0 border-0" style="height:100px;"
+                                        onclick="showImageModal('{{ row.Imagen }}', 'Imagen externa')">
+                                    <img src="{{ row.Imagen }}" alt="externa" class="img-thumbnail" style="height:100px;">
+                                </button>
                             </div>
                         </div>
                         {% endif %}
@@ -271,21 +269,20 @@
                         <!-- Usar imágenes procesadas por el backend -->
                         {% if row is mapping and row.get('_imagenes') and row._imagenes %}
                         <div class="mb-3">
-                            <label class="form-label d-block">Imágenes actuales ({{ row._imagenes|length }})</label>
+                            <p class="form-label fw-bold d-block">Imágenes actuales ({{ row._imagenes|length }})</p>
                             <div class="d-flex flex-wrap gap-3 align-items-center">
                                 {% for img_url in row._imagenes %}
                                     {% set img_filename = img_url.split('/')[-1] %}
                                     <div class="position-relative">
-                                        <img src="{{ img_url }}" 
-                                             alt="Imagen {{ loop.index }}" 
-                                             class="img-thumbnail" 
-                                             style="height:100px; cursor: pointer;"
-                                             data-image-url="{{ img_url }}"
-                                             data-image-title="Imagen {{ loop.index }}"
-                                             onclick="showImageModal(this.dataset.imageUrl, this.dataset.imageTitle)">
+                                        <button type="button" class="btn p-0 border-0" style="height:100px;"
+                                                onclick="showImageModal('{{ img_url }}', 'Imagen {{ loop.index }}')">
+                                            <img src="{{ img_url }}" alt="{{ loop.index }}" class="img-thumbnail" style="height:100px;">
+                                        </button>
                                         {% if not img_url.startswith('http') or 'amazonaws' in img_url %}
-                                            <input type="checkbox" name="delete_images" value="{{ img_filename }}" class="position-absolute top-0 end-0 m-1" style="transform: scale(1.5);">
-                                            <label class="d-block text-center small mt-1">Eliminar</label>
+                                            <div class="position-relative">
+                                                <input type="checkbox" id="delete_image_{{ loop.index }}" name="delete_images" value="{{ img_filename }}" class="position-absolute top-0 end-0 m-1" style="transform: scale(1.5);">
+                                                <label for="delete_image_{{ loop.index }}" class="d-block text-center small mt-1">Eliminar</label>
+                                            </div>
                                         {% else %}
                                             <small class="d-block text-center text-muted mt-1">Externa</small>
                                         {% endif %}
@@ -341,12 +338,33 @@
       </div>
       <div class="modal-body image-modal-body">
         <div class="modal-image-container">
-          <div class="spinner-border text-primary image-loading-spinner" role="status" style="display: none;">
+          <div class="spinner-border text-primary image-loading-spinner" style="display: none;">
             <span class="visually-hidden">Cargando imagen...</span>
           </div>
-          <img src="/static/img/image-placeholder.png" id="modalImage" class="modal-image" alt="imagen del catálogo"
-               onload="this.classList.add('image-loaded'); this.previousElementSibling.style.display='none';"
-               onerror="this.src='/static/img/image-error.svg';">
+          <img src="/static/img/image-placeholder.png" id="modalImage" class="modal-image" alt="del catálogo">
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const modalImage = document.getElementById('modalImage');
+              if (modalImage) {
+                modalImage.onload = function() {
+                  this.classList.add('image-loaded');
+                  if (this.previousElementSibling) {
+                    this.previousElementSibling.style.display = 'none';
+                  }
+                };
+                modalImage.onerror = function() {
+                  this.src = '/static/img/image-error.svg';
+                };
+              }
+
+              // Agregar manejo de tecla Escape para cerrar el modal
+              document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && document.getElementById('imageModal').classList.contains('show')) {
+                  document.querySelector('#imageModal .btn-close').click();
+                }
+              });
+            });
+          </script>
         </div>
       </div>
       <div class="modal-footer image-modal-footer">
@@ -361,10 +379,6 @@
 <style>
 .multimedia-preview, .documento-preview {
     margin-top: 10px;
-}
-
-.alert {
-    margin-bottom: 0;
 }
 
 /* Mejoras de responsividad */
@@ -488,6 +502,7 @@ input[type="file"] {
 .alert {
     word-wrap: break-word;
     overflow-wrap: break-word;
+    margin-bottom: 0;
 }
 
 .alert a {

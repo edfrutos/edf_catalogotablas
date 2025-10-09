@@ -24,7 +24,7 @@
             DEBUG_MODE = window.APP_CONFIG.DEBUG_MODE;
         }
     } catch (error) {
-        console.warn('No se pudo cargar la configuración de depuración para modal-functions-ALL.js');
+        console.warn('No se pudo cargar la configuración de depuración para modal-functions-ALL.js', error);
     }
     
     // Función para logging condicional
@@ -830,6 +830,35 @@
         `;
     }
     
+    // Función para determinar el título del modal según el tipo de archivo
+    function getMultimediaTitle(fileExtension, isYouTube, multimediaTitle) {
+        if (['mp4', 'webm', 'avi', 'mov'].includes(fileExtension)) {
+            return 'Reproduciendo Video';
+        } else if (['mp3', 'wav', 'ogg', 'aac'].includes(fileExtension)) {
+            return 'Reproduciendo Audio';
+        } else if (isYouTube) {
+            return 'Video de YouTube';
+        } 
+        return multimediaTitle || 'Contenido Multimedia';
+    }
+    
+    // Función para configurar los elementos multimedia y manejar errores
+    function setupMultimediaElements(modalContent, cleanMultimediaSrc) {
+        const videoElements = modalContent.querySelectorAll('video');
+        const audioElements = modalContent.querySelectorAll('audio');
+        
+        [...videoElements, ...audioElements].forEach(element => {
+            element.onerror = function() {
+                log('Error cargando multimedia:', cleanMultimediaSrc);
+                showErrorInModal(
+                    modalContent,
+                    'Error al cargar multimedia',
+                    'No se pudo cargar el archivo multimedia.'
+                );
+            };
+        });
+    }
+    
     // Función para mostrar multimedia en modal
     function showMultimediaModal(multimediaSrc, multimediaTitle, e) {
         log('showMultimediaModal llamado con:', { multimediaSrc, multimediaTitle });
@@ -860,15 +889,7 @@
         const isS3File = isS3Url(cleanMultimediaSrc);
         
         // Configurar título según tipo
-        if (['mp4', 'webm', 'avi', 'mov'].includes(fileExtension)) {
-            modalTitle.textContent = 'Reproduciendo Video';
-        } else if (['mp3', 'wav', 'ogg', 'aac'].includes(fileExtension)) {
-            modalTitle.textContent = 'Reproduciendo Audio';
-        } else if (isYouTube) {
-            modalTitle.textContent = 'Video de YouTube';
-        } else {
-            modalTitle.textContent = multimediaTitle || 'Contenido Multimedia';
-        }
+        modalTitle.textContent = getMultimediaTitle(fileExtension, isYouTube, multimediaTitle);
         
         // Mostrar modal
         const modal = new bootstrap.Modal(modalElement);
@@ -883,20 +904,8 @@
         // Configurar contenido
         modalContent.innerHTML = mediaHTML;
         
-        // Manejar errores para elementos multimedia
-        const videoElements = modalContent.querySelectorAll('video');
-        const audioElements = modalContent.querySelectorAll('audio');
-        
-        [...videoElements, ...audioElements].forEach(element => {
-            element.onerror = function() {
-                log('Error cargando multimedia:', cleanMultimediaSrc);
-                showErrorInModal(
-                    modalContent,
-                    'Error al cargar multimedia',
-                    'No se pudo cargar el archivo multimedia.'
-                );
-            };
-        });
+        // Configurar elementos multimedia y manejar errores
+        setupMultimediaElements(modalContent, cleanMultimediaSrc);
         
         // Optimizar tamaño del modal para multimedia
         optimizeMultimediaModalSize(fileExtension, isYouTube);
@@ -994,14 +1003,12 @@
             } else if (videoElement.msRequestFullscreen) {
                 videoElement.msRequestFullscreen();
             }
-        } else {
-            if (document.exitFullscreen) {
-                document.exitFullscreen();
-            } else if (document.webkitExitFullscreen) {
-                document.webkitExitFullscreen();
-            } else if (document.msExitFullscreen) {
-                document.msExitFullscreen();
-            }
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
         }
     }
     
@@ -1146,7 +1153,7 @@
             } else {
                 // Fallback simple usando CSS
                 const currentRotation = iframe.style.transform ? 
-                    parseInt(iframe.style.transform.replace(/[^0-9]/g, '')) || 0 : 0;
+                    parseInt(iframe.style.transform.replace(/\D/g, '')) || 0 : 0;
                 const newRotation = (currentRotation + 90) % 360;
                 
                 iframe.style.transform = `rotate(${newRotation}deg)`;
@@ -1194,7 +1201,7 @@
             } else {
                 // Fallback simple usando escala CSS
                 const currentScale = iframe.style.transform ? 
-                    parseFloat(iframe.style.transform.replace(/[^0-9.]/g, '')) || 1 : 1;
+                    parseFloat(iframe.style.transform.replace(/[^\d.]/g, '')) || 1 : 1;
                 
                 let newScale;
                 if (direction > 0) {
@@ -1202,7 +1209,7 @@
                     if (newScale > 3) newScale = 3; // Límite máximo
                 } else {
                     newScale = currentScale * 0.8;
-                    if (newScale < 0.5) newScale = 0.5; // Límite mínimo
+                    newScale = Math.max(0.5, newScale); // Límite mínimo
                 }
                 
                 iframe.style.transform = `scale(${newScale})`;

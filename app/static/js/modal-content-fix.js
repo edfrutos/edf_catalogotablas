@@ -17,7 +17,8 @@
             DEBUG_MODE = window.APP_CONFIG.DEBUG_MODE;
         }
     } catch (error) {
-        console.warn('No se pudo cargar la configuración de depuración para modal-content-fix.js');
+        console.warn('No se pudo cargar la configuración de depuración para modal-content-fix.js', error);
+        DEBUG_MODE = false; // Usar valor por defecto en caso de error
     }
     
     // Función para logging condicional
@@ -174,17 +175,22 @@
             fixSpecificModal(event.target);
         });
         
+        // Funciones auxiliares para reducir el anidamiento
+        function processNode(node) {
+            if (node.nodeType === 1 && node.classList?.contains('modal')) {
+                fixSpecificModal(node);
+            }
+        }
+        
+        function processMutation(mutation) {
+            if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                mutation.addedNodes.forEach(processNode);
+            }
+        }
+        
         // Observer para detectar nuevos modales añadidos dinámicamente
         const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
-                    mutation.addedNodes.forEach(function(node) {
-                        if (node.nodeType === 1 && node.classList && node.classList.contains('modal')) {
-                            fixSpecificModal(node);
-                        }
-                    });
-                }
-            });
+            mutations.forEach(processMutation);
         });
         
         // Observar cambios en el body para detectar nuevos modales

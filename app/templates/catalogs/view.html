@@ -42,7 +42,7 @@
                             {% for header in catalog.headers %}
                             <td>
                                 {% if header == 'Imagen' and row[header] %}
-                                    <img src="{{ row[header] }}" alt="Imagen" class="img-thumbnail" style="max-width: 100px;">
+                                    <img src="{{ row[header] }}" alt="{{ header }}" class="img-thumbnail" style="max-width: 100px;">
                                 {% elif header == 'Multimedia' and row[header] %}
                                     <a href="javascript:void(0)" data-action="show-multimedia-modal" data-media-url="{{ row[header] }}" data-media-name="Multimedia {{ loop.index }}">Ver multimedia</a>
                                 {% else %}
@@ -51,7 +51,7 @@
                             </td>
                             {% endfor %}
                             <td>
-                                <div class="btn-group" role="group">
+                                <fieldset class="btn-group">
                                     <a href="{{ url_for('catalogs.view_row', catalog_id=catalog_id, row_index=loop.index0) }}" class="btn btn-sm btn-info">
                                         <i class="fas fa-eye"></i> Ver
                                     </a>
@@ -63,7 +63,7 @@
                                             <i class="fas fa-trash"></i> Eliminar
                                         </button>
                                     </form>
-                                </div>
+                                </fieldset>
                             </td>
                         </tr>
                         {% endfor %}

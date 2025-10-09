@@ -65,9 +65,9 @@
                 <tr>
                     <th style="width: 60px;">
                         #
-                        <span class="sort-icon" data-column="0" data-type="number" onclick="sortTable(this.dataset.column, this.dataset.type)">
+                        <button type="button" class="btn btn-sm p-0 sort-icon" data-column="0" data-type="number" onclick="sortTable(this.dataset.column, this.dataset.type)" aria-label="Ordenar columna número">
                             <i class="bi bi-chevron-expand" id="sort-icon-0"></i>
-                        </span>
+                        </button>
                     </th>
                     {% for header in catalog.headers %}
                     <th>
@@ -78,9 +78,9 @@
                         {% else %}
                         {{ header }}
                         {% endif %}
-                        <span class="sort-icon" data-column="{{ loop.index }}" data-type="text" onclick="sortTable(this.dataset.column, this.dataset.type)">
+                        <button type="button" class="btn btn-sm p-0 sort-icon" data-column="{{ loop.index }}" data-type="text" onclick="sortTable(this.dataset.column, this.dataset.type)" aria-label="Ordenar columna {{ header }}">
                             <i class="bi bi-chevron-expand" id="sort-icon-{{ loop.index }}"></i>
-                        </span>
+                        </button>
                     </th>
                     {% endfor %}
                     <th style="width: 120px;">Imágenes</th>
@@ -93,8 +93,7 @@
                     <td class="fw-bold text-primary">{{ loop.index }}</td>
                     {% for header in catalog.headers %}
                     <td>
-                        <!-- DEBUG: Header actual = "{{ header }}" -->
-                        <span style="color: red; font-size: 10px;">DEBUG: {{ header }}</span>
+                        <!-- Header: {{ header }} -->
                         {% if header == 'Multimedia' %}
                             <!-- Columna Multimedia -->
                             {% if row[header] %}
@@ -105,36 +104,41 @@
                                         <!-- Archivo en S3 -->
                                         <div class="multimedia-preview">
                                             {% if multimedia_data is string and multimedia_data.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')) %}
-                                                <img src="{{ multimedia_data }}" 
-                                                     alt="Multimedia" 
-                                                     class="img-thumbnail multimedia-thumbnail"
-                                                     onclick="showMultimediaModal('{{ multimedia_data }}', '{{ multimedia_data.split('/')[-1] }}')">
+                                                <button type="button" class="btn p-0 border-0" onclick="showMultimediaModal('{{ multimedia_data }}', '{{ multimedia_data.split('/')[-1] }}')" aria-label="Ver multimedia">
+                                                    <img src="{{ multimedia_data }}" 
+                                                         alt="Vista previa de multimedia" 
+                                                         class="img-thumbnail multimedia-thumbnail">
+                                                </button>
                                             {% elif multimedia_data is string and multimedia_data.lower().endswith(('.mp4', '.avi', '.mov', '.wmv')) %}
-                                                <div class="multimedia-thumbnail-container" 
+                                                <button type="button" class="btn p-0 border-0 multimedia-thumbnail-container"
                                                      onclick="showMultimediaModal('{{ multimedia_data }}', '{{ multimedia_data.split('/')[-1] }}')"
-                                                     style="cursor: pointer; position: relative; display: inline-block;">
+                                                     style="position: relative; display: inline-block;">
                                                     <video class="multimedia-thumbnail" 
                                                            style="pointer-events: none;">
                                                         <source src="{{ multimedia_data }}" type="video/mp4">
+                                                        <track src="" kind="captions" srclang="es" label="Subtítulos en español">
+                                                        <track src="" kind="descriptions" srclang="es" label="Descripciones en español">
                                                         Tu navegador no soporta el elemento video.
                                                     </video>
                                                     <div class="play-overlay">
                                                         <i class="fas fa-play text-white"></i>
                                                     </div>
-                                                </div>
+                                                </button>
                                             {% elif multimedia_data is string and multimedia_data.lower().endswith(('.mp3', '.wav', '.ogg')) %}
-                                                <div class="multimedia-thumbnail-container" 
+                                                <button type="button" class="btn p-0 border-0 multimedia-thumbnail-container"
                                                      onclick="showMultimediaModal('{{ multimedia_data }}', '{{ multimedia_data.split('/')[-1] }}')"
-                                                     style="cursor: pointer; position: relative; display: inline-block;">
+                                                     style="position: relative; display: inline-block;"
+                                                     aria-label="Reproducir audio">
                                                     <audio class="multimedia-thumbnail" 
                                                            style="pointer-events: none;">
                                                         <source src="{{ multimedia_data }}" type="audio/mpeg">
+                                                        <track src="" kind="captions" srclang="es" label="Subtítulos en español">
                                                         Tu navegador no soporta el elemento audio.
                                                     </audio>
                                                     <div class="play-overlay">
                                                         <i class="fas fa-music text-white"></i>
                                                     </div>
-                                                </div>
+                                                </button>
                                             {% else %}
                                                 <a href="#" 
                                                    onclick="showMultimediaModal('{{ multimedia_data }}', '{{ multimedia_data.split('/')[-1] }}'); return false;"
@@ -157,48 +161,56 @@
                                     <!-- Archivo local -->
                                     <div class="multimedia-preview">
                                         {% if multimedia_data is string and multimedia_data.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')) %}
-                                <img src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" 
-                                     alt="Multimedia" 
-                                     class="img-thumbnail multimedia-thumbnail"
-                                     data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
-                                     data-title="{{ multimedia_data }}"
-                                     onclick="showMultimediaModal(this.dataset.src, this.dataset.title)">
+                                            <button type="button" class="btn p-0 border-0"
+                                                 data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
+                                                 data-title="{{ multimedia_data }}"
+                                                 onclick="showMultimediaModal(this.dataset.src, this.dataset.title)"
+                                                 aria-label="Ver imagen {{ multimedia_data }}">
+                                                <img src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" 
+                                                     alt="Vista previa de {{ multimedia_data }}" 
+                                                     class="img-thumbnail multimedia-thumbnail">
+                                            </button>
                                         {% elif multimedia_data is string and multimedia_data.lower().endswith(('.mp4', '.avi', '.mov', '.wmv')) %}
-                                <div class="multimedia-thumbnail-container" 
-                                     data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
-                                     data-title="{{ multimedia_data }}"
-                                     onclick="showMultimediaModal(this.dataset.src, this.dataset.title)"
-                                     style="cursor: pointer; position: relative; display: inline-block;">
-                                    <video class="multimedia-thumbnail" 
-                                           style="pointer-events: none;">
-                                        <source src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" type="video/mp4">
-                                        Tu navegador no soporta el elemento video.
-                                    </video>
+                                            <button type="button" class="btn p-0 border-0 multimedia-thumbnail-container" 
+                                                 data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
+                                                 data-title="{{ multimedia_data }}"
+                                                 onclick="showMultimediaModal(this.dataset.src, this.dataset.title)"
+                                                 style="position: relative; display: inline-block;"
+                                                 aria-label="Ver video {{ multimedia_data }}">
+                                                <video class="multimedia-thumbnail" 
+                                                       style="pointer-events: none;">
+                                                    <source src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" type="video/mp4">
+                                                    <track src="" kind="captions" srclang="es" label="Subtítulos en español">
+                                                    <track src="" kind="descriptions" srclang="es" label="Descripciones en español">
+                                                    Tu navegador no soporta el elemento video.
+                                                </video>
                                                 <div class="play-overlay">
                                                     <i class="fas fa-play text-white"></i>
                                                 </div>
-                                            </div>
+                                            </button>
                                         {% elif multimedia_data is string and multimedia_data.lower().endswith(('.mp3', '.wav', '.ogg')) %}
-                                <div class="multimedia-thumbnail-container" 
-                                     data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
-                                     data-title="{{ multimedia_data }}"
-                                     onclick="showMultimediaModal(this.dataset.src, this.dataset.title)"
-                                     style="cursor: pointer; position: relative; display: inline-block;">
-                                    <audio class="multimedia-thumbnail" 
-                                           style="pointer-events: none;">
-                                        <source src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" type="audio/mpeg">
-                                        Tu navegador no soporta el elemento audio.
-                                    </audio>
+                                            <button type="button" class="btn p-0 border-0 multimedia-thumbnail-container" 
+                                                 data-src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}"
+                                                 data-title="{{ multimedia_data }}"
+                                                 onclick="showMultimediaModal(this.dataset.src, this.dataset.title)"
+                                                 style="position: relative; display: inline-block;"
+                                                 aria-label="Reproducir audio {{ multimedia_data }}">
+                                                <audio class="multimedia-thumbnail" 
+                                                       style="pointer-events: none;">
+                                                    <source src="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" type="audio/mpeg">
+                                                    <track src="" kind="captions" srclang="es" label="Subtítulos en español">
+                                                    Tu navegador no soporta el elemento audio.
+                                                </audio>
                                                 <div class="play-overlay">
                                                     <i class="fas fa-music text-white"></i>
                                                 </div>
-                                            </div>
-                                                                    {% else %}
-                                <a href="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" 
-                                   target="_blank" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-download"></i> Descargar
-                                </a>
-                            {% endif %}
+                                            </button>
+                                        {% else %}
+                                            <a href="{{ url_for('uploaded_images.uploaded_images', filename=multimedia_data) }}" 
+                                               target="_blank" class="btn btn-sm btn-outline-secondary">
+                                                <i class="fas fa-download"></i> Descargar
+                                            </a>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
                             {% else %}
@@ -245,11 +257,11 @@
                                 <span class="text-muted">-</span>
                             {% endif %}
                         {% else %}
-                            <!-- DEBUG: Header = "{{ header }}" -->
+
                             <!-- DEBUG: Header type = {{ header|type }} -->
                             <!-- DEBUG: Header length = {{ header|length }} -->
                             <!-- DEBUG: Header contains 'Documentación' = {{ 'Documentación' in header }} -->
-                            <!-- DEBUG: Header == 'Documentación' = {{ header == 'Documentación' }} -->
+
                             {% if 'Documentación' in header %}
                                 <!-- DEBUG: PROCESANDO COLUMNA DOCUMENTACIÓN -->
                             <!-- Columna Documentos/Documentación - MÚLTIPLES DOCUMENTOS -->
@@ -563,13 +575,16 @@
                         {% if row is mapping and row.get('_imagenes') and row._imagenes %}
                             {% for img_url in row._imagenes %}
                                 {% if loop.index <= 3 %}
-                                    <img src="{{ img_url }}" 
-                                         alt="Imagen {{ loop.index }}" 
-                                         class="img-thumbnail catalog-preview-img" 
-                                         style="width: 60px; height: 60px; object-fit: cover; margin-right: 4px; cursor: pointer; border-radius: 4px; border: 1px solid #ccc;"
+                                    <button type="button" class="btn p-0 border-0"
                                          onclick="showImageModal('{{ img_url }}', 'Imagen {{ loop.index }}')"
-                                         onerror="this.src='{{ url_for('static', filename='img/image-error.svg') }}'"
-                                         loading="lazy">
+                                         aria-label="Ver imagen {{ loop.index }} en tamaño completo">
+                                        <img src="{{ img_url }}" 
+                                             alt="{{ loop.index }} del catálogo" 
+                                             class="img-thumbnail catalog-preview-img" 
+                                             style="width: 60px; height: 60px; object-fit: cover; margin-right: 4px; border-radius: 4px; border: 1px solid #ccc;"
+                                             onerror="this.src='{{ url_for('static', filename='img/image-error.svg') }}'"
+                                             loading="lazy">
+                                    </button>
                                 {% endif %}
                             {% endfor %}
                             {% if row._imagenes|length > 3 %}
@@ -612,12 +627,17 @@
       </div>
       <div class="modal-body image-modal-body">
         <div class="modal-image-container">
-          <div class="spinner-border text-primary image-loading-spinner" role="status" style="display: none;">
+                    <output class="spinner-border text-primary image-loading-spinner" style="display: none;">
             <span class="visually-hidden">Cargando imagen...</span>
-          </div>
-          <img src="/static/img/image-placeholder.png" id="modalImage" class="modal-image" alt="imagen del catálogo"
-               onload="this.classList.add('image-loaded'); this.previousElementSibling.style.display='none';"
+          </output>
+          <img src="/static/img/image-placeholder.png" id="modalImage" class="modal-image" alt="Vista previa del elemento seleccionado"
                onerror="this.src='/static/img/image-error.svg';">
+          <script>
+            document.getElementById('modalImage').addEventListener('load', function() {
+                this.classList.add('image-loaded');
+                document.querySelector('.image-loading-spinner').style.display = 'none';
+            });
+          </script>
         </div>
       </div>
       <div class="modal-footer image-modal-footer">
@@ -697,7 +717,10 @@
 </style>
 
 <!-- Scripts necesarios para el sistema unificado -->
-<!-- modal-functions-UNIFIED.js se carga desde base.html -->
+<!-- modal-functions-ALL.js está cargado en base.html y gestiona todas las funcionalidades de modales -->
+
+<!-- Script para mejorar accesibilidad de enlaces que se usan como botones -->
+<script src="{{ url_for('static', filename='js/a11y-fix-buttons.js') }}"></script>
 
 <script>
 // Función para ordenar tabla

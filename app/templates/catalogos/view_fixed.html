@@ -364,13 +364,9 @@
 </div>
 
 <script>
-// Función para mostrar modal de imagen
-function showImageModal(imageSrc, imageTitle) {
-    document.getElementById('modalImage').src = imageSrc;
-    document.getElementById('imageModalLabel').innerHTML = '<i class="fas fa-image"></i> ' + imageTitle;
-    const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-    modal.show();
-}
+// NOTA: Esta función ha sido reemplazada por la versión en modal-functions-ALL.js
+// Se mantiene la referencia para compatibilidad con código existente
+console.log('[INFO] Usando showImageModal del sistema unificado de modales');
 
 // Función para confirmar eliminación de fila
 function confirmDeleteRow(catalogId, rowIndex) {
