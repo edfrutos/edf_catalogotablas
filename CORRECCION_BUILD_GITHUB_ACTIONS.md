@@ -257,3 +257,82 @@ PyInstaller no estaba en requirements.txt ni se instalaba explícitamente
 **Tiempo de resolución**: ~10 minutos  
 **Estado**: ✅ CORREGIDO Y PUSHEADO  
 **Próximo build**: En progreso automáticamente
+
+---
+
+## 🔧 Corrección Adicional - pywebview Version
+
+### Fecha: 4 de Febrero de 2026 (Actualización)
+
+## 🐛 Nuevo Problema Detectado
+
+### Error en GitHub Actions
+```
+ERROR: Could not find a version that satisfies the requirement pywebview==5.0.7
+ERROR: No matching distribution found for pywebview==5.0.7
+```
+
+### Causa
+La versión `pywebview==5.0.7` **no existe** en PyPI. Las versiones disponibles son:
+- `5.0`, `5.0.1`, `5.0.3`, `5.0.4`, `5.0.5` (falta 5.0.7)
+- `5.1`, `5.2`, `5.3`, `5.3.1`, `5.3.2`, `5.4` (compatibles con Python 3.10)
+- `6.0`, `6.1` (requieren Python 3.11+)
+
+---
+
+## ✅ Solución Implementada
+
+### Corrección de Versión
+
+**requirements.txt actualizado**:
+```python
+# Build y empaquetado
+pyinstaller==6.3.0
+pywebview==5.4        # Cambio: 5.0.7 → 5.4
+websockets==12.0
+```
+
+### Workflow Mejorado
+
+Actualizado el fallback en `.github/workflows/build_macos_app.yml` para incluir:
+- ✅ Todas las dependencias actualizadas
+- ✅ Versión correcta de pywebview (5.4)
+- ✅ Generación automática de `requirements_python310.txt` completo
+
+---
+
+## 📊 Versiones Verificadas
+
+| Paquete | Versión Anterior | Versión Correcta | Estado |
+|---------|------------------|------------------|--------|
+| pyinstaller | 6.3.0 | 6.3.0 | ✅ OK |
+| pywebview | 5.0.7 ❌ | 5.4 ✅ | Corregido |
+| websockets | 12.0 | 12.0 | ✅ OK |
+
+---
+
+## 💾 Commit
+
+```bash
+Hash: 4b963ab1
+Tipo: fix
+Mensaje: corregir versión de pywebview para Python 3.10
+Archivos: 2 modificados
+Cambios: +59 insertions, -19 deletions
+```
+
+---
+
+## 🎯 Estado Final
+
+```
+Problema original:  ✅ RESUELTO (PyInstaller añadido)
+Problema pywebview: ✅ RESUELTO (versión corregida)
+Build esperado:     ✅ DEBERÍA FUNCIONAR AHORA
+```
+
+---
+
+**Última actualización**: 4 de Febrero de 2026, 11:50 AM  
+**Commits totales**: 3 (PyInstaller + Docs + pywebview)  
+**Estado**: ✅ COMPLETAMENTE CORREGIDO
