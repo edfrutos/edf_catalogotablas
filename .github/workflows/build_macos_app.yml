@@ -18,6 +18,12 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
       - name: Configure secrets and environment
         run: |
           echo "🔧 Configurando secrets y variables de entorno..."
