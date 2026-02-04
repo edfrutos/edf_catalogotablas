@@ -151,63 +151,63 @@ jobs:
               else
                 echo "❌ ERROR: requirements.txt tampoco encontrado"
                 echo "🔧 Creando archivo requirements_python310.txt básico..."
-                cat > requirements_python310.txt << 'EOF'
-# Requirements para Python 3.10+
-# Generado automáticamente para GitHub Actions
-
-# Framework Web
-flask==3.0.2
-flask-login==0.6.3
-werkzeug==3.0.1
-gunicorn==23.0.0
-
-# Base de datos
-pymongo==4.10.1
-dnspython==2.6.1
-
-# Cloud Storage (AWS S3)
-boto3==1.34.34
-botocore==1.34.34
-s3transfer==0.10.4
-
-# Servicios Google
-google-api-core==2.25.1
-google-api-python-client==2.171.0
-google-auth==2.40.3
-google-auth-httplib2==0.2.0
-google-auth-oauthlib==1.2.2
-googleapis-common-protos==1.70.0
-
-# Procesamiento de datos
-pandas==2.0.3
-python-dateutil==2.9.0.post0
-
-# Utilidades
-python-dotenv==1.0.1
-pydantic==2.11.7
-click==8.1.8
-jmespath==1.0.1
-sniffio==1.3.1
-msgpack==1.1.1
-
-# Plantillas
-jinja2==3.1.6
-markupsafe==2.1.5
-
-# Seguridad y señales
-itsdangerous==2.2.0
-blinker==1.8.2
-typing_extensions==4.13.2
-
-# Build y empaquetado
-pyinstaller==6.3.0
-pywebview==5.4
-websockets==12.0
-
-# Desarrollo y testing
-black==24.8.0
-pytest==8.3.5
-EOF
+                {
+                  echo "# Requirements para Python 3.10+"
+                  echo "# Generado automáticamente para GitHub Actions"
+                  echo ""
+                  echo "# Framework Web"
+                  echo "flask==3.0.2"
+                  echo "flask-login==0.6.3"
+                  echo "werkzeug==3.0.1"
+                  echo "gunicorn==23.0.0"
+                  echo ""
+                  echo "# Base de datos"
+                  echo "pymongo==4.10.1"
+                  echo "dnspython==2.6.1"
+                  echo ""
+                  echo "# Cloud Storage (AWS S3)"
+                  echo "boto3==1.34.34"
+                  echo "botocore==1.34.34"
+                  echo "s3transfer==0.10.4"
+                  echo ""
+                  echo "# Servicios Google"
+                  echo "google-api-core==2.25.1"
+                  echo "google-api-python-client==2.171.0"
+                  echo "google-auth==2.40.3"
+                  echo "google-auth-httplib2==0.2.0"
+                  echo "google-auth-oauthlib==1.2.2"
+                  echo "googleapis-common-protos==1.70.0"
+                  echo ""
+                  echo "# Procesamiento de datos"
+                  echo "pandas==2.0.3"
+                  echo "python-dateutil==2.9.0.post0"
+                  echo ""
+                  echo "# Utilidades"
+                  echo "python-dotenv==1.0.1"
+                  echo "pydantic==2.11.7"
+                  echo "click==8.1.8"
+                  echo "jmespath==1.0.1"
+                  echo "sniffio==1.3.1"
+                  echo "msgpack==1.1.1"
+                  echo ""
+                  echo "# Plantillas"
+                  echo "jinja2==3.1.6"
+                  echo "markupsafe==2.1.5"
+                  echo ""
+                  echo "# Seguridad y señales"
+                  echo "itsdangerous==2.2.0"
+                  echo "blinker==1.8.2"
+                  echo "typing_extensions==4.13.2"
+                  echo ""
+                  echo "# Build y empaquetado"
+                  echo "pyinstaller==6.3.0"
+                  echo "pywebview==5.4"
+                  echo "websockets==12.0"
+                  echo ""
+                  echo "# Desarrollo y testing"
+                  echo "black==24.8.0"
+                  echo "pytest==8.3.5"
+                } > requirements_python310.txt
                 echo "✅ Archivo requirements_python310.txt creado con dependencias completas"
               fi
             else
