@@ -178,8 +178,27 @@ jobs:
       - name: Install dependencies
         run: |
           echo "📦 Instalando dependencias..."
-          pip install --upgrade pip
-          pip install -r requirements_python310.txt
+          pip install --upgrade pip setuptools wheel
+          
+          # Instalar PyInstaller primero
+          echo "🔧 Instalando PyInstaller..."
+          pip install pyinstaller==6.3.0
+          
+          # Verificar que PyInstaller está instalado
+          python -m PyInstaller --version || echo "⚠️  Error al instalar PyInstaller"
+          
+          # Instalar el resto de dependencias
+          if [ -f "requirements_python310.txt" ]; then
+            echo "📦 Instalando desde requirements_python310.txt..."
+            pip install -r requirements_python310.txt
+          elif [ -f "requirements.txt" ]; then
+            echo "📦 Instalando desde requirements.txt..."
+            pip install -r requirements.txt
+          else
+            echo "❌ ERROR: No se encontró archivo requirements"
+            exit 1
+          fi
+          
           echo "✅ Dependencias instaladas"
 
       - name: Verify and create .spec file
@@ -314,6 +333,10 @@ jobs:
         run: |
           echo "🔨 Iniciando construcción de la aplicación..."
           
+          # Verificar que PyInstaller está disponible
+          echo "🔍 Verificando PyInstaller..."
+          python -m PyInstaller --version
+          
           # Verificación final antes del build
           if [ -f "pre_build_final_check.sh" ]; then
             echo "🔍 Ejecutando verificación final pre-build..."
@@ -328,6 +351,13 @@ jobs:
             ./build_macos_app.sh
           else
             echo "⚠️  Script build_macos_app.sh no encontrado, usando PyInstaller directamente..."
+            
+            # Verificar que el archivo .spec existe
+            if [ ! -f "EDF_CatalogoDeTablas_Native_WebSockets.spec" ]; then
+              echo "❌ ERROR: EDF_CatalogoDeTablas_Native_WebSockets.spec no encontrado"
+              exit 1
+            fi
+            
             python -m PyInstaller EDF_CatalogoDeTablas_Native_WebSockets.spec --clean
           fi
           

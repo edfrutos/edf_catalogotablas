@@ -46,6 +46,11 @@ itsdangerous==2.2.0
 blinker==1.8.2
 typing_extensions==4.13.2
 
+# Build y empaquetado
+pyinstaller==6.3.0
+pywebview==5.0.7
+websockets==12.0
+
 # Desarrollo y testing
 black==24.8.0
 pytest==8.3.5
