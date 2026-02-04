@@ -13,61 +13,82 @@
                         <div class="mb-3">
                             {% if header == 'Multimedia' %}
                                 <!-- Campo especial para Multimedia -->
-                                <label class="form-label fw-bold">
+                                <div class="form-label fw-bold">
                                     <i class="fas fa-video"></i> {{ header }}
-                                </label>
+                                </div>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <label class="form-label">URL de Multimedia (opcional)</label>
-                                        <input type="url" class="form-control" name="{{ header }}_url" 
-                                               placeholder="https://ejemplo.com/video.mp4">
+                                        <label class="form-label" for="{{ header }}-url"><i class="fas fa-link"></i> URL de Multimedia (opcional)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fas fa-link"></i></span>
+                                            <input type="url" class="form-control" id="{{ header }}-url" name="{{ header }}_url" 
+                                                   placeholder="https://ejemplo.com/video.mp4">
+                                        </div>
                                         <div class="form-text">Enlaza a un archivo multimedia externo</div>
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Subir Archivo Multimedia</label>
-                                        <input type="file" class="form-control" name="{{ header }}_file" 
-                                               accept="video/*,audio/*,image/*">
+                                        <label class="form-label" for="multimedia-file-input"><i class="fas fa-file-upload"></i> Subir Archivo Multimedia Local</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fas fa-file-upload"></i></span>
+                                            <input type="file" class="form-control" name="{{ header }}_file" 
+                                                   accept="video/*,audio/*,image/*" id="multimedia-file-input">
+                                            <button type="button" class="btn btn-primary" onclick="document.getElementById('multimedia-file-input').click()">
+                                                <i class="fas fa-folder-open"></i> Seleccionar archivo
+                                            </button>
+                                        </div>
                                         <div class="form-text">Videos: MP4, AVI, MOV | Audio: MP3, WAV | Imágenes: JPG, PNG, GIF | Máximo: 300MB</div>
+                                        <div id="selected-multimedia-file" class="mt-2 small"></div>
                                     </div>
                                 </div>
                                 
             {% elif header in ['Documentos', 'Documentación'] %}
                 <!-- Campo especial para Documentos/Documentación - MÚLTIPLES DOCUMENTOS -->
-                <label class="form-label fw-bold">
+                <div class="form-label fw-bold">
                     <i class="fas fa-file-alt"></i> {{ header }}
                     <span class="badge bg-success ms-2">Múltiples</span>
-                </label>
+                </div>
 
                 <!-- URLs de Documentos -->
                 <div class="mb-3">
-                    <label class="form-label">URLs de Documentos (opcional)</label>
+                    <label class="form-label" for="url-{{ header }}-{{ loop.index0 }}"><i class="fas fa-link"></i> URLs de Documentos (opcional)</label>
                     <div id="urls-container-{{ loop.index0 }}">
                         <div class="input-group mb-2">
-                            <input type="url" class="form-control" name="{{ header }}_url_{{ loop.index0 }}"
+                            <span class="input-group-text bg-light"><i class="fas fa-link"></i></span>
+                            <input type="url" class="form-control" id="url-{{ header }}-{{ loop.index0 }}" name="{{ header }}_url_{{ loop.index0 }}"
                                    placeholder="https://ejemplo.com/documento.pdf">
                             <button type="button" class="btn btn-outline-success" onclick="addUrlField('urls-container-{{ loop.index0 }}', '{{ header }}_url_{{ loop.index0 }}')">
-                                <i class="fas fa-plus"></i>
+                                <i class="fas fa-plus"></i> Añadir más URLs
                             </button>
                         </div>
                     </div>
-                    <div class="form-text">Puedes agregar múltiples URLs de documentos externos</div>
+                    <div class="form-text">Puedes agregar múltiples URLs de documentos externos (PDF, Excel, Word, etc.)</div>
                 </div>
 
                 <!-- Archivos de Documentos -->
                 <div class="mb-3">
-                    <label class="form-label">Subir Documentos</label>
-                    <input type="file" class="form-control" name="{{ header }}_file_{{ loop.index0 }}"
-                           accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.md" multiple>
-                    <div class="form-text">PDF, Word, Excel, Texto, RTF, Markdown | Máximo: 50MB cada uno | Puedes seleccionar múltiples archivos</div>
+                    <label class="form-label" for="file-{{ header }}-{{ loop.index0 }}"><i class="fas fa-file-upload"></i> Subir Documentos Locales</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-file-upload"></i></span>
+                        <input type="file" class="form-control" id="file-{{ header }}-{{ loop.index0 }}" name="{{ header }}_file_{{ loop.index0 }}"
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.txt,.rtf,.md" multiple>
+                        <button type="button" class="btn btn-primary" onclick="document.getElementById('file-{{ header }}-{{ loop.index0 }}').click()">
+                            <i class="fas fa-folder-open"></i> Seleccionar archivos
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        PDF, Word, Excel, Texto, RTF, Markdown | Máximo: 50MB cada uno | Puedes seleccionar múltiples archivos<br>
+                        <span class="text-success"><i class="fas fa-check-circle"></i> Los archivos Excel (.xlsx) son compatibles y se pueden visualizar</span>
+                    </div>
+                    <div id="selected-files-{{ loop.index0 }}" class="mt-2 small"></div>
                 </div>
                                 
                             {% elif header == 'Fecha' %}
                                 <!-- Campo especial para Fecha (columna inteligente) -->
-                                <label class="form-label">
+                                <label class="form-label" for="fecha-{{ loop.index0 }}">
                                     <i class="fas fa-calendar-alt"></i> {{ header }}
                                     <span class="badge bg-info ms-2">Auto</span>
                                 </label>
-                                <input type="date" class="form-control" name="{{ header }}" 
+                                <input type="date" class="form-control" id="fecha-{{ loop.index0 }}" name="{{ header }}" 
                                        value="">
                                 <div class="form-text">
                                     <i class="fas fa-magic"></i> <strong>Columna Inteligente:</strong> 
@@ -76,19 +97,26 @@
                                 
                             {% else %}
                                 <!-- Campo normal -->
-                                <label class="form-label">{{ header }}</label>
-                                <input type="text" class="form-control" name="{{ header }}" placeholder="Ingresa {{ header.lower() }}">
+                                <label class="form-label" for="input-{{ header }}-{{ loop.index0 }}">{{ header }}</label>
+                                <input type="text" class="form-control" id="input-{{ header }}-{{ loop.index0 }}" name="{{ header }}" placeholder="Ingresa {{ header.lower() }}">
                             {% endif %}
                         </div>
                         {% endfor %}
                         
                         <!-- Sección de imágenes (mantener compatibilidad) -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">
+                            <label class="form-label fw-bold" for="images-file-input">
                                 <i class="fas fa-images"></i> Imágenes Adicionales (máx. 3)
                             </label>
-                            <input type="file" class="form-control" name="images" accept="image/*" multiple>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-images"></i></span>
+                                <input type="file" class="form-control" name="images" accept="image/*" multiple id="images-file-input">
+                                <button type="button" class="btn btn-primary" onclick="document.getElementById('images-file-input').click()">
+                                    <i class="fas fa-folder-open"></i> Seleccionar imágenes
+                                </button>
+                            </div>
                             <div class="form-text">Estas imágenes se mostrarán en la columna de imágenes del catálogo</div>
+                            <div id="selected-images" class="mt-2 small"></div>
                         </div>
                         
                         <div class="alert alert-info">
@@ -98,6 +126,10 @@
                                 <li><strong>Documentos/Documentación:</strong> Puedes subir documentos (PDFs, Word, Excel, Markdown) o enlazar URLs externas</li>
                                 <li><strong>Imágenes:</strong> Las imágenes adicionales se mostrarán en la columna de imágenes del catálogo</li>
                             </ul>
+                            <hr>
+                            <div class="mt-2">
+                                <i class="fas fa-file-excel text-success"></i> <strong>Compatibilidad con Excel:</strong> Los archivos Excel (.xlsx) son completamente compatibles y se pueden visualizar tanto al cargar archivos locales como al usar URLs externas.
+                            </div>
                         </div>
                         
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
@@ -136,6 +168,7 @@ function addUrlField(containerId, fieldName) {
     const newField = document.createElement('div');
     newField.className = 'input-group mb-2';
     newField.innerHTML = `
+        <span class="input-group-text bg-light"><i class="fas fa-link"></i></span>
         <input type="url" class="form-control" name="${fieldName}" 
                placeholder="https://ejemplo.com/documento.pdf">
         <button type="button" class="btn btn-outline-danger" onclick="removeUrlField(this)">
@@ -149,5 +182,120 @@ function addUrlField(containerId, fieldName) {
 function removeUrlField(button) {
     button.parentElement.remove();
 }
+
+// Funciones para mostrar nombres de archivos seleccionados
+document.addEventListener('DOMContentLoaded', function() {
+    // Para documentos
+    const fileInputs = document.querySelectorAll('input[type="file"][name^="Documento"]');
+    fileInputs.forEach((input, index) => {
+        input.addEventListener('change', function() {
+            const fileList = Array.from(this.files).map(file => file.name);
+            const filesSelectedDiv = document.getElementById(`selected-files-${index}`);
+            if (filesSelectedDiv) {
+                if (fileList.length > 0) {
+                    const fileTypeIcons = {
+                        'pdf': 'fa-file-pdf',
+                        'doc': 'fa-file-word',
+                        'docx': 'fa-file-word',
+                        'xls': 'fa-file-excel',
+                        'xlsx': 'fa-file-excel',
+                        'txt': 'fa-file-alt',
+                        'rtf': 'fa-file-alt',
+                        'md': 'fa-file-alt'
+                    };
+                    
+                    let fileListHTML = '';
+                    fileList.forEach(fileName => {
+                        const extension = fileName.split('.').pop().toLowerCase();
+                        const iconClass = fileTypeIcons[extension] || 'fa-file';
+                        fileListHTML += `
+                            <div class="mb-1">
+                                <i class="fas ${iconClass} text-secondary"></i> ${fileName}
+                            </div>`;
+                    });
+                    
+                    filesSelectedDiv.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-check-circle"></i> <strong>Archivos seleccionados (${fileList.length}):</strong>
+                            <div class="mt-2">${fileListHTML}</div>
+                        </div>`;
+                } else {
+                    filesSelectedDiv.innerHTML = '';
+                }
+            }
+        });
+    });
+
+    // Para multimedia
+    const multimediaInput = document.getElementById('multimedia-file-input');
+    if (multimediaInput) {
+        multimediaInput.addEventListener('change', function() {
+            const fileDiv = document.getElementById('selected-multimedia-file');
+            if (this.files.length > 0) {
+                const file = this.files[0];
+                const fileName = file.name;
+                const fileType = file.type;
+                let iconClass = 'fa-file';
+                
+                // Determinar el tipo de icono según el MIME type
+                if (fileType.startsWith('video/')) {
+                    iconClass = 'fa-file-video';
+                } else if (fileType.startsWith('audio/')) {
+                    iconClass = 'fa-file-audio';
+                } else if (fileType.startsWith('image/')) {
+                    iconClass = 'fa-file-image';
+                }
+                
+                fileDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-check-circle"></i> <strong>Archivo seleccionado:</strong>
+                        <div class="mt-2">
+                            <i class="fas ${iconClass} text-secondary"></i> ${fileName}
+                            <span class="badge bg-secondary">${fileType}</span>
+                        </div>
+                    </div>`;
+            } else {
+                fileDiv.innerHTML = '';
+            }
+        });
+    }
+
+    // Para imágenes
+    const imagesInput = document.getElementById('images-file-input');
+    if (imagesInput) {
+        imagesInput.addEventListener('change', function() {
+            const filesDiv = document.getElementById('selected-images');
+            const fileList = Array.from(this.files);
+            
+            if (fileList.length > 0) {
+                let fileListHTML = '';
+                fileList.forEach(file => {
+                    fileListHTML += `
+                        <div class="mb-1">
+                            <i class="fas fa-file-image text-secondary"></i> ${file.name}
+                        </div>`;
+                });
+                
+                filesDiv.innerHTML = `
+                    <div class="alert alert-info">
+                        <i class="fas fa-check-circle"></i> <strong>Imágenes seleccionadas (${fileList.length}):</strong>
+                        <div class="mt-2">${fileListHTML}</div>
+                    </div>`;
+                
+                // Verificar límite de imágenes (máx. 3)
+                if (fileList.length > 3) {
+                    filesDiv.innerHTML += `
+                        <div class="alert alert-warning mt-2">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Advertencia:</strong> Has seleccionado ${fileList.length} imágenes, pero el límite es de 3.
+                            Solo se procesarán las primeras 3 imágenes.
+                        </div>`;
+                }
+            } else {
+                filesDiv.innerHTML = '';
+            }
+        });
+    }
+})
 </script>
 {% endblock %}

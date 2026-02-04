@@ -111,6 +111,7 @@ def create_app(testing=False):
     from .routes.dev_template import bp_dev_template
     from .routes.emergency_access import emergency_bp
     from .routes.images_routes import images_bp
+    from .debug_routes import debug_blueprint
     from .routes.main_routes import main_bp
     from .routes.maintenance_routes import register_maintenance_routes
     from .routes.scripts_routes import scripts_bp
@@ -133,6 +134,7 @@ def create_app(testing=False):
         (testing_bp, None),
         (images_bp, None),
         (emergency_bp, None),
+        (debug_blueprint, None),  # Blueprint para depuración
     ]
 
     for bp, prefix in blueprints:

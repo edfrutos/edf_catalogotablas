@@ -1,7 +1,7 @@
 /**
  * DEBUG CONFIGURATION
  * Archivo centralizado para configurar opciones de depuración
- * Fecha: 8 de octubre de 2025
+ * Actualizado: 2026-02-04
  */
 
 (function() {
@@ -9,10 +9,13 @@
     const isLocalhost = window.location.hostname === 'localhost' || 
                        window.location.hostname === '127.0.0.1';
     
+    // Comprobar si el debug persistente está activado
+    const isPersistentDebug = localStorage.getItem('debugMode') === 'true';
+    
     // Configuración global para todo el proyecto
     window.APP_CONFIG = {
-        // Deshabilitar logs en producción
-        DEBUG_MODE: false,
+        // Activar debug en localhost o si está configurado como persistente
+        DEBUG_MODE: isLocalhost || isPersistentDebug,
         
         // Otras configuraciones de rendimiento
         PERFORMANCE: {
@@ -41,6 +44,11 @@
         }
     };
     
+    // Función global para obtener el estado de debug
+    window.getDebugMode = function() {
+        return window.APP_CONFIG.DEBUG_MODE;
+    };
+    
     // Reemplazar console.log en producción para evitar logs accidentales
     if (!window.APP_CONFIG.DEBUG_MODE) {
         // Guardar la referencia original por si es necesaria
@@ -51,5 +59,7 @@
             // No hacer nada en producción
             return;
         };
+    } else {
+        console.log('%c[DEBUG-CONFIG] Modo de depuración ACTIVO', 'color: green; font-weight: bold');
     }
 })();

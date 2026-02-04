@@ -41,6 +41,165 @@ function getEnvironmentType() {
   }
 }
 
+// Función para corregir enlaces de S3 en la página
+function fixS3Links() {
+  try {
+    log("[MODAL-UNIFIED] 🔧 Verificando enlaces S3 en la página...");
+    
+    // Buscar todos los botones que abren documentos
+    const docButtons = document.querySelectorAll('[data-action="show-document"]');
+    
+    if (docButtons.length === 0) {
+      log("[MODAL-UNIFIED] ℹ️ No se encontraron botones de documentos en esta página");
+      return;
+    }
+    
+    log(`[MODAL-UNIFIED] 🔍 Encontrados ${docButtons.length} botones de documentos para verificar`);
+    
+    let excelCount = 0;
+    let fixedCount = 0;
+    
+    docButtons.forEach(button => {
+      const docSrc = button.getAttribute('data-document-src');
+      
+      // Verificar si es un enlace a Excel en S3 que necesita corrección
+      if (docSrc && isExcelFile(docSrc)) {
+        excelCount++;
+        log("[MODAL-UNIFIED] � Verificando enlace Excel:", docSrc);
+        
+        // Caso 1: URL pública de S3 que necesita convertirse a /admin/s3/
+        if (docSrc.includes('s3.eu-central-1.amazonaws.com')) {
+          const adminUrl = normalizeS3Url(docSrc, 'admin');
+          log("[MODAL-UNIFIED] 🔧 Corrigiendo URL de Excel S3:", docSrc, "→", adminUrl);
+          button.setAttribute('data-document-src', adminUrl);
+          fixedCount++;
+        } 
+        // Caso 2: URL que no tiene prefijo /admin/s3/ pero debería (nombres de archivo simples)
+        else if (!docSrc.includes('/admin/s3/') && docSrc.toLowerCase().endsWith('.xlsx')) {
+          const adminUrl = normalizeS3Url(docSrc, 'admin');
+          log("[MODAL-UNIFIED] 🔧 Agregando prefijo /admin/s3/ a URL de Excel:", docSrc, "→", adminUrl);
+          button.setAttribute('data-document-src', adminUrl);
+          fixedCount++;
+        }
+      }
+    });
+    
+    log(`[MODAL-UNIFIED] ✅ Verificación completada: ${excelCount} archivos Excel encontrados, ${fixedCount} URLs corregidas`);
+  } catch (error) {
+    console.error("[MODAL-UNIFIED] ❌ Error al corregir enlaces S3:", error);
+  }
+}
+
+// Función para detectar si un archivo es de tipo Excel (.xlsx o .xls)
+function isExcelFile(url) {
+  // Si la URL es undefined o null, no es un Excel
+  if (!url) {
+    log("[MODAL-UNIFIED] ⚠️ isExcelFile: URL es undefined o null");
+    return false;
+  }
+  
+  // Detección específica para URLs conocidas de spreadsheets
+  if (url.includes('/admin/catalogo/spreadsheets/') || 
+      url.includes('/catalogo/spreadsheets/')) {
+    if (DEBUG_MODE) console.log('[EXCEL-DEBUG] Detectado patrón de URL para spreadsheet:', url);
+    return true;
+  }
+  
+  // Detección específica para el ID problemático
+  if (url.includes('68bdb85ace7fe626f3d9d4de')) {
+    if (DEBUG_MODE) console.log('[EXCEL-DEBUG] Detectado ID problemático de spreadsheet:', url);
+    return true;
+  }
+  
+  // Obtener el nombre del archivo
+  let fileName;
+  if (url.includes('?')) {
+    // Manejo de URL con parámetros
+    const urlParts = url.split('?');
+    fileName = urlParts[0];
+  } else {
+    fileName = url;
+  }
+  
+  // Limpiar cualquier parámetro o fragmento adicional
+  fileName = fileName.split('#')[0]; // Eliminar cualquier fragmento
+  
+  // Extraer la última parte del path (nombre del archivo)
+  const lastSegment = fileName.split('/').pop();
+  
+  // Verificar extensiones específicas de Excel
+  const isExcel = lastSegment && 
+    (lastSegment.toLowerCase().endsWith('.xlsx') || 
+     lastSegment.toLowerCase().endsWith('.xls'));
+     
+  log("[MODAL-UNIFIED] 📊 isExcelFile:", url, "→", isExcel);
+  return isExcel;
+}
+
+// Función auxiliar para determinar la extensión de un archivo
+function getFileExtension(url) {
+  if (!url) return '';
+  
+  // Eliminar parámetros de consulta y fragmentos
+  let cleanUrl = url.split('?')[0].split('#')[0];
+  
+  // Obtener la última parte de la ruta
+  const filename = cleanUrl.split('/').pop();
+  
+  // Si no hay nombre de archivo, devolver cadena vacía
+  if (!filename) return '';
+  
+  // Verificar si hay una extensión
+  const parts = filename.split('.');
+  return parts.length > 1 ? parts.pop().toLowerCase() : '';
+}
+
+// Función para normalizar URLs de S3
+function normalizeS3Url(url, urlType = 'admin') {
+  if (!url) return '';
+  
+  // Agregar logs detallados en modo debug
+  log("[MODAL-UNIFIED] 🔧 normalizeS3Url - URL original:", url);
+  log("[MODAL-UNIFIED] 🔧 normalizeS3Url - Tipo solicitado:", urlType);
+  
+  // Extraer el nombre del archivo de cualquier tipo de URL
+  let fileName;
+  
+  if (url.includes('/admin/s3/')) {
+    // Ya es una URL del tipo /admin/s3/nombrearchivo.xlsx
+    fileName = url.substring(url.indexOf('/admin/s3/') + '/admin/s3/'.length);
+    log("[MODAL-UNIFIED] 🔧 Extracción de /admin/s3/:", fileName);
+  } else if (url.includes('s3.eu-central-1.amazonaws.com')) {
+    // Es una URL del tipo https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/nombrearchivo.xlsx
+    fileName = url.substring(url.indexOf('.com/') + '.com/'.length);
+    log("[MODAL-UNIFIED] 🔧 Extracción de URL S3 pública:", fileName);
+  } else if (url.includes('/')) {
+    // URL con estructura de ruta
+    fileName = url.split('/').pop();
+    log("[MODAL-UNIFIED] 🔧 Extracción de URL con rutas:", fileName);
+  } else {
+    // Nombre de archivo simple
+    fileName = url;
+    log("[MODAL-UNIFIED] 🔧 Nombre de archivo simple:", fileName);
+  }
+  
+  // Eliminar parámetros de consulta si existen
+  fileName = fileName.split('?')[0];
+  
+  // Construir y retornar la URL solicitada
+  let resultUrl;
+  if (urlType === 'admin' || urlType === 'internal') {
+    resultUrl = `/admin/s3/${fileName}`;
+  } else if (urlType === 'public' || urlType === 'external') {
+    resultUrl = `https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/${fileName}`;
+  } else {
+    // URL relativa (solo el nombre del archivo)
+    resultUrl = fileName;
+  }
+  
+  log("[MODAL-UNIFIED] ✅ normalizeS3Url - URL resultante:", resultUrl);
+  return resultUrl;
+}
 
 
 // ============================================================================
@@ -50,15 +209,23 @@ function getEnvironmentType() {
 // Función para mostrar documentos en modal (PDF, Markdown, Texto)
 // Función auxiliar para determinar el título según la extensión del archivo
 function getDocumentTitle(fileExtension) {
-  if (fileExtension === 'pdf') {
+  // Si no hay extensión o es inválida, devolver título genérico
+  if (!fileExtension || typeof fileExtension !== 'string') {
+    return 'Documento';
+  }
+  
+  // Limpiar la extensión por si tiene parámetros adicionales
+  const cleanExt = fileExtension.split('?')[0].toLowerCase();
+  
+  if (cleanExt === 'pdf') {
     return 'Ver PDF';
-  } else if (fileExtension === 'md') {
+  } else if (cleanExt === 'md') {
     return 'Ver Markdown';
-  } else if (['doc', 'docx'].includes(fileExtension)) {
+  } else if (['doc', 'docx'].includes(cleanExt)) {
     return 'Ver Documento';
-  } else if (['xls', 'xlsx'].includes(fileExtension)) {
-    return 'Ver Hoja de Cálculo';
-  } else if (['ppt', 'pptx'].includes(fileExtension)) {
+  } else if (['xls', 'xlsx'].includes(cleanExt)) {
+    return 'Ver Hoja de Cálculo Excel';
+  } else if (['ppt', 'pptx'].includes(cleanExt)) {
     return 'Ver Presentación';
   }
   return 'Documento';
@@ -130,13 +297,77 @@ function showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
 
 // Función para mostrar archivos Excel desde S3
 function showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl) {
-  // Obtener la URL pública para archivos de S3
-  let publicViewUrl = documentSrc;
-  if (documentSrc.includes('/admin/s3/')) {
-    // Convertir URL interna a URL pública para visualización externa
-    const fileName = documentSrc.split('/').pop();
-    publicViewUrl = `https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/${fileName}`;
+  // Log para solucionar problemas
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: Inicio de showExcelS3Content");
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: documentSrc =", documentSrc);
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: documentTitle =", documentTitle);
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: proxyUrl =", proxyUrl);
+  
+  // Asegurarnos de tener URLs normalizadas usando nuestra función centralizada
+  let s3AdminUrl, publicViewUrl, proxyUrl;
+  
+  try {
+    // Identificar la URL que se está pasando
+    const isUrlFromLocal = documentSrc.includes('localhost') || documentSrc.startsWith('/');
+    const isDirectS3Url = documentSrc.includes('s3.eu-central-1.amazonaws.com');
+    const isAdminS3Url = documentSrc.includes('/admin/s3/');
+    
+    if (DEBUG_MODE) {
+      console.log('[EXCEL-DEBUG] Análisis de URL Excel:');
+      console.log(`   - ¿URL local? ${isUrlFromLocal}`);
+      console.log(`   - ¿URL directa de S3? ${isDirectS3Url}`);
+      console.log(`   - ¿URL admin de S3? ${isAdminS3Url}`);
+    }
+    
+    // Normalizar todas las URLs necesarias
+    s3AdminUrl = normalizeS3Url(documentSrc, 'admin');
+    publicViewUrl = normalizeS3Url(documentSrc, 'public');
+    
+    // Si se proporciona proxyUrl, normalizarla también
+    if (proxyUrl) {
+      // Si la URL de proxy ya viene en formato /admin/s3/ la mantenemos
+      if (proxyUrl.includes('/admin/s3/')) {
+        // Ya está en formato correcto
+      } else {
+        // Normalizamos a formato admin
+        proxyUrl = normalizeS3Url(proxyUrl, 'admin');
+      }
+    } else {
+      // Si no se proporciona proxyUrl, usar s3AdminUrl
+      proxyUrl = s3AdminUrl;
+    }
+  } catch (error) {
+    console.error('Error al normalizar URLs de Excel:', error);
+    // En caso de error, usar valores directos para evitar fallos catastróficos
+    s3AdminUrl = documentSrc;
+    publicViewUrl = documentSrc;
+    proxyUrl = proxyUrl || documentSrc;
   }
+  
+  // Log de todas las URLs procesadas
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: URLs procesadas:");
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: - s3AdminUrl =", s3AdminUrl);
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: - publicViewUrl =", publicViewUrl);
+  log("[MODAL-UNIFIED] 📊 EXCEL-S3: - proxyUrl final =", proxyUrl);
+  
+  // Log mejorado para depuración
+  log("[MODAL-UNIFIED] 📊 showExcelS3Content llamado");
+  log("[MODAL-UNIFIED] 📊 documentSrc:", documentSrc);
+  log("[MODAL-UNIFIED] 📊 s3AdminUrl:", s3AdminUrl);
+  log("[MODAL-UNIFIED] 📊 proxyUrl:", proxyUrl);
+  log("[MODAL-UNIFIED] 📊 publicViewUrl:", publicViewUrl);
+  
+  // Verificar que la URL contenga /admin/s3/ para acceso correcto
+  if (!proxyUrl.includes('/admin/s3/')) {
+    log("[MODAL-UNIFIED] ⚠️ Advertencia: proxyUrl no contiene /admin/s3/");
+    // Intentar corregir la URL
+    const fileName = proxyUrl.split('/').pop();
+    proxyUrl = `/admin/s3/${fileName}`;
+    log("[MODAL-UNIFIED] 🔧 proxyUrl corregida:", proxyUrl);
+  }
+  
+  // Asegurar que el título del documento sea válido
+  const safeTitle = documentTitle || 'Documento Excel';
   
   // Preparar el contenido
   modalContent.innerHTML = `
@@ -144,7 +375,7 @@ function showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl) 
       <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
       <h5>Documento Excel</h5>
       <p class="text-muted mb-3">
-        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Archivo:</strong> ${safeTitle}<br>
         <strong>Tipo:</strong> XLSX<br>
         <strong>Ubicación:</strong> S3
       </p>
@@ -155,22 +386,53 @@ function showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl) 
       </div>
       
       <div class="excel-viewer-container">
+        <!-- Vista previa incrustada si es posible (solo para algunas configuraciones) -->
+        <div class="excel-preview mb-4">
+          <iframe src="${proxyUrl}" width="100%" height="400" style="border: 1px solid #ddd; display: block; margin: 0 auto;" onload="this.style.height='600px';" allowfullscreen></iframe>
+          <div class="text-center mt-2 text-muted"><small>Si el documento no se visualiza correctamente, utilice los botones para abrirlo directamente.</small></div>
+        </div>
+        
         <div class="text-center mt-4">
           <i class="fas fa-file-excel fa-5x text-success mb-3"></i>
           <h4>Archivo Excel</h4>
           <p>Puede utilizar los botones a continuación para abrir o descargar este archivo.</p>
           <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-            <a href="${proxyUrl}" target="_blank" class="btn btn-success btn-lg">
+            <a href="${proxyUrl}" target="_blank" class="btn btn-success btn-lg excel-open-btn">
               <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
             </a>
-            <button type="button" class="btn btn-outline-success btn-lg" data-action="download-s3-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+            <button type="button" class="btn btn-outline-success btn-lg excel-download-btn" data-action="download-s3-file" data-document-src="${publicViewUrl}" data-document-title="${safeTitle}">
               <i class="fas fa-download"></i> Descargar
             </button>
+          </div>
+          
+          <!-- Botón alternativo si el principal falla -->
+          <div class="mt-3" style="${window.DEBUG_MODE ? 'display:block' : ''}">
+            <a href="${publicViewUrl}" target="_blank" class="btn btn-sm btn-outline-secondary">
+              <i class="fas fa-external-link-alt"></i> URL Pública Alternativa
+            </a>
+          </div>
+          
+          <!-- Información de depuración -->
+          <div class="mt-4 p-3 text-start bg-light border" style="font-size: 12px; max-height: 200px; overflow-y: auto; display: ${window.DEBUG_MODE ? 'block' : 'none'}">
+            <h6 class="text-muted">Información de Depuración:</h6>
+            <pre class="mb-0"><code>
+URL del documento: ${documentSrc}
+URL de proxy: ${proxyUrl}
+URL S3 Admin: ${s3AdminUrl}
+URL S3 Pública: ${publicViewUrl}
+            </code></pre>
           </div>
         </div>
       </div>
     </div>
   `;
+  
+  // Forzar los colores correctos para Excel
+  const excelModalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (excelModalDialog) {
+    excelModalDialog.style.maxWidth = '900px';
+    excelModalDialog.style.width = '85%';
+  }
   
   // Insertar botones en el modal-footer
   setupDocumentButtons(documentSrc, documentTitle, 's3');
@@ -189,17 +451,127 @@ function showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl) 
   }
 }
 
+// Función especial para mostrar spreadsheets de catálogo
+function showCatalogoSpreadsheet(modalContent, documentSrc, documentTitle) {
+  log("[MODAL-UNIFIED] 📅 showCatalogoSpreadsheet llamado con:", { documentSrc, documentTitle });
+  
+  // Extraer el ID del spreadsheet de la URL
+  let spreadsheetId = '';
+  if (documentSrc.includes('/catalogo/spreadsheets/')) {
+    spreadsheetId = documentSrc.split('/catalogo/spreadsheets/').pop().split('/')[0];
+  } else if (documentSrc.includes('spreadsheets/')) {
+    spreadsheetId = documentSrc.split('spreadsheets/').pop().split('/')[0];
+  }
+  
+  // Construir la URL correcta para acceder al spreadsheet
+  const spreadsheetUrl = `/admin/catalogo/spreadsheets/${spreadsheetId}`;
+  const downloadUrl = `/admin/catalogo/spreadsheets/${spreadsheetId}/download`;
+  
+  if (DEBUG_MODE) {
+    console.log('[EXCEL-CATALOG] Procesando spreadsheet de catálogo:');
+    console.log('  - URL original:', documentSrc);
+    console.log('  - ID extraido:', spreadsheetId);
+    console.log('  - URL generada:', spreadsheetUrl);
+    console.log('  - URL de descarga:', downloadUrl);
+  }
+  
+  // Preparar el contenido
+  modalContent.innerHTML = `
+    <div class="text-center p-3">
+      <i class="fas fa-table fa-3x text-primary mb-2"></i>
+      <h5>Hoja de Cálculo de Catálogo</h5>
+      <p class="text-muted mb-3">
+        <strong>Título:</strong> ${documentTitle || 'Hoja de Cálculo'}<br>
+        <strong>ID:</strong> ${spreadsheetId}<br>
+      </p>
+      
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Este tipo de documento se debe abrir en una nueva pestaña para su correcta visualización.
+      </div>
+      
+      <div class="text-center mt-4">
+        <i class="fas fa-table fa-5x text-primary mb-3"></i>
+        <p>Utilice los botones a continuación para acceder a este documento.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+          <a href="${spreadsheetUrl}" target="_blank" class="btn btn-primary btn-lg">
+            <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+          </a>
+          <a href="${downloadUrl}" class="btn btn-outline-primary btn-lg">
+            <i class="fas fa-download"></i> Descargar
+          </a>
+        </div>
+        
+        <!-- Información de depuración -->
+        <div class="mt-4 p-3 text-start bg-light border" style="font-size: 12px; max-height: 200px; overflow-y: auto; display: ${window.DEBUG_MODE ? 'block' : 'none'}">
+          <h6 class="text-muted">Información de Depuración:</h6>
+          <pre class="mb-0"><code>
+URL original: ${documentSrc}
+ID del spreadsheet: ${spreadsheetId}
+URL de apertura: ${spreadsheetUrl}
+URL de descarga: ${downloadUrl}
+          </code></pre>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Configurar botones adicionales en el footer
+  const modalFooter = document.querySelector('#documentModal .modal-footer');
+  if (modalFooter) {
+    modalFooter.innerHTML = `
+      <div class="d-flex gap-2 w-100 justify-content-between">
+        <div class="d-flex gap-2">
+          <a href="${spreadsheetUrl}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+          </a>
+          <a href="${downloadUrl}" class="btn btn-outline-primary">
+            <i class="fas fa-download"></i> Descargar
+          </a>
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    `;
+  }
+}
+
 // Función para mostrar archivos Excel locales
 function showExcelLocalContent(modalContent, documentSrc, documentTitle) {
+  // Comprobar que el documentSrc sea válido
+  if (!documentSrc) {
+    logError("[MODAL-UNIFIED] ⚠️ Error: documentSrc está vacío en showExcelLocalContent");
+    modalContent.innerHTML = `
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle"></i>
+        <strong>Error:</strong> No se ha proporcionado una URL válida para el documento Excel.
+      </div>
+    `;
+    return;
+  }
+  
   // Convertir ruta local a URL absoluta para Office Online Viewer
-  const absoluteUrl = new URL(documentSrc, window.location.origin).href;
+  let absoluteUrl;
+  try {
+    absoluteUrl = new URL(documentSrc, window.location.origin).href;
+  } catch (error) {
+    logError("[MODAL-UNIFIED] ⚠️ Error al crear URL absoluta:", error);
+    absoluteUrl = documentSrc; // Usar la URL original como fallback
+  }
+  
+  // Log mejorado para depuración
+  log("[MODAL-UNIFIED] 📊 showExcelLocalContent llamado");
+  log("[MODAL-UNIFIED] 📊 documentSrc:", documentSrc);
+  log("[MODAL-UNIFIED] 📊 absoluteUrl:", absoluteUrl);
+  
+  // Asegurar que el título del documento sea válido
+  const safeTitle = documentTitle || documentSrc.split('/').pop() || 'Documento Excel';
   
   modalContent.innerHTML = `
     <div class="text-center p-3">
       <i class="fas fa-file-excel fa-3x text-success mb-2"></i>
       <h5>Documento Excel</h5>
       <p class="text-muted mb-3">
-        <strong>Archivo:</strong> ${documentTitle}<br>
+        <strong>Archivo:</strong> ${safeTitle}<br>
         <strong>Tipo:</strong> XLSX<br>
         <strong>Ubicación:</strong> Local
       </p>
@@ -215,10 +587,10 @@ function showExcelLocalContent(modalContent, documentSrc, documentTitle) {
           <h4>Archivo Excel</h4>
           <p>Puede utilizar los botones a continuación para abrir o descargar este archivo.</p>
           <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
-            <a href="${documentSrc}" target="_blank" class="btn btn-success btn-lg">
+            <a href="${absoluteUrl}" target="_blank" class="btn btn-success btn-lg">
               <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
             </a>
-            <button type="button" class="btn btn-outline-success btn-lg" data-action="download-local-file" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+            <button type="button" class="btn btn-outline-success btn-lg" data-action="download-local-file" data-document-src="${documentSrc}" data-document-title="${safeTitle}">
               <i class="fas fa-download"></i> Descargar
             </button>
           </div>
@@ -246,6 +618,34 @@ function showExcelLocalContent(modalContent, documentSrc, documentTitle) {
 
 // Función para mostrar otros tipos de contenido desde S3
 function showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension) {
+  // Verificar si es un archivo Excel usando nuestra función isExcelFile
+  // y también verificar por extensión como respaldo
+  const isExcelByExt = ['xls', 'xlsx'].includes(fileExtension?.toLowerCase());
+  const isExcelByFn = isExcelFile(documentSrc);
+  
+  // Log para depuración
+  if (isExcelByExt || isExcelByFn) {
+    log("[MODAL-UNIFIED] 📊 Archivo Excel detectado en showOtherS3Content:", documentSrc);
+    log("[MODAL-UNIFIED] 📊 Detectado por extensión:", isExcelByExt ? 'Sí' : 'No');
+    log("[MODAL-UNIFIED] 📊 Detectado por función isExcelFile:", isExcelByFn ? 'Sí' : 'No');
+    
+    // Redireccionar a la función correcta
+    let proxyUrl = documentSrc;
+    
+    // Asegurarnos de usar la URL correcta para acceso a S3
+    if (!documentSrc.includes('/admin/s3/')) {
+      if (documentSrc.includes('s3.eu-central-1.amazonaws.com')) {
+        proxyUrl = documentSrc.replace(
+          'https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/', 
+          '/admin/s3/'
+        );
+      }
+    }
+    
+    showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
+    return;
+  }
+  
   modalContent.innerHTML = `
     <div class="text-center p-4">
       <i class="fas fa-file fa-4x text-primary mb-3"></i>
@@ -332,21 +732,65 @@ function setupDocumentButtons(documentSrc, documentTitle, sourceType) {
   const modalFooter = document.querySelector('#documentModal .modal-footer');
   if (!modalFooter) return;
   
+  // Obtener extensión del archivo
+  let fileExtension = '';
+  if (documentSrc && typeof documentSrc === 'string') {
+    const parts = documentSrc.split('.');
+    if (parts.length > 1) {
+      fileExtension = parts.pop().split('?')[0].toLowerCase();
+    }
+  }
+  
+  // Flag para saber si es un archivo Excel usando la función mejorada
+  const isExcelFile = window.isExcelFile ? window.isExcelFile(documentSrc) : ['xls', 'xlsx'].includes(fileExtension);
+  
+  // Preparar URL para abrir en nueva pestaña
+  let openUrl = documentSrc;
+  // Normalizar URL si es un archivo Excel (funciona para S3 y local)
+  if (isExcelFile) {
+    if (window.normalizeS3Url && (documentSrc.includes('/admin/s3/') || sourceType === 's3')) {
+      openUrl = window.normalizeS3Url(documentSrc);
+      if (DEBUG_MODE) console.log('[EXCEL-DEBUG] URL normalizada para Excel:', openUrl);
+    } else if (sourceType === 'local' && !openUrl.startsWith('http')) {
+      openUrl = new URL(openUrl, window.location.origin).href;
+      if (DEBUG_MODE) console.log('[EXCEL-DEBUG] URL local convertida a absoluta:', openUrl);
+    }
+  }
+
+  // Determinar clases de botones (destacar botones de Excel)
+  const primaryBtnClass = isExcelFile ? 'btn-success' : 'btn-primary';
+  const outlineBtnClass = isExcelFile ? 'btn-outline-success' : 'btn-outline-primary';
+  
   const actionType = sourceType === 's3' ? 'download-s3-file' : 'download-local-file';
   
   modalFooter.innerHTML = `
     <div class="d-flex gap-2 w-100 justify-content-between">
       <div class="d-flex gap-2">
-        <a href="${documentSrc}" target="_blank" class="btn btn-primary">
+        <a href="${openUrl}" target="_blank" class="${isExcelFile ? 'btn ' + primaryBtnClass : 'btn btn-primary'}">
           <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
         </a>
-        <button type="button" class="btn btn-outline-primary" data-action="${actionType}" data-document-src="${documentSrc}" data-document-title="${documentTitle}">
+        <button type="button" class="${isExcelFile ? 'btn ' + outlineBtnClass : 'btn btn-outline-primary'}" 
+                data-action="${actionType}" 
+                data-document-src="${documentSrc}" 
+                data-document-title="${documentTitle || 'documento' + (isExcelFile ? '.xlsx' : '')}">
           <i class="fas fa-download"></i> Descargar
         </button>
       </div>
       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
     </div>
   `;
+  
+  // Log para depuración
+  if (isExcelFile) {
+    log(`[MODAL-UNIFIED] 🔧 Configurando botones para Excel (${sourceType}):`, documentTitle);
+    if (DEBUG_MODE) {
+      console.log(`[EXCEL-DEBUG] 📝 Detalles de configuración:`);
+      console.log(`   - URL original: ${documentSrc}`);
+      console.log(`   - URL para abrir: ${openUrl}`);
+      console.log(`   - Tipo de fuente: ${sourceType}`);
+      console.log(`   - Extensión detectada: ${fileExtension}`);
+    }
+  }
 }
 
 function showDocumentModal(documentSrc, documentTitle) {
@@ -363,16 +807,47 @@ function showDocumentModal(documentSrc, documentTitle) {
     return;
   }
   
-  // Configurar título genérico basado en el tipo de archivo
-  const fileExtension = documentSrc.split('.').pop()?.toLowerCase();
-  modalTitle.textContent = getDocumentTitle(fileExtension);
+  // Verificar PRIMERO si es un spreadsheet de catálogo (casos especiales)
+  const isCatalogoSpreadsheet = documentSrc && (
+    documentSrc.includes('/catalogo/spreadsheets/') || 
+    documentSrc.includes('68bdb85ace7fe626f3d9d4de')
+  );
   
-  // Log de la extensión detectada
-  log("[MODAL-UNIFIED] 🔍 Extensión detectada:", fileExtension);
+  if (isCatalogoSpreadsheet) {
+    log("[MODAL-UNIFIED] 📅 Spreadsheet de catálogo detectado:", documentSrc);
+    console.log('[MODAL-UNIFIED] 🔍 URL analizada:', documentSrc);
+    console.log('[MODAL-UNIFIED] 🔍 Título:', documentTitle);
+    
+    modalTitle.textContent = documentTitle || 'Hoja de cálculo de Catálogo';
+    
+    // Mostrar modal primero
+    const modal = new bootstrap.Modal(modalElement);
+    modal.show();
+    
+    // Mostrar contenido especializado para spreadsheets
+    showCatalogoSpreadsheet(modalContent, documentSrc, documentTitle);
+    return; // Terminamos aquí, ya que showCatalogoSpreadsheet se encarga de todo
+  }
   
-  // Log adicional para ayudar en la depuración de archivos Excel
-  if (['xls', 'xlsx'].includes(fileExtension)) {
-    log("[MODAL-UNIFIED] 📊 Archivo Excel detectado:", documentSrc);
+  // Verificar si es un archivo Excel usando la función especializada
+  const isExcel = isExcelFile(documentSrc);
+  if (isExcel) {
+    log("[MODAL-UNIFIED] 📊 Archivo Excel detectado por función especializada:", documentSrc);
+    log("[MODAL-UNIFIED] 📊 Título del documento Excel:", documentTitle || 'No disponible');
+    modalTitle.textContent = documentTitle || 'Documento Excel';
+    fileExtension = documentSrc.toLowerCase().endsWith('.xlsx') ? 'xlsx' : 'xls';
+  } else {
+    // Configurar título genérico basado en el tipo de archivo
+    let fileExtension = '';
+    if (documentSrc && typeof documentSrc === 'string') {
+      // Usar getFileExtension para obtener la extensión correctamente
+      fileExtension = getFileExtension(documentSrc);
+    }
+    
+    modalTitle.textContent = getDocumentTitle(fileExtension);
+    
+    // Log de la extensión detectada
+    log("[MODAL-UNIFIED] 🔍 Extensión detectada:", fileExtension);
   }
   
   // Mostrar modal primero
@@ -404,19 +879,22 @@ function showDocumentModal(documentSrc, documentTitle) {
       // Mostrar PDF S3
       showPdfS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
       
-    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+    } else if (['xls', 'xlsx'].includes(fileExtension) || isExcelFile(documentSrc)) {
       // Excel S3 - usar Office Online Viewer
-      const proxyUrl = cleanDocumentSrc.replace(
-        'https://edf-catalogo-tablas.s3.eu-central-1.amazonaws.com/',
-        '/admin/s3/'
-      );
+      
+      // Normalizar las URLs para acceso interno y externo
+      const adminUrl = normalizeS3Url(documentSrc, 'admin');
+      const publicUrl = normalizeS3Url(documentSrc, 'public');
       
       // Log mejorado para depuración
       log("[MODAL-UNIFIED] 📊 Mostrando archivo Excel S3:", documentSrc);
-      log("[MODAL-UNIFIED] 🔗 URL de proxy:", proxyUrl);
+      log("[MODAL-UNIFIED] 🔗 URL interna (admin):", adminUrl);
+      log("[MODAL-UNIFIED] 🔗 URL pública:", publicUrl);
+      log("[MODAL-UNIFIED] 📊 Extensión del archivo Excel S3:", fileExtension);
+      log("[MODAL-UNIFIED] 📊 Detectado por isExcelFile():", isExcelFile(documentSrc));
       
       // Mostrar Excel S3
-      showExcelS3Content(modalContent, documentSrc, documentTitle, proxyUrl);
+      showExcelS3Content(modalContent, publicUrl, documentTitle || 'Documento Excel', adminUrl);
       
     } else if (fileExtension === 'md') {
       // Markdown S3
@@ -427,8 +905,25 @@ function showDocumentModal(documentSrc, documentTitle) {
       showTextInModal(documentSrc, documentTitle);
       
     } else {
-      // Otros tipos S3
-      showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension);
+      // Verificación adicional para archivos Excel con extensiones mal detectadas
+      if (documentSrc.toLowerCase().includes('.xlsx') || 
+          documentSrc.toLowerCase().includes('.xls') || 
+          isExcelFile(documentSrc)) {
+        log("[MODAL-UNIFIED] 📊 Detectando Excel por nombre de archivo en S3:", documentSrc);
+        log("[MODAL-UNIFIED] 📊 Detectado por isExcelFile():", isExcelFile(documentSrc));
+        
+        // Normalizar las URLs para acceso interno y externo
+        const adminUrl = normalizeS3Url(documentSrc, 'admin');
+        const publicUrl = normalizeS3Url(documentSrc, 'public');
+        
+        log("[MODAL-UNIFIED] 🔗 URL normalizada (admin):", adminUrl);
+        log("[MODAL-UNIFIED] 🔗 URL pública normalizada:", publicUrl);
+        
+        showExcelS3Content(modalContent, publicUrl, documentTitle || 'Documento Excel', adminUrl);
+      } else {
+        // Otros tipos S3
+        showOtherS3Content(modalContent, documentSrc, documentTitle, fileExtension);
+      }
     }
     
   } else {
@@ -439,10 +934,12 @@ function showDocumentModal(documentSrc, documentTitle) {
       // PDF local - iframe directo
       showPdfLocalContent(modalContent, documentSrc, documentTitle);
       
-    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+    } else if (['xls', 'xlsx'].includes(fileExtension) || isExcelFile(documentSrc)) {
       // Excel local - usar Office Online Viewer
       log("[MODAL-UNIFIED] 📊 Mostrando archivo Excel local:", documentSrc);
-      showExcelLocalContent(modalContent, documentSrc, documentTitle);
+      log("[MODAL-UNIFIED] 📊 Extensión del archivo Excel local:", fileExtension);
+      log("[MODAL-UNIFIED] 📊 Detectado por isExcelFile():", isExcelFile(documentSrc));
+      showExcelLocalContent(modalContent, documentSrc, documentTitle || 'Documento Excel');
       
     } else if (fileExtension === 'md') {
       // Markdown local
@@ -453,8 +950,17 @@ function showDocumentModal(documentSrc, documentTitle) {
       showTextInModal(documentSrc, documentTitle);
       
     } else {
-      // Otros tipos locales
-      showOtherLocalContent(modalContent, documentSrc, documentTitle, fileExtension);
+      // Verificación adicional para archivos Excel con extensiones mal detectadas
+      if (documentSrc.toLowerCase().includes('.xlsx') || 
+          documentSrc.toLowerCase().includes('.xls') || 
+          isExcelFile(documentSrc)) {
+        log("[MODAL-UNIFIED] 📊 Detectando Excel por nombre de archivo local:", documentSrc);
+        log("[MODAL-UNIFIED] 📊 Detectado por isExcelFile():", isExcelFile(documentSrc));
+        showExcelLocalContent(modalContent, documentSrc, documentTitle || 'Documento Excel');
+      } else {
+        // Otros tipos locales
+        showOtherLocalContent(modalContent, documentSrc, documentTitle, fileExtension);
+      }
     }
   }
   
@@ -1279,6 +1785,103 @@ window.showMultimediaModal = showMultimediaModal;
 // Exportar funciones de descarga
 window.downloadS3File = downloadS3File;
 window.downloadLocalFile = downloadLocalFile;
+
+// Exportar función especializada para spreadsheets
+window.showSpreadsheetContent = showSpreadsheetContent;
+window.isExcelFile = isExcelFile;
+
+// Función especializada para mostrar spreadsheets de catálogo
+function showSpreadsheetContent(modalContent, documentSrc, documentTitle) {
+  log("[MODAL-UNIFIED] 📅 Mostrando spreadsheet de catálogo:", documentSrc);
+  
+  // Extraer el ID del spreadsheet de la URL
+  let spreadsheetId = '';
+  if (documentSrc.includes('/catalogo/spreadsheets/')) {
+    spreadsheetId = documentSrc.split('/catalogo/spreadsheets/').pop().split('/')[0];
+  } else if (documentSrc.includes('spreadsheets/')) {
+    spreadsheetId = documentSrc.split('spreadsheets/').pop().split('/')[0];
+  } else {
+    // Para casos como el ID problemático directo
+    const parts = documentSrc.split('/');
+    spreadsheetId = parts[parts.length - 1] || '68bdb85ace7fe626f3d9d4de';
+  }
+  
+  // Construir URLs correctas para acceso
+  const viewUrl = `/admin/catalogo/spreadsheets/${spreadsheetId}`;
+  const downloadUrl = `/admin/catalogo/spreadsheets/${spreadsheetId}/download`;
+  
+  // Debugging
+  console.log('[SPREADSHEET-CONTENT] Datos del spreadsheet:');
+  console.log('- URL original:', documentSrc);
+  console.log('- ID extraído:', spreadsheetId);
+  console.log('- URL de visualización:', viewUrl);
+  console.log('- URL de descarga:', downloadUrl);
+  
+  // Preparar contenido
+  modalContent.innerHTML = `
+    <div class="text-center p-3">
+      <i class="fas fa-table fa-3x text-success mb-2"></i>
+      <h5>Hoja de Cálculo de Catálogo</h5>
+      <p class="text-muted mb-3">
+        <strong>Título:</strong> ${documentTitle || 'Hoja de Cálculo'}<br>
+        <strong>ID:</strong> ${spreadsheetId}<br>
+      </p>
+      
+      <div class="alert alert-info mt-3">
+        <i class="fas fa-info-circle"></i>
+        <strong>Información:</strong> Este tipo de documento debe abrirse en una nueva pestaña para su correcta visualización.
+      </div>
+      
+      <div class="excel-preview mb-4">
+        <div class="text-center py-3 bg-light border rounded">
+          <i class="fas fa-table fa-4x text-success mb-3"></i>
+          <h5>Vista previa no disponible</h5>
+          <p>Por favor, utilice el botón "Abrir en nueva pestaña" para visualizar este documento.</p>
+        </div>
+      </div>
+      
+      <div class="text-center mt-4">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+          <a href="${viewUrl}" target="_blank" class="btn btn-success btn-lg">
+            <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+          </a>
+          <a href="${downloadUrl}" class="btn btn-outline-success btn-lg">
+            <i class="fas fa-download"></i> Descargar
+          </a>
+        </div>
+        
+        <div class="mt-3">
+          <small class="text-muted">URL de acceso: <code>${viewUrl}</code></small>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Configurar botones en el footer
+  const modalFooter = document.querySelector('#documentModal .modal-footer');
+  if (modalFooter) {
+    modalFooter.innerHTML = `
+      <div class="d-flex gap-2 w-100 justify-content-between">
+        <div class="d-flex gap-2">
+          <a href="${viewUrl}" target="_blank" class="btn btn-success">
+            <i class="fas fa-external-link-alt"></i> Abrir en Nueva Pestaña
+          </a>
+          <a href="${downloadUrl}" class="btn btn-outline-success">
+            <i class="fas fa-download"></i> Descargar
+          </a>
+        </div>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    `;
+  }
+  
+  // Ajustar el tamaño del modal
+  const modalDialog = document.querySelector('#documentModal .modal-dialog');
+  if (modalDialog) {
+    modalDialog.style.maxWidth = '800px';
+    modalDialog.style.width = '85%';
+  }
+}
 window.downloadMarkdownFile = downloadMarkdownFile;
 window.downloadDocument = downloadDocument;
 window.downloadMultimedia = downloadMultimedia;
@@ -1380,23 +1983,63 @@ document.addEventListener('DOMContentLoaded', function() {
     // Evento para manejar la descarga de archivos Excel locales
     document.body.addEventListener('click', function(event) {
         if (event.target.closest('[data-action="download-local-file"]')) {
-            const button = event.target.closest('[data-action="download-local-file"]');
-            const fileSrc = button.getAttribute('data-document-src');
-            const fileName = button.getAttribute('data-document-title');
-            
-            if (fileSrc) {
-                log(`[MODAL-UNIFIED] 📥 Iniciando descarga de archivo Excel local: ${fileName}`);
+            try {
+                const button = event.target.closest('[data-action="download-local-file"]');
+                const fileSrc = button.getAttribute('data-document-src');
+                const fileName = button.getAttribute('data-document-title') || 'documento_excel.xlsx';
                 
-                // Crear un enlace temporal para la descarga
-                const downloadLink = document.createElement('a');
-                downloadLink.href = fileSrc;
-                downloadLink.download = fileName || 'documento_excel.xlsx';
-                downloadLink.style.display = 'none';
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                
-                log(`[MODAL-UNIFIED] ✅ Descarga de archivo Excel iniciada: ${fileName}`);
+                if (fileSrc) {
+                    log(`[MODAL-UNIFIED] 📥 Iniciando descarga de archivo Excel local: ${fileName}`);
+                    log(`[MODAL-UNIFIED] 📥 URL origen: ${fileSrc}`);
+                    
+                    // Asegurar que tenemos una URL absoluta
+                    let downloadUrl = fileSrc;
+                    if (!downloadUrl.startsWith('http') && !downloadUrl.startsWith('/')) {
+                        downloadUrl = `/${downloadUrl}`;
+                    }
+                    
+                    if (!downloadUrl.startsWith('http')) {
+                        downloadUrl = new URL(downloadUrl, window.location.origin).href;
+                    }
+                    
+                    log(`[MODAL-UNIFIED] 📥 URL final para descarga: ${downloadUrl}`);
+                    
+                    // Crear un enlace temporal para la descarga
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = downloadUrl;
+                    downloadLink.download = fileName;
+                    downloadLink.style.display = 'none';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    log(`[MODAL-UNIFIED] ✅ Descarga de archivo Excel iniciada: ${fileName}`);
+                    
+                    // Mostrar mensaje de confirmación
+                    const msgContainer = document.createElement('div');
+                    msgContainer.className = 'alert alert-success mt-3 fade show';
+                    msgContainer.innerHTML = `
+                        <i class="fas fa-check-circle"></i> 
+                        <strong>Descarga iniciada:</strong> ${fileName}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+                    `;
+                    
+                    // Insertar mensaje en el modal
+                    const modalContent = document.querySelector('#documentContent');
+                    if (modalContent) {
+                        modalContent.appendChild(msgContainer);
+                        
+                        // Eliminar mensaje después de 5 segundos
+                        setTimeout(() => {
+                            if (msgContainer.parentNode === modalContent) {
+                                modalContent.removeChild(msgContainer);
+                            }
+                        }, 5000);
+                    }
+                }
+            } catch (error) {
+                console.error('[MODAL-UNIFIED] ❌ Error durante la descarga de archivo local:', error);
+                alert('Error al iniciar la descarga. Por favor, inténtelo de nuevo.');
             }
         }
     });
@@ -1410,10 +2053,20 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (fileSrc) {
                 log(`[MODAL-UNIFIED] 📥 Iniciando descarga de archivo Excel desde S3: ${fileName}`);
+                log(`[MODAL-UNIFIED] 📥 URL de origen: ${fileSrc}`);
+                
+                // Determinar la URL correcta para descargar
+                let downloadUrl = fileSrc;
+                if (fileSrc.includes('/admin/s3/')) {
+                    // Usamos la URL de proxy para la descarga
+                    log(`[MODAL-UNIFIED] 📥 Usando URL de proxy para descarga de S3`);
+                } else if (fileSrc.includes('s3.amazonaws.com')) {
+                    log(`[MODAL-UNIFIED] 📥 Usando URL directa de S3`);
+                }
                 
                 // Crear un enlace temporal para la descarga
                 const downloadLink = document.createElement('a');
-                downloadLink.href = fileSrc;
+                downloadLink.href = downloadUrl;
                 downloadLink.download = fileName || 'documento_excel.xlsx';
                 downloadLink.style.display = 'none';
                 document.body.appendChild(downloadLink);
@@ -1421,10 +2074,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.removeChild(downloadLink);
                 
                 log(`[MODAL-UNIFIED] ✅ Descarga de archivo Excel iniciada desde S3: ${fileName}`);
+            } else {
+                console.error('[MODAL-UNIFIED] ❌ Error al iniciar descarga: URL no disponible');
+                alert('Error al iniciar la descarga. URL no disponible.');
             }
         }
     });
     
     log("[MODAL-UNIFIED] ✅ Corrección de overflow instalada");
     log("[MODAL-UNIFIED] ✅ Soporte para Excel instalado correctamente");
+    
+    // Corregir enlaces S3 para asegurar formato correcto
+    fixS3Links();
+    
+    log("[MODAL-UNIFIED] ✅ Corrector de URLs de S3 instalado");
 });
