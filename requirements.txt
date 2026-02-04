@@ -48,7 +48,7 @@ typing_extensions==4.13.2
 
 # Build y empaquetado
 pyinstaller==6.3.0
-pywebview==5.0.7
+pywebview==5.4
 websockets==12.0
 
 # Desarrollo y testing

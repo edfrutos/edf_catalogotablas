@@ -151,24 +151,64 @@ jobs:
               else
                 echo "❌ ERROR: requirements.txt tampoco encontrado"
                 echo "🔧 Creando archivo requirements_python310.txt básico..."
-                echo "flask==3.0.0" > requirements_python310.txt
-                echo "pymongo==4.6.0" >> requirements_python310.txt
-                echo "boto3==1.34.0" >> requirements_python310.txt
-                echo "pandas==2.1.0" >> requirements_python310.txt
-                echo "openpyxl==3.1.2" >> requirements_python310.txt
-                echo "python-dotenv==1.0.0" >> requirements_python310.txt
-                echo "werkzeug==3.0.1" >> requirements_python310.txt
-                echo "jinja2==3.1.2" >> requirements_python310.txt
-                echo "markupsafe==2.1.3" >> requirements_python310.txt
-                echo "itsdangerous==2.1.2" >> requirements_python310.txt
-                echo "click==8.1.7" >> requirements_python310.txt
-                echo "cryptography==41.0.7" >> requirements_python310.txt
-                echo "Pillow==10.1.0" >> requirements_python310.txt
-                echo "psutil==5.9.6" >> requirements_python310.txt
-                echo "pywebview==5.0.7" >> requirements_python310.txt
-                echo "requests==2.31.0" >> requirements_python310.txt
-                echo "websockets==12.0" >> requirements_python310.txt
-                echo "✅ Archivo requirements_python310.txt creado con dependencias básicas"
+                cat > requirements_python310.txt << 'EOF'
+# Requirements para Python 3.10+
+# Generado automáticamente para GitHub Actions
+
+# Framework Web
+flask==3.0.2
+flask-login==0.6.3
+werkzeug==3.0.1
+gunicorn==23.0.0
+
+# Base de datos
+pymongo==4.10.1
+dnspython==2.6.1
+
+# Cloud Storage (AWS S3)
+boto3==1.34.34
+botocore==1.34.34
+s3transfer==0.10.4
+
+# Servicios Google
+google-api-core==2.25.1
+google-api-python-client==2.171.0
+google-auth==2.40.3
+google-auth-httplib2==0.2.0
+google-auth-oauthlib==1.2.2
+googleapis-common-protos==1.70.0
+
+# Procesamiento de datos
+pandas==2.0.3
+python-dateutil==2.9.0.post0
+
+# Utilidades
+python-dotenv==1.0.1
+pydantic==2.11.7
+click==8.1.8
+jmespath==1.0.1
+sniffio==1.3.1
+msgpack==1.1.1
+
+# Plantillas
+jinja2==3.1.6
+markupsafe==2.1.5
+
+# Seguridad y señales
+itsdangerous==2.2.0
+blinker==1.8.2
+typing_extensions==4.13.2
+
+# Build y empaquetado
+pyinstaller==6.3.0
+pywebview==5.4
+websockets==12.0
+
+# Desarrollo y testing
+black==24.8.0
+pytest==8.3.5
+EOF
+                echo "✅ Archivo requirements_python310.txt creado con dependencias completas"
               fi
             else
               echo "✅ requirements_python310.txt encontrado"
