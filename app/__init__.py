@@ -1,7 +1,16 @@
 # app/__init__.py
 """
 Módulo de inicialización de la aplicación Flask para edf_catalogotablas.
-Configura blueprints, variables de entorno, S3, MongoDB y otros componentes.
+
+NOTA: Este archivo mantiene compatibilidad con versiones anteriores.
+Para nuevos proyectos, se recomienda usar el patrón factory en app/factory.py
+
+Funcionalidades:
+- Configuración de blueprints
+- Variables de entorno y configuración
+- Conexión a S3 y MongoDB
+- Sistema de autenticación con Flask-Login
+- Gestión de extensiones y middleware
 """
 import importlib.util
 import logging
@@ -28,6 +37,7 @@ from .routes.main_routes import main_bp
 from .routes.scripts_routes import scripts_bp
 from .routes.scripts_tools_routes import scripts_tools_bp
 from .routes.usuarios_routes import usuarios_bp
+from .debug_routes import debug_blueprint  # Blueprint para depuración
 
 
 # Agregar excepciones personalizadas
@@ -375,6 +385,13 @@ def _register_additional_blueprints(app):
         app.logger.info("Blueprint de emergencia (emergency_bp) registrado correctamente.")
     except Exception as e:
         app.logger.error(f"Error registrando blueprint de emergencia: {str(e)}")
+    
+    # Registrar blueprint de depuración (debug_blueprint)
+    try:
+        app.register_blueprint(debug_blueprint)
+        app.logger.info("Blueprint de depuración (debug_blueprint) registrado correctamente.")
+    except Exception as e:
+        app.logger.error(f"Error registrando blueprint de depuración: {str(e)}")
 
     # Registrar blueprints adicionales si existen
     try:
