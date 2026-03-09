@@ -9,7 +9,6 @@ from flask import Flask, g
 from flask_login import LoginManager
 from bson.objectid import ObjectId
 
-
 def create_app(testing=False):
     app = Flask(
         __name__,
