@@ -698,7 +698,7 @@ def view(catalog_id, catalog):
             )
             # Procesar manualmente si no está disponible la utilidad
             for i, fila in enumerate(catalog.get("data", [])):
-                if fila:
+                if fila and isinstance(fila, dict):
                     imagenes_urls = []
 
                     # 1. URLs externas (campo Imagen)
@@ -1162,7 +1162,7 @@ def edit_row(catalog_id, row_index, catalog):
             ]
         # Si no hay imágenes nuevas ni a eliminar, conservar las existentes
         if "images" not in row_data:
-            row_data["images"] = catalog["rows"][row_index].get("images", [])
+            row_data["images"] = catalog_data[row_index].get("images", [])
         # Guardar cambios en ambas claves
         for coll_name in ["spreadsheets"]:
             try:
@@ -1628,6 +1628,8 @@ def create():
                 "name": catalog_name,
                 "headers": headers,
                 "rows": [],
+                "data": [],  # Sincronizado con rows; data es la fuente de verdad para imágenes
+                "miniatura": "",  # Requerido por catalogs.html; vacío hasta que haya imágenes
                 "created_by": username,
                 "owner": username,  # Campo adicional para compatibilidad
                 "owner_name": nombre,  # Guardar el nombre real del usuario
@@ -1743,27 +1745,12 @@ def import_catalog():
                 return redirect(request.url)
 
             # Procesar el archivo según su formato
-            if not pandas_available:
-                flash(
-                    "Funcionalidad de importación no disponible. pandas no está instalado.",
-                    "danger",
-                )
-                return redirect(request.url)
-
-            # Verificar que pandas esté disponible antes de procesar
-            if not pandas_available or pd is None:
-                flash(
-                    "Funcionalidad de importación no disponible. pandas no está instalado.",
-                    "danger",
-                )
-                return redirect(request.url)
-
             if file.filename and file.filename.endswith(".csv"):
                 # Procesar CSV - usar el stream del archivo
                 df = pd.read_csv(file.stream, encoding="utf-8")
             else:
                 # Procesar Excel - usar el stream del archivo
-                df = pd.read_excel(file)
+                df = pd.read_excel(file.stream)
 
             # Verificar que el archivo tiene datos
             if df.empty:

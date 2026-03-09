@@ -7,7 +7,7 @@ from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from flask import Flask, g
 from flask_login import LoginManager
-
+from bson.objectid import ObjectId
 
 def create_app(testing=False):
     app = Flask(
@@ -77,7 +77,10 @@ def create_app(testing=False):
             raise Exception(
                 "users_collection no está inicializada. No se puede autenticar usuarios sin conexión a la base de datos."
             )
-        user_data = users_collection.find_one({"email": user_id})
+        try:
+            user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        except Exception:
+            return None
         if not user_data:
             return None
         return User(user_data)
@@ -107,7 +110,6 @@ def create_app(testing=False):
     from .routes.dev_template import bp_dev_template
     from .routes.emergency_access import emergency_bp
     from .routes.images_routes import images_bp
-    from .debug_routes import debug_blueprint
     from .routes.main_routes import main_bp
     from .routes.maintenance_routes import register_maintenance_routes
     from .routes.scripts_routes import scripts_bp
@@ -130,7 +132,6 @@ def create_app(testing=False):
         (testing_bp, None),
         (images_bp, None),
         (emergency_bp, None),
-        (debug_blueprint, None),  # Blueprint para depuración
     ]
 
     for bp, prefix in blueprints:
@@ -163,5 +164,14 @@ def create_app(testing=False):
     )
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
+
+    # Iniciar persistencia de caché en disco (cuando está habilitada)
+    if not testing:
+        try:
+            from app.cache_system import start_cache_persistence
+
+            start_cache_persistence()
+        except Exception as e:
+            app.logger.warning(f"No se pudo iniciar persistencia de caché: {e}")
 
     return app

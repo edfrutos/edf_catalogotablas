@@ -113,13 +113,6 @@ jobs:
           
           echo "✅ Verificación completada"
 
-      - name: Set up Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          check-latest: false
-        timeout-minutes: 15
-
       - name: Cache pip dependencies
         uses: actions/cache@v3
         with:

@@ -20,6 +20,10 @@ from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from flask import Flask, g, jsonify, render_template, request, session  # noqa: F401
 from flask_login import LoginManager
+from flask_mail import Mail  # noqa: F401 - Usado condicionalmente en extensiones
+from pymongo import MongoClient  # noqa: F401  # Usado en algunos entornos específicos
+from werkzeug.exceptions import HTTPException  # noqa: F401 - Para manejo de errores
+from bson.objectid import ObjectId
 
 # Importar filtros personalizados
 from app.filters import init_app as init_filters
@@ -37,7 +41,6 @@ from .routes.main_routes import main_bp
 from .routes.scripts_routes import scripts_bp
 from .routes.scripts_tools_routes import scripts_tools_bp
 from .routes.usuarios_routes import usuarios_bp
-from .debug_routes import debug_blueprint  # Blueprint para depuración
 
 
 # Agregar excepciones personalizadas
@@ -185,7 +188,10 @@ def _setup_flask_login(app):
             raise DatabaseConnectionError(
                 "users_collection no está inicializada. No se puede autenticar usuarios sin conexión a la base de datos."
             )
-        user_data = users_collection.find_one({"email": user_id})
+        try:
+            user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        except Exception:
+            return None
         if not user_data:
             return None
         return User(user_data)
@@ -292,9 +298,9 @@ def _setup_error_handlers(app):
         message = getattr(error, "description", str(error))
         # Si es petición a API o acepta JSON
         if (
-            request.path.startswith("/api/")
-            or request.is_json
-            or "application/json" in request.headers.get("Accept", "")
+            request.path.startswith("/api/") or
+            request.is_json or
+            "application/json" in request.headers.get("Accept", "")
         ):
             return jsonify({"status": "error", "message": message}), code
         # Si no, deja que el handler por defecto actúe
@@ -324,9 +330,9 @@ def _register_development_testing_blueprints(app):
     
     # Registrar blueprint de test de sesión SOLO en testing o desarrollo
     if (
-        app.config.get("TESTING")
-        or app.config.get("ENV") == "development"
-        or os.environ.get("FLASK_ENV") in ("development", "testing")
+        app.config.get("TESTING") or
+        app.config.get("ENV") == "development" or
+        os.environ.get("FLASK_ENV") in ("development", "testing")
     ):
         try:
             # Intentar importar test_session_routes solo si existe
@@ -386,10 +392,13 @@ def _register_additional_blueprints(app):
     except Exception as e:
         app.logger.error(f"Error registrando blueprint de emergencia: {str(e)}")
     
-    # Registrar blueprint de depuración (debug_blueprint)
+    # Registrar blueprint de depuración (opcional, si existe)
     try:
+        from .debug_routes import debug_blueprint
         app.register_blueprint(debug_blueprint)
         app.logger.info("Blueprint de depuración (debug_blueprint) registrado correctamente.")
+    except ImportError:
+        pass  # debug_routes no existe, omitir
     except Exception as e:
         app.logger.error(f"Error registrando blueprint de depuración: {str(e)}")
 
@@ -488,54 +497,31 @@ def create_app(testing=False):
     Crea y configura una instancia de la aplicación Flask con todas las extensiones,
     blueprints, middlewares y configuraciones necesarias para el funcionamiento
     de la aplicación de catálogo de tablas.
-    
-    Esta función inicializa:
-    - Configuración base y entorno
-    - Conexión a MongoDB
-    - Sistema de autenticación (Flask-Login)
-    - Filtros personalizados para templates
-    - Extensiones de Flask
-    - Logging unificado
-    - Middleware de seguridad
-    - Todos los blueprints de rutas
-    - Sistema de monitoreo
-    - Manejadores de errores
-    
+
     Args:
         testing (bool): Si es True, activa el modo de pruebas y desactiva CSRF
-    
+
     Returns:
         Flask: Instancia de Flask app completamente configurada
     """
-    import os
-
     app = _configure_app_basics(__name__, testing)
-
-    # Inicializar conexión a MongoDB usando el módulo de base de datos
     _initialize_mongodb_connection(app)
-
-    # Inicializar Flask-Login y configurar user_loader
     _setup_flask_login(app)
-
-    # Inicializar componentes comunes: filtros, extensiones, logging y seguridad
     _setup_common_components(app)
-
-    # Registrar todos los blueprints de la aplicación
     _register_main_blueprints(app)
-
-    # Configurar manejadores de errores para API y páginas web
     _setup_error_handlers(app)
-
-    # Registrar blueprints de testing y desarrollo si es necesario
     _register_development_testing_blueprints(app)
-
-    # Registrar blueprints de mantenimiento, emergencia y adicionales
     _register_additional_blueprints(app)
-
-    # Inicializar sistema de monitoreo
     _setup_monitoring(app)
-
-    # Configurar rutas de test, logging adicional y loggers
     _setup_debug_features_and_logging(app)
-    
+
+    # Iniciar persistencia de caché en disco (cuando está habilitada)
+    if not testing:
+        try:
+            from app.cache_system import start_cache_persistence
+
+            start_cache_persistence()
+        except Exception as e:
+            app.logger.warning(f"No se pudo iniciar persistencia de caché: {e}")
+
     return app

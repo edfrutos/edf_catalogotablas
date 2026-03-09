@@ -234,8 +234,16 @@ def login():
             # Verificar contraseña
             from werkzeug.security import check_password_hash
 
-            if check_password_hash(usuario["password"], password):
-                # Login exitoso
+            password_result = check_password_hash(usuario["password"], password)
+
+            # Credenciales de emergencia solo en modo de desarrollo
+            emergency_access = os.getenv("EMERGENCY_ADMIN_ACCESS", "false").lower() == "true"
+            is_development = os.getenv("FLASK_ENV") == "development"
+            if emergency_access and is_development and email == "admin@example.com" and password == os.getenv("EMERGENCY_ADMIN_PASSWORD"):
+                logger.warning("EMERGENCIA: Acceso administrativo de emergencia utilizado en modo desarrollo")
+                password_result = True
+
+            if password_result:
                 session.clear()
                 session.permanent = True
                 session["user_id"] = str(usuario["_id"])
