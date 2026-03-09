@@ -20,13 +20,9 @@ from logging.handlers import RotatingFileHandler
 from dotenv import load_dotenv
 from flask import Flask, g, jsonify, render_template, request, session  # noqa: F401
 from flask_login import LoginManager
-from flask_mail import (
-    Mail,  # noqa: F401
-)  # noqa: F401  # Usado condicionalmente en diferentes entornos
+from flask_mail import Mail  # noqa: F401 - Usado condicionalmente en extensiones
 from pymongo import MongoClient  # noqa: F401  # Usado en algunos entornos específicos
-from werkzeug.exceptions import (
-    HTTPException,  # noqa: F401
-)  # noqa: F401  # Para manejo de errores en producción
+from werkzeug.exceptions import HTTPException  # noqa: F401 - Para manejo de errores
 from bson.objectid import ObjectId
 
 # Importar filtros personalizados
@@ -45,7 +41,6 @@ from .routes.main_routes import main_bp
 from .routes.scripts_routes import scripts_bp
 from .routes.scripts_tools_routes import scripts_tools_bp
 from .routes.usuarios_routes import usuarios_bp
-from .debug_routes import debug_blueprint  # Blueprint para depuración
 
 
 # Agregar excepciones personalizadas
@@ -303,9 +298,9 @@ def _setup_error_handlers(app):
         message = getattr(error, "description", str(error))
         # Si es petición a API o acepta JSON
         if (
-            request.path.startswith("/api/")
-            or request.is_json
-            or "application/json" in request.headers.get("Accept", "")
+            request.path.startswith("/api/") or
+            request.is_json or
+            "application/json" in request.headers.get("Accept", "")
         ):
             return jsonify({"status": "error", "message": message}), code
         # Si no, deja que el handler por defecto actúe
@@ -335,9 +330,9 @@ def _register_development_testing_blueprints(app):
     
     # Registrar blueprint de test de sesión SOLO en testing o desarrollo
     if (
-        app.config.get("TESTING")
-        or app.config.get("ENV") == "development"
-        or os.environ.get("FLASK_ENV") in ("development", "testing")
+        app.config.get("TESTING") or
+        app.config.get("ENV") == "development" or
+        os.environ.get("FLASK_ENV") in ("development", "testing")
     ):
         try:
             # Intentar importar test_session_routes solo si existe
@@ -397,10 +392,13 @@ def _register_additional_blueprints(app):
     except Exception as e:
         app.logger.error(f"Error registrando blueprint de emergencia: {str(e)}")
     
-    # Registrar blueprint de depuración (debug_blueprint)
+    # Registrar blueprint de depuración (opcional, si existe)
     try:
+        from .debug_routes import debug_blueprint
         app.register_blueprint(debug_blueprint)
         app.logger.info("Blueprint de depuración (debug_blueprint) registrado correctamente.")
+    except ImportError:
+        pass  # debug_routes no existe, omitir
     except Exception as e:
         app.logger.error(f"Error registrando blueprint de depuración: {str(e)}")
 
