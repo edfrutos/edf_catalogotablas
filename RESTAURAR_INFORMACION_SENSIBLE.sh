@@ -108,13 +108,13 @@ cat > app_data/edefrutos2025_notifications_config.json.RECOVERED << 'EOF'
   "smtp": {
     "server": "smtp-relay.brevo.com",
     "port": 587,
-    "username": "admin@edefrutos.me",
-    "password": "Rmp3UXwsIkvA0c1dRmp3UXwsIkvA0c1d",
+    "username": "TU_SMTP_USERNAME@ejemplo.com",
+    "password": "TU_SMTP_PASSWORD",
     "use_tls": true
   },
   "recipients": [
-    "admin@edefrutos2025.xyz",
-    "edfrutos@gmail.com"
+    "tu-email1@ejemplo.com",
+    "tu-email2@ejemplo.com"
   ],
   "thresholds": {
     "cpu": 85,
@@ -186,13 +186,13 @@ FLASK_DEBUG=True
 SECRET_KEY=tu-secret-key-super-seguro
 
 # Configuración SMTP/Brevo
-BREVO_SMTP_USERNAME=admin@edefrutos.me
-BREVO_SMTP_PASSWORD=Rmp3UXwsIkvA0c1dRmp3UXwsIkvA0c1d
+BREVO_SMTP_USERNAME=tu-smtp-username@ejemplo.com
+BREVO_SMTP_PASSWORD=tu-smtp-password
 BREVO_API_KEY=tu-brevo-api-key
 
 # Emails de notificación
-NOTIFICATION_EMAIL_1=admin@edefrutos2025.xyz
-NOTIFICATION_EMAIL_2=edfrutos@gmail.com
+NOTIFICATION_EMAIL_1=tu-email1@ejemplo.com
+NOTIFICATION_EMAIL_2=tu-email2@ejemplo.com
 
 # Google Drive API (opcional)
 GOOGLE_CREDENTIALS_FILE=tools/db_utils/credentials.json
@@ -224,15 +224,9 @@ echo "  ✅ .env.TEMPLATE"
 echo ""
 echo "⚠️  IMPORTANTE - SIGUIENTES PASOS:"
 echo "  1. Renombrar .RECOVERED y .TEMPLATE a nombres reales"
-echo "  2. Actualizar credenciales con valores reales"
+echo "  2. Actualizar credenciales con valores reales (los archivos usan placeholders)"
 echo "  3. Verificar que .gitignore excluye estos archivos"
 echo "  4. NO commitear archivos con credenciales reales"
-echo ""
-echo "🔐 CREDENCIALES ENCONTRADAS:"
-echo "  📧 SMTP Username: admin@edefrutos.me"
-echo "  🔑 SMTP Password: Rmp3UXwsIkvA0c1dRmp3UXwsIkvA0c1d"
-echo "  📮 Email 1: admin@edefrutos2025.xyz"
-echo "  📮 Email 2: edfrutos@gmail.com"
 echo ""
 echo "🚨 RECORDATORIO DE SEGURIDAD:"
 echo "  - Cambiar passwords si fueron comprometidos"
