@@ -290,9 +290,13 @@ def _periodic_cache_save():
 
 
 def start_cache_persistence():
-    """Inicia el hilo de persistencia de caché solo cuando es necesario"""
-    global _save_thread, _save_thread_enabled
-    
+    """Inicia el hilo de persistencia de caché solo cuando es necesario (y está habilitado)"""
+    global _save_thread, _save_thread_enabled, _cache_file
+
+    if _cache_file is None:
+        logging.debug("Persistencia de caché no iniciada (_cache_file es None)")
+        return
+
     if _save_thread is None or not _save_thread.is_alive():
         _save_thread_enabled = True
         _save_thread = threading.Thread(target=_periodic_cache_save)

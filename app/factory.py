@@ -151,4 +151,13 @@ def create_app(testing=False):
     file_handler.setFormatter(formatter)
     app.logger.addHandler(file_handler)
 
+    # Iniciar persistencia de caché en disco (cuando está habilitada)
+    if not testing:
+        try:
+            from app.cache_system import start_cache_persistence
+
+            start_cache_persistence()
+        except Exception as e:
+            app.logger.warning(f"No se pudo iniciar persistencia de caché: {e}")
+
     return app

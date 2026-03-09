@@ -1141,6 +1141,8 @@ def create():
                 "name": catalog_name,
                 "headers": headers,
                 "rows": [],
+                "data": [],  # Sincronizado con rows; data es la fuente de verdad para imágenes
+                "miniatura": "",  # Requerido por catalogs.html; vacío hasta que haya imágenes
                 "created_by": username,
                 "owner": username,  # Campo adicional para compatibilidad
                 "owner_name": nombre,  # Guardar el nombre real del usuario
