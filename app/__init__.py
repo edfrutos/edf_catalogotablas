@@ -16,6 +16,7 @@ from pymongo import MongoClient  # noqa: F401  # Usado en algunos entornos espec
 from werkzeug.exceptions import (
     HTTPException,  # noqa: F401
 )  # noqa: F401  # Para manejo de errores en producción
+from bson.objectid import ObjectId
 
 from config import Config  # noqa: F401  # Usado condicionalmente según entorno
 from app.logging_config import setup_logging  # noqa: F401  # Usado en otros módulos
@@ -149,7 +150,10 @@ def create_app(testing=False):
             raise Exception(
                 "users_collection no está inicializada. No se puede autenticar usuarios sin conexión a la base de datos."
             )
-        user_data = users_collection.find_one({"email": user_id})
+        try:
+            user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        except Exception:
+            return None
         if not user_data:
             return None
         return User(user_data)

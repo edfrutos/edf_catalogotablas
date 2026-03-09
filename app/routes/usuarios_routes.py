@@ -102,7 +102,7 @@ def edit():
     if users_collection is None:
         flash("Error de conexión a la base de datos.", "danger")
         return redirect(url_for("main.dashboard"))
-    user = users_collection.find_one({"_id": session["user_id"]})
+    user = users_collection.find_one({"_id": ObjectId(session["user_id"])})
 
     if request.method == "POST":
         new_email = request.form["email"]

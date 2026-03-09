@@ -181,7 +181,7 @@ def is_admin(user):
 
 # Añadir esta para obtener un usuario por ID
 def get_user_by_id(user_id):
-    return get_users_collection().find_one({"_id": user_id})  # type: ignore
+    return get_users_collection().find_one({"_id": ObjectId(user_id)})
 
 
 def get_db():

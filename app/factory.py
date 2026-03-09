@@ -7,6 +7,7 @@ from logging.handlers import RotatingFileHandler
 from flask import Flask, g
 from flask_login import LoginManager
 from dotenv import load_dotenv
+from bson.objectid import ObjectId
 
 def create_app(testing=False):
     app = Flask(
@@ -73,7 +74,10 @@ def create_app(testing=False):
             raise Exception(
                 "users_collection no está inicializada. No se puede autenticar usuarios sin conexión a la base de datos."
             )
-        user_data = users_collection.find_one({"email": user_id})
+        try:
+            user_data = users_collection.find_one({"_id": ObjectId(user_id)})
+        except Exception:
+            return None
         if not user_data:
             return None
         return User(user_data)
