@@ -36,6 +36,7 @@ from flask import (
     url_for,
 )
 from werkzeug.utils import secure_filename
+
 from app.database import get_mongo_db
 from app.utils.image_utils import get_images_for_template, upload_image_to_s3
 from app.utils.mongo_utils import is_mongo_available, is_valid_object_id

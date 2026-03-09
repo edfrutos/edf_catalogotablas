@@ -494,7 +494,15 @@ def _setup_debug_features_and_logging(app):
 
 def create_app(testing=False):
     """
-    Crea y configura una instancia de la aplicación Flask.
+    Crea y configura una instancia de la aplicación Flask con todas las extensiones,
+    blueprints, middlewares y configuraciones necesarias para el funcionamiento
+    de la aplicación de catálogo de tablas.
+
+    Args:
+        testing (bool): Si es True, activa el modo de pruebas y desactiva CSRF
+
+    Returns:
+        Flask: Instancia de Flask app completamente configurada
     """
     app = _configure_app_basics(__name__, testing)
     _initialize_mongodb_connection(app)
