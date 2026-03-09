@@ -804,7 +804,7 @@ def edit_row(catalog_id, row_index, catalog):
             ]
         # Si no hay imágenes nuevas ni a eliminar, conservar las existentes
         if "images" not in row_data:
-            row_data["images"] = catalog["rows"][row_index].get("images", [])
+            row_data["images"] = catalog_data[row_index].get("images", [])
         # Guardar cambios en ambas claves
         for coll_name in ["spreadsheets"]:
             try:
