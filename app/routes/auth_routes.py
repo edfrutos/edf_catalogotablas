@@ -680,7 +680,6 @@ def logout():
     return response
 
 
-@auth_bp.route("/debug_secret_key")
 
 
 # ============================================================
@@ -696,4 +695,3 @@ def logout():
 # DEPRECATED: /login_direct eliminada
 # RAZÓN: Permiten acceso sin autenticación válida
 #        Credenciales hardcodeadas son riesgo crítico
-
