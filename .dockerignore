@@ -1,0 +1,103 @@
+# Docker Build Ignore
+# Exclude unnecessary files from Docker image to reduce size
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.project
+.pydevproject
+*.sublime-project
+*.sublime-workspace
+
+# Node (if used for frontend assets)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Development
+.env
+.env.local
+.env.*.local
+.ipynb_checkpoints
+*.ipynb
+jupyter_data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+.cache/
+
+# OS-specific
+Thumbs.db
+.DS_Store
+
+# Documentation
+docs/
+*.md
+LICENSE
+README*
+
+# Testing
+tests/
+.pytest_cache/
+coverage/
+htmlcov/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Unnecessary project structure
+.qodo/
+.mypy_cache/
+.auxly/
+.agent/
+.cursor/
+.well-known/
+.planning/
+.claude*
+Backups_proyecto/
+
+# Archived files
+_archived_*
+obsolete/
+
+# Node/JavaScript
+.npmrc
+package-lock.json
+.pnpm-lock.yaml
