@@ -45,15 +45,22 @@ class SecurityMiddleware:
 
     def after_request(self, response):
         """Ejecutado después de cada request"""
-        # Headers de seguridad (simplificados para desarrollo)
+        # Headers de seguridad activados en TODAS las versiones
         response.headers["X-Content-Type-Options"] = "nosniff"
-        # response.headers["X-Frame-Options"] = "SAMEORIGIN"
-        # response.headers["X-XSS-Protection"] = "1; mode=block"
-        # response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        # CSP deshabilitado para desarrollo local
-        # response.headers["Content-Security-Policy"] = (
-        #     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self';"
-        # )
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        
+        # Content Security Policy - Ajustado para desarrollo y producción
+        csp = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.jsdelivr.net; "
+            "style-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+            "img-src 'self' data: https:; "
+            "font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
+            "connect-src 'self';"
+        )
+        response.headers["Content-Security-Policy"] = csp
 
         # Headers adicionales de seguridad
         response.headers["Strict-Transport-Security"] = (

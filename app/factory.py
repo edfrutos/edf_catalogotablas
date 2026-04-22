@@ -19,8 +19,21 @@ def create_app(testing=False):
     if testing:
         app.config["TESTING"] = True
         app.config["WTF_CSRF_ENABLED"] = False
+        app.secret_key = os.getenv("SECRET_KEY", "test-secret-key-12345")
+    else:
+        # En producción, SECRET_KEY es OBLIGATORIA y segura
+        secret_key = os.getenv("SECRET_KEY")
+        if not secret_key:
+            raise ValueError(
+                "❌ CRÍTICO: SECRET_KEY no está configurado en variables de entorno. "
+                "Esto es requerido en producción para la seguridad de las sesiones."
+            )
+        if len(secret_key) < 32:
+            raise ValueError(
+                "❌ CRÍTICO: SECRET_KEY es muy corta. Debe tener al menos 32 caracteres."
+            )
+        app.secret_key = secret_key
 
-    app.secret_key = os.getenv("SECRET_KEY", "edf_secret_key_2025")
     app.config.from_object("config.Config")
 
     session_dir = app.config.get("SESSION_FILE_DIR")

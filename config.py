@@ -19,8 +19,8 @@ class BaseConfig:
     # Reduce el tiempo de vida de la sesión a 4 horas para liberar recursos más rápido
     PERMANENT_SESSION_LIFETIME = 14400  # 4 horas
 
-    # Clave secreta para sesiones
-    SECRET_KEY = os.environ.get("SECRET_KEY", "clave-secreta-por-defecto")
+    # Clave secreta para sesiones - REQUERIDA en producción
+    SECRET_KEY = os.environ.get("SECRET_KEY", None)  # None fuerza validación en startup
     MONGO_URI = os.getenv("MONGO_URI")
 
     # Configuración de proxy
