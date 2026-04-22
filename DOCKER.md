@@ -36,11 +36,24 @@ openssl rand -base64 32
 ### 2. Construir la Imagen
 
 ```bash
-# Build con Docker Compose (automático al hacer up)
+# Opción A: Usar script helper (recomendado)
+./build-docker.sh latest
+# Este script detecta si Docker Hub está disponible
+# Si no: sugiere build con Alpine (offline)
+
+# Opción B: Build con docker-compose (requiere Docker Hub)
 docker-compose build
 
-# O manualmente
+# Opción C: Build manual con Dockerfile estándar
 docker build -t edf-catalogotablas:latest .
+
+# Opción D: Build con Alpine si no tienes acceso a Docker Hub
+docker build -f Dockerfile.alpine -t edf-catalogotablas:alpine .
+```
+
+**⚠️ Si ves "401 Unauthorized" en Docker Hub:**
+- Lee [DOCKER_OFFLINE.md](./DOCKER_OFFLINE.md) para soluciones
+- Opción rápida: `docker build -f Dockerfile.alpine ...`
 ```
 
 ### 3. Iniciar los Contenedores

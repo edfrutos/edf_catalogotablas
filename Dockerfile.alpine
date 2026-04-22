@@ -1,0 +1,80 @@
+# Dockerfile.alpine - Works without Docker Hub access
+# Base: alpine:latest (already available locally)
+# Size: ~500-600MB (vs 350MB with python:3.10-slim, but no Docker Hub needed)
+
+FROM alpine:latest AS builder
+
+WORKDIR /app
+
+# Install Python 3.10 and build dependencies from Alpine repos
+RUN apk add --no-cache \
+    python3=3.11.10-r1 \
+    py3-pip \
+    build-base \
+    libffi-dev \
+    openssl-dev \
+    && ln -sf python3 /usr/bin/python
+
+# Copy requirements
+COPY requirements.txt .
+
+# Create wheels for all dependencies
+RUN pip install --no-cache-dir --user --upgrade pip setuptools wheel && \
+    pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
+
+# ============================================================
+# STAGE 2: Runtime
+# ============================================================
+FROM alpine:latest
+
+ARG APP_ENV=production
+ENV APP_ENV=$APP_ENV \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+# Install Python 3 runtime and only essential dependencies
+RUN apk add --no-cache \
+    python3 \
+    py3-pip \
+    curl \
+    && ln -sf python3 /usr/bin/python
+
+# Copy wheels from builder
+COPY --from=builder /app/wheels /wheels
+COPY --from=builder /app/requirements.txt .
+
+# Install wheels (no compilation needed)
+RUN pip install --no-cache /wheels/*
+
+# Copy application code
+COPY . .
+
+# Create non-root user
+RUN addgroup -g 1001 appgroup && \
+    adduser -D -u 1001 -G appgroup appuser && \
+    chown -R appuser:appgroup /app
+
+# Create directories
+RUN mkdir -p /app/logs /app/app/static/uploads && \
+    chown -R appuser:appgroup /app/logs /app/app/static/uploads
+
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5002/health || exit 1
+
+EXPOSE 5002
+
+# Default command
+CMD ["gunicorn", \
+     "--bind", "0.0.0.0:5002", \
+     "--workers", "4", \
+     "--worker-class", "sync", \
+     "--timeout", "120", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "wsgi:app"]
