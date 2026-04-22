@@ -1,0 +1,110 @@
+services:
+  # ============================================================
+  # EDF Catálogo de Tablas - Flask Web Application
+  # ============================================================
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        APP_ENV: production
+    container_name: edf_catalogotablas_app
+    restart: unless-stopped
+    environment:
+      # Flask Configuration
+      FLASK_ENV: "${FLASK_ENV:-production}"
+      FLASK_APP: wsgi.py
+      SECRET_KEY: "${SECRET_KEY}"
+      
+      # MongoDB Atlas Configuration (Cloud)
+      # Format: mongodb+srv://username:password@cluster.mongodb.net/database?retryWrites=true&w=majority
+      MONGO_URI: "${MONGO_URI}"
+      
+      # Redis Configuration (if using local Redis)
+      # Leave empty to skip Redis, or set to Redis Cloud URL
+      REDIS_URL: "${REDIS_URL:-}"
+      
+      # Application Configuration
+      HOST: 0.0.0.0
+      PORT: 5002
+      UPLOAD_FOLDER: /app/uploads
+      LOG_DIR: /app/logs
+      
+      # AWS S3 (Optional)
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID:-}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY:-}"
+      AWS_REGION: "${AWS_REGION:-us-east-1}"
+      S3_BUCKET_NAME: "${S3_BUCKET_NAME:-}"
+      USE_S3: "${USE_S3:-false}"
+      
+      # Email Configuration (Optional)
+      MAIL_SERVER: "${MAIL_SERVER:-}"
+      MAIL_PORT: "${MAIL_PORT:-587}"
+      MAIL_USE_TLS: "${MAIL_USE_TLS:-true}"
+      MAIL_USERNAME: "${MAIL_USERNAME:-}"
+      MAIL_PASSWORD: "${MAIL_PASSWORD:-}"
+      
+      # Emergency Access (Development Only)
+      EMERGENCY_TOKEN: "${EMERGENCY_TOKEN:-}"
+      
+      # Security Headers
+      SESSION_COOKIE_SECURE: "${SESSION_COOKIE_SECURE:-true}"
+      SESSION_COOKIE_HTTPONLY: "${SESSION_COOKIE_HTTPONLY:-true}"
+      
+    ports:
+      - "${APP_PORT:-5002}:5002"
+    
+    volumes:
+      - ./app/static/uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./data:/app/data
+    
+    healthcheck:
+      test: curl -f http://localhost:5002/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - edf_network
+    
+    labels:
+      com.example.description: "EDF Catálogo de Tablas - Flask Application (MongoDB Atlas)"
+      com.example.version: "1.0.0"
+
+  # ============================================================
+  # Redis - Sesiones y caching (OPCIONAL - comentar si no necesitas)
+  # ============================================================
+  redis:
+    image: redis:latest
+    container_name: edf_catalogotablas_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-change_me_in_production}
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - edf_network
+    profiles:
+      - with_redis
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  edf_network:
+    driver: bridge
+
+# ============================================================
+# Volumes
+# ============================================================
+volumes:
+  redis_data:
+    driver: local
