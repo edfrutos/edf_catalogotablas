@@ -33,27 +33,50 @@ REDIS_PASSWORD=your_redis_password
 openssl rand -base64 32
 ```
 
-### 2. Construir la Imagen
+## ⚠️ Solución para "401 Unauthorized" - Docker Hub
 
-```bash
-# Opción A: Usar script helper (recomendado)
-./build-docker.sh latest
-# Este script detecta si Docker Hub está disponible
-# Si no: sugiere build con Alpine (offline)
-
-# Opción B: Build con docker-compose (requiere Docker Hub)
-docker-compose build
-
-# Opción C: Build manual con Dockerfile estándar
-docker build -t edf-catalogotablas:latest .
-
-# Opción D: Build con Alpine si no tienes acceso a Docker Hub
-docker build -f Dockerfile.alpine -t edf-catalogotablas:alpine .
+Si ves este error:
+```
+error: failed to fetch oauth token: unexpected status from GET request to 
+https://auth.docker.io/token: 401 Unauthorized
 ```
 
-**⚠️ Si ves "401 Unauthorized" en Docker Hub:**
-- Lee [DOCKER_OFFLINE.md](./DOCKER_OFFLINE.md) para soluciones
-- Opción rápida: `docker build -f Dockerfile.alpine ...`
+**Opciones:**
+
+### ✅ Opción 1: Login a Docker Hub (Recomendado)
+```bash
+docker logout
+docker login
+docker-compose build
+```
+
+### ✅ Opción 2: Usar credenciales en fichero
+```bash
+# En ~/.docker/config.json (si tienes un token anterior)
+docker build -t edf-catalogotablas:latest .
+```
+
+### ✅ Opción 3: Descargar imagen en máquina con acceso
+```bash
+# En máquina CON acceso a Docker Hub:
+docker pull python:3.10-slim
+docker save python:3.10-slim | gzip > python-3.10-slim.tar.gz
+
+# Transferir a máquina SIN acceso:
+scp python-3.10-slim.tar.gz user@target:/tmp/
+
+# En máquina destino:
+docker load < /tmp/python-3.10-slim.tar.gz
+docker build -t edf-catalogotablas:latest .
+```
+
+### ✅ Opción 4: Usar Dockerfile.alpine (si Alpine funciona)
+```bash
+docker build -f Dockerfile.alpine -t edf-catalogotablas:alpine .
+```
+**Nota:** Alpine no es compatible con todas las dependencias (pandas).
+
+Ver [DOCKER_OFFLINE.md](./DOCKER_OFFLINE.md) para más detalles.
 ```
 
 ### 3. Iniciar los Contenedores
